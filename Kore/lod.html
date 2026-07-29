@@ -1,0 +1,2012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kore | LOD Validation Tool</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        /* Premium Light Theme Variables */
+        :root {
+            --accent-primary: #0ea5e9;
+            --accent-hover: #0284c7;
+            --bg-app: #f8fafc;
+            --bg-surface: #ffffff;
+            --text-main: #0f172a;
+            --text-secondary: #475569;
+            --border-subtle: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.05);
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            
+            /* Status Colors */
+            --error-bg: #fef2f2;
+            --error-text: #ef4444;
+            --error-border: #fecaca;
+            --success-bg: #ecfdf5;
+            --success-text: #10b981;
+            --success-border: #a7f3d0;
+            --warning-bg: #fffbeb;
+            --warning-text: #d97706;
+            --warning-border: #fde68a;
+        }
+
+        /* --- GLOBAL WORKSPACE THEMES --- */
+        body[data-theme="midnight"] {
+            --bg-app: #0f172a; --bg-surface: #1e293b; --text-main: #f8fafc; --text-secondary: #94a3b8;
+            --border-subtle: #334155; --accent-primary: #38bdf8; --accent-hover: #7dd3fc;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5); --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            --error-bg: #450a0a; --error-text: #fca5a5; --error-border: #7f1d1d;
+            --success-bg: #064e3b; --success-text: #6ee7b7; --success-border: #065f46;
+        }
+        body[data-theme="cyberpunk"] {
+            --bg-app: #000000; --bg-surface: #121212; --text-main: #00ff41; --text-secondary: #ff00ff;
+            --border-subtle: #00ff41; --accent-primary: #ff00ff; --accent-hover: #ff00aa;
+            --radius-md: 0px; --radius-sm: 0px; --shadow-sm: 0 0 5px rgba(0, 255, 65, 0.2);
+            --shadow-md: 0 0 10px rgba(255, 0, 255, 0.2);
+            --error-bg: #2a0000; --error-text: #ff0000; --error-border: #ff0000;
+            --success-bg: #002a00; --success-text: #00ff41; --success-border: #00ff41;
+        }
+        body[data-theme="corporate"] {
+            --bg-app: #e2e8f0; --bg-surface: #ffffff; --text-main: #1e293b; --text-secondary: #475569;
+            --border-subtle: #cbd5e1; --accent-primary: #1d4ed8; --accent-hover: #1e40af;
+            --radius-md: 4px; --radius-sm: 2px;
+        }
+        body[data-theme="earthy"] {
+            --bg-app: #fdf8f5; --bg-surface: #ffffff; --text-main: #3f3e3a; --text-secondary: #6b7280;
+            --border-subtle: #e5e5e5; --accent-primary: #5c7f67; --accent-hover: #4a6652;
+            --radius-md: 24px; --radius-sm: 16px;
+        }
+        body[data-theme="oceanic"] {
+            --bg-app: #e0f2fe; --bg-surface: #f0f9ff; --text-main: #0c4a6e; --text-secondary: #0369a1;
+            --border-subtle: #bae6fd; --accent-primary: #0284c7; --accent-hover: #0369a1;
+            --radius-md: 16px; --radius-sm: 12px;
+            --error-bg: #ffe4e6; --error-text: #be123c; --error-border: #fda4af;
+        }
+        /* THEME: Midnight Dark */
+        body[data-theme="midnight"] {
+            --bg-app: #0f172a; --bg-surface: #1e293b; --text-main: #f8fafc; --text-secondary: #94a3b8;
+            --border-subtle: #334155; --accent-primary: #38bdf8; --accent-hover: #7dd3fc;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5); --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+        /* THEME: Cyberpunk */
+        body[data-theme="cyberpunk"] {
+            --bg-app: #000000; --bg-surface: #121212; --text-main: #00ff41; --text-secondary: #ff00ff;
+            --border-subtle: #00ff41; --accent-primary: #ff00ff; --accent-hover: #ff00aa;
+            --radius-md: 0px; --radius-sm: 0px; --shadow-sm: 0 0 5px rgba(0, 255, 65, 0.2);
+            --shadow-md: 0 0 10px rgba(255, 0, 255, 0.2);
+        }
+        /* THEME: Corporate Classic */
+        body[data-theme="corporate"] {
+            --bg-app: #e2e8f0; --bg-surface: #ffffff; --text-main: #1e293b; --text-secondary: #475569;
+            --border-subtle: #cbd5e1; --accent-primary: #1d4ed8; --accent-hover: #1e40af;
+            --radius-md: 4px; --radius-sm: 2px;
+        }
+        /* THEME: Earthy Minimal */
+        body[data-theme="earthy"] {
+            --bg-app: #fdf8f5; --bg-surface: #ffffff; --text-main: #3f3e3a; --text-secondary: #6b7280;
+            --border-subtle: #e5e5e5; --accent-primary: #5c7f67; --accent-hover: #4a6652;
+            --radius-md: 24px; --radius-sm: 16px;
+        }
+        /* THEME: Oceanic */
+        body[data-theme="oceanic"] {
+            --bg-app: #e0f2fe; --bg-surface: #f0f9ff; --text-main: #0c4a6e; --text-secondary: #0369a1;
+            --border-subtle: #bae6fd; --accent-primary: #0284c7; --accent-hover: #0369a1;
+            --radius-md: 16px; --radius-sm: 12px;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg-app);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            
+            -webkit-font-smoothing: antialiased;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* --- Global Header --- */
+        .global-header {
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            height: 64px;
+            box-shadow: var(--shadow-sm);
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            height: 100%;
+        }
+
+        .kore-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .kore-logo span {
+            color: var(--accent-primary);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 8px;
+            height: 100%;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: var(--text-secondary);
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            height: 100%;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--accent-primary);
+            border-bottom-color: var(--accent-primary);
+            background-color: rgba(14, 165, 233, 0.08);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 64px;
+            left: 0;
+            background-color: var(--bg-surface);
+            min-width: 200px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-subtle);
+            border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+            overflow: hidden;
+            z-index: 101;
+        }
+
+        .nav-item:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content a { white-space: nowrap;
+            color: var(--text-secondary);
+            padding: 14px 20px;
+            text-decoration: none;
+            display: block;
+            border-bottom: 1px solid var(--bg-app);
+            font-weight: 500;
+        }
+
+        .dropdown-content a:hover {
+            background-color: rgba(14, 165, 233, 0.05);
+            color: var(--accent-primary);
+            padding-left: 24px;
+            transition: all 0.2s ease;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-badge {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: var(--bg-app);
+            padding: 6px 12px;
+            border-radius: 99px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        /* --- Main Content Layout --- */
+        .main-container {
+            padding: 40px 32px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+            flex-grow: 1;
+        }
+
+        .hero-banner {
+            background: var(--bg-surface);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
+            box-shadow: var(--shadow-sm);
+            height: 160px;
+            position: relative;
+            margin-bottom: 32px;
+        }
+
+        .hero-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to top, rgba(15,23,42,0.9), transparent);
+            padding: 24px 30px;
+            box-sizing: border-box;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .hero-title {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .hero-subtitle {
+            margin: 6px 0 0 0;
+            font-size: 1rem;
+            color: #cbd5e1;
+            max-width: 800px;
+        }
+
+        /* --- Buttons & Inputs --- */
+        .btn {
+            background-color: var(--bg-surface);
+            color: var(--text-main);
+            border: 1px solid var(--border-subtle);
+            padding: 10px 18px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: var(--bg-app);
+            border-color: var(--text-secondary);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-primary);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            border: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-heal {
+            background-color: var(--success-text);
+            color: white;
+            border: none;
+        }
+
+        .btn-heal:hover {
+            background-color: #059669;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .input, .form-select {
+            padding: 12px 16px;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            outline: none;
+            background: var(--bg-surface);
+            color: var(--text-main);
+            font-family: inherit;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        .input:focus, .form-select:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+        
+        .form-row {
+            margin-bottom: 24px;
+        }
+
+        .form-row label.form-label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .form-hint {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            margin-bottom: 8px;
+        }
+
+        .checkbox-label input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-primary);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        /* --- Drag & Drop Zone --- */
+        .drop-zone {
+            border: 2px dashed var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 40px 20px;
+            text-align: center;
+            background-color: var(--bg-app);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .drop-zone.dragover {
+            border-color: var(--accent-primary);
+            background-color: rgba(14, 165, 233, 0.05);
+        }
+
+        .drop-zone-icon {
+            font-size: 2.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .drop-zone-text {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 0 0 8px 0;
+        }
+
+        .drop-zone-subtext {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* --- Dynamic Toggles Panel --- */
+        .toggles-panel {
+            background: var(--bg-app);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            margin-top: 16px;
+        }
+        .toggles-panel-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- Sections --- */
+        .section-card {
+            background: var(--bg-surface);
+            border-radius: var(--radius-md);
+            padding: 32px;
+            border: 1px solid var(--border-subtle);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 32px;
+        }
+
+        .section-header {
+            margin: 0 0 24px 0;
+            font-size: 1.3rem;
+            color: var(--text-main);
+            font-weight: 700;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 16px;
+        }
+
+        /* GRID LAYOUT OVERFLOW FIX */
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 32px;
+            align-items: start;
+        }
+        .layout-grid > section {
+            min-width: 0; 
+        }
+
+        /* --- Validation Status --- */
+        .status-text {
+            margin-top: 16px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            display: none;
+        }
+
+        .status-text.active {
+            display: block;
+            background: var(--bg-app);
+            color: var(--text-main);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .status-text.error {
+            background: var(--error-bg);
+            color: var(--error-text);
+            border-color: var(--error-border);
+        }
+        
+        .status-text.success {
+            background: var(--success-bg);
+            color: var(--success-text);
+            border-color: var(--success-border);
+        }
+
+        /* --- Results Metrics --- */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: var(--bg-app);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            text-align: center;
+        }
+
+        .metric-label {
+            display: block;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            display: block;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1;
+        }
+        
+        /* --- Results Table --- */
+        .table-container {
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            overflow-x: auto;
+            margin-bottom: 24px;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            background: var(--bg-surface);
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        th {
+            background: var(--bg-app);
+            padding: 12px 16px;
+            font-weight: 600;
+            color: var(--text-main);
+            border-bottom: 2px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .error-pill {
+            background: var(--error-bg);
+            color: var(--error-text);
+            border: 1px solid var(--error-border);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .success-banner {
+            background: var(--success-bg);
+            border: 1px solid var(--success-border);
+            color: var(--success-text);
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            text-align: center;
+            font-size: 1.05rem;
+        }
+
+        /* --- Spatial Heatmap --- */
+        .heatmap-container {
+            margin-top: 32px;
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 24px;
+            width: 100%;
+        }
+        
+        .heatmap-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .heatmap-table td.heatmap-bad-cell {
+            background-color: var(--error-bg);
+            color: var(--error-text);
+            font-weight: 700;
+            border: 1px solid var(--error-border);
+        }
+
+        /* --- Rules Grid --- */
+        .rules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .rule-group {
+            background: var(--bg-app);
+            padding: 20px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .rule-group h3 {
+            margin: 0 0 12px 0;
+            font-size: 1rem;
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .rule-group ul {
+            margin: 0;
+            padding-left: 20px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .rule-group li {
+            margin-bottom: 6px;
+        }
+
+        .rule-group code {
+            background: rgba(14, 165, 233, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--text-main);
+        }
+
+        /* --- FLOATING COMMAND PALETTE NOTEPAD --- */
+        #floatingNotepad { position: fixed; top: 15%; left: 50%; transform: translateX(-50%); width: 600px; max-width: 90vw; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); z-index: 9999; display: none; flex-direction: column; overflow: hidden; }
+        #fnHeader { background: var(--bg-app); padding: 12px 20px; cursor: move; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); font-weight: 600; color: var(--text-main); user-select: none; }
+        #fnClose { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary); }
+        #fnContent { width: 100%; height: 300px; padding: 16px; border: none; outline: none; resize: none; font-family: 'Inter', system-ui, sans-serif; font-size: 0.95rem; line-height: 1.5; color: var(--text-main); background: var(--bg-surface); box-sizing: border-box; }
+        #fnContent.code-mode { font-family: monospace; background: #1e293b; color: #f8fafc; }
+        .fn-toolbar { display: flex; justify-content: space-between; padding: 10px 16px; background: var(--bg-app); border-top: 1px solid var(--border-subtle); align-items: center; }
+        .fn-push-btn { background: var(--success-text); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; display: none; }
+        .fn-push-btn:hover { background: #059669; }
+
+        /* --- Global Footer --- */
+        .global-footer {
+            background-color: var(--bg-surface);
+            border-top: 1px solid var(--border-subtle);
+            padding: 24px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            font-weight: 500;
+            margin-top: auto;
+        }
+    
+        
+    
+    
+            pre, code { white-space: pre-wrap; word-break: break-word; overflow-x: auto; max-width: 100%; }
+    
+    </style>
+
+    <!-- SEO & Mobile Optimization -->
+    <meta name="description" content="Kore Enterprise Workspace - Advanced Cloud Management System">
+    <meta name="keywords" content="Kore, Workspace, Enterprise, Management, LOD">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' font-family='Arial' fill='%230ea5e9' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' font-family='Arial' fill='%230ea5e9' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+
+    <style>
+        /* Mobile Layout & Back-to-Top */
+        
+        
+        .mobile-toggle { display: none; }
+        
+        #backToTop {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s, background 0.3s;
+        }
+        #backToTop:hover { background: var(--accent-hover); }
+    </style>
+
+
+<style>
+/* --- RESPONSIVE MOBILE & TABLET (Injected) --- */
+* { box-sizing: border-box; }
+img, video, iframe, canvas { max-width: 100%; height: auto; }
+body { overflow-x: hidden; width: 100%; }
+
+@media (max-width: 1023px) {
+    .modal-content, .system-modal, .storage-tracker { max-width: 95vw !important; }
+
+    .global-header {
+        flex-direction: column;
+        height: auto;
+        padding: 10px 16px;
+        gap: 10px;
+    }
+    .header-left {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .search-container {
+        width: 100%;
+    }
+    .search-bar {
+        width: 100%;
+    }
+    .mobile-toggle {
+        display: flex !important;
+        align-items: center;
+        background: none;
+        border: none;
+        color: var(--text-main);
+        cursor: pointer;
+    }
+    .nav-menu {
+        display: none !important;
+        flex-direction: column;
+        width: 100%;
+        background: var(--bg-surface);
+        position: absolute;
+        top: 100%;
+        left: 0;
+        box-shadow: var(--shadow-md);
+        z-index: 200;
+        max-height: 70vh;
+        overflow-y: auto;
+        border-top: 1px solid var(--border-subtle);
+    }
+    .nav-menu.open {
+        display: flex !important;
+    }
+    .nav-item {
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--border-subtle);
+        width: 100%;
+        flex-wrap: wrap;
+        height: auto;
+    }
+    .nav-item:last-child {
+        border-bottom: none;
+    }
+    .dropdown-content {
+        position: static;
+        display: none;
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        width: 100%;
+        padding-left: 20px;
+        margin-top: 10px;
+    }
+    .nav-item.open-mobile .dropdown-content {
+        display: block !important;
+    }
+    /* Hide hover effects on mobile */
+    .nav-item:hover .dropdown-content, 
+    .nav-item:focus-within .dropdown-content,
+    .nav-item:active .dropdown-content {
+        display: none;
+    }
+    .nav-item.open-mobile:hover .dropdown-content,
+    .nav-item.open-mobile:focus-within .dropdown-content,
+    .nav-item.open-mobile:active .dropdown-content {
+        display: block !important;
+    }
+    
+    .dashboard-grid, .dashboard-layout, .apps-grid, .grid-container,
+    .layout-grid, .chart-grid, .library-controls, .add-task-panel,
+    .controls-grid, .content-grid, .layout-split, .form-grid,
+    .metrics-bar, .view-boxes, .grid-2, .workspace-grid,
+    .kpi-grid, .nav-pref-grid, .color-target-grid, .rules-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .metrics-bar, .form-grid {
+        gap: 16px !important;
+    }
+    .main-container {
+        padding: 15px !important;
+    }
+    .hero-banner {
+        padding: 30px 15px !important;
+        height: auto !important;
+        min-height: 160px;
+    }
+    .hero-title {
+        font-size: 1.8rem !important;
+    }
+    
+    /* Make tables scrollable */
+    table, .table-container, .data-table-container {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    /* Ensure containers don't overflow */
+    .panel, .card, .widget, .card-body, .intel-panel, .info-panel {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    /* Layout fixes for sidebars */
+    .workspace-layout {
+        flex-direction: column !important;
+    }
+    .sidebar {
+        width: 100% !important;
+        max-height: none !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border-subtle);
+        position: static !important;
+    }
+}
+</style>
+
+</head>
+<body>
+    <script>
+        // Theme Initializer to prevent flash on load
+        const savedTheme = localStorage.getItem('kore_theme') || 'default';
+        if(savedTheme !== 'default') {
+            document.body.setAttribute('data-theme', savedTheme);
+        }
+    </script>
+
+<header class="global-header">
+        <div class="header-left">
+            <h1 class="kore-logo">Kore<span>.</span></h1>
+        <button class="mobile-toggle" aria-label="Toggle Menu" onclick="toggleMobileNav()"><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 12h18M3 6h18M3 18h18"></path></svg></button>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">Dashboard</a>
+                
+                <div class="nav-item active">Operations ▼
+                    <div class="dropdown-content">
+                        <a href="apps.html">Apps</a>
+                        <a href="file-converter.html">File to LOAD Converter</a>
+                        <a href="lod.html">LOD Validation Tool</a>
+                        <a href="macros.html">Macro Library</a>
+                        <a href="nebula.html">Nebula HTML Forge</a>
+                        <a href="passwords.html">Password Generator</a>
+                    <a href="business-tools.html">Business & Sec Tools</a>
+                        <a href="todo.html">Personal To-Do</a>
+                        <a href="product-html.html">Product HTML Converter</a>
+                        <a href="scanner.html">Vulnerability Scanner</a>
+                        <a href="work.html">Work Tracker</a>
+                    </div>
+                </div>
+                
+                <div class="nav-item">Resources ▼
+                    <div class="dropdown-content">
+                        <a href="info-archive.html">Archive</a>
+                        <a href="reports.html">Data/Reports</a>
+                        <a href="docs.html">Document Library</a>
+                        <a href="info-hub.html">Info Hub</a>
+                    </div>
+                </div>
+                
+                <a href="about.html" class="nav-item">About</a>
+                <a href="settings.html" class="nav-item">Settings</a>
+            </nav>
+        </div>
+        <div id="userIdentityBadge" class="user-badge">Authenticating...</div>
+    </header>
+
+    <main class="main-container">
+        
+        <section class="hero-banner">
+            <img src="images/LODBanner.jpg" alt="LOD Validation Tool" onerror="this.onerror=null; this.src='https://picsum.photos/1200/300?grayscale&blur=2';">
+            <div class="hero-overlay">
+                <div>
+                    <h2 class="hero-title">LOD Validation Tool</h2>
+                    <p class="hero-subtitle">Strict, offline validation and automated healing for LOD and PALOD files.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="layout-grid">
+            
+            <section class="section-card">
+                <h2 class="section-header">1. Configuration & Upload</h2>
+
+                <div class="form-row">
+                    <label class="form-label" for="lodMode">Validation Profile</label>
+                    <select id="lodMode" class="form-select">
+                        <option value="lod">LOD (Standard Ruleset)</option>
+                        <option value="palod">PALOD (Requires 1NAPR- prefix on all POs)</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label" for="lodFileInput">Target CSV File</label>
+                    <div id="dropZone" class="drop-zone">
+                        <div class="drop-zone-icon">📄</div>
+                        <p class="drop-zone-text">Drag & Drop CSV file here</p>
+                        <p class="drop-zone-subtext">or click to browse from your computer</p>
+                        <input type="file" id="lodFileInput" accept=".csv" style="display:none;">
+                    </div>
+                    <div id="selectedFileName" style="margin-top: 8px; font-size: 0.85rem; font-weight: 600; color: var(--accent-primary); display: none;"></div>
+                </div>
+
+                <div class="toggles-panel">
+                    <div class="toggles-panel-title">Dynamic Rule Toggles</div>
+                    <label class="checkbox-label" for="lodStopOnFatal">
+                        <input type="checkbox" id="lodStopOnFatal" checked>
+                        Halt execution if column layout deviates from 28 columns
+                    </label>
+                    <label class="checkbox-label" for="ignoreServiceLevel">
+                        <input type="checkbox" id="ignoreServiceLevel">
+                        Bypass Service Level restrictions (Allow non-standard codes)
+                    </label>
+                    <label class="checkbox-label" for="ignoreEmailValidation">
+                        <input type="checkbox" id="ignoreEmailValidation">
+                        Bypass Email Domain Validation (Allow missing/invalid suffix)
+                    </label>
+                    <label class="checkbox-label" for="ignorePoUniqueness">
+                        <input type="checkbox" id="ignorePoUniqueness">
+                        Bypass Customer PO location uniqueness check
+                    </label>
+                    <label class="checkbox-label" for="ignoreZipValidation">
+                        <input type="checkbox" id="ignoreZipValidation">
+                        Bypass ZIP format restrictions (Allow non-US formats)
+                    </label>
+                    <label class="checkbox-label" for="ignoreCountryValidation">
+                        <input type="checkbox" id="ignoreCountryValidation">
+                        Bypass Country restrictions (Allow non-standard country codes)
+                    </label>
+                    <label class="checkbox-label" for="ignoreOrderType">
+                        <input type="checkbox" id="ignoreOrderType">
+                        Bypass Order Type Restrictions
+                    </label>
+                    <label class="checkbox-label" for="ignoreWhitespace">
+                        <input type="checkbox" id="ignoreWhitespace">
+                        Bypass Whitespace & Artifact Restrictions
+                    </label>
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 24px;">
+                    <button type="button" id="lodValidateBtn" class="btn btn-primary" style="flex: 1; padding: 14px; font-size: 1.05rem;">Validate Data</button>
+                    <button type="button" id="lodHealBtn" class="btn btn-heal" style="flex: 1; padding: 14px; font-size: 1.05rem;">Auto-Heal & Export</button>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); text-align: center; margin-top: 12px; font-weight: 500;">⚠️ Warning: Auto-Heal modifies your data. Please double-check the exported file for accuracy before dropping it into your system. Note that auto-heal can only correct noticeable changes like emails, spaces, etc. It cannot fix everything.</p>
+
+                <div id="lodStatus" class="status-text"></div>
+                
+                <div class="form-row" style="margin-top: 32px; border-top: 1px solid var(--border-subtle); padding-top: 24px;">
+                    <div class="form-label" style="font-weight: 600; display: block; margin-bottom: 8px; color: var(--text-main);">Reference Materials</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+                        <a href="data:text/csv;charset=utf-8,Group%20Code%2CCustomer%20%23%2CItem%20Number%2CQuantity%2CCustomer%20PO%2CName%2CShip-to-Address%201%2CShip-to%20Address%202%2CShip-to%20Address%203%2CCity%2CState%2CZIP%2CCountry%2CContact%20name%2CContact%2COrder%20Type%2CService%20Level%20of%20Shipment%2CAllocation%20Rule%2CCustomer%20In%20Hands%20Date%2COn%20or%20Before%20Indicator%20%28O%20or%20B%29%2CMust%20Ship%20Date%2CAddress%20Over-Ride%2CCarrier%2CShip%20From%20Warehouse%2CGL-Code%2CConfirmation%20Email%2CShip%20Confirmation%20Email%2CSite%0A" class="btn" download="LOD-Blank-Template.csv">Download Blank Template (CSV)</a>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section-card">
+                <h2 class="section-header">2. Diagnostic Results</h2>
+
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <span class="metric-label">Total Data Rows</span>
+                        <span class="metric-value" id="lodTotalRows">0</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Rows with Errors</span>
+                        <span class="metric-value" id="lodErrorRowCount" style="color: var(--error-text);">0</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Total Issues</span>
+                        <span class="metric-value" id="lodTotalIssues" style="color: var(--error-text);">0</span>
+                    </div>
+                </div>
+
+                <div id="lodNoErrorsMessage" style="display:none; margin-bottom: 24px;">
+                    <div class="success-banner">✅ Validation Passed. Zero issues detected in payload.</div>
+                </div>
+
+                <div id="lodErrorsContainer" style="display:none;">
+                    <div class="table-container" style="max-height: 300px; overflow-y: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 60px;">Row</th>
+                                    <th style="width: 180px;">Target Column</th>
+                                    <th style="width: 150px;">Detected Value</th>
+                                    <th>Violation</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lodErrorsTableBody">
+                                </tbody>
+                        </table>
+                    </div>
+
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+                        <button type="button" id="lodDownloadErrorCsvBtn" class="btn">Export CSV Report</button>
+                        <button type="button" id="lodDownloadHtmlReportBtn" class="btn">Export HTML Report</button>
+                        <button type="button" id="lodCopyResultsBtn" class="btn btn-primary">Copy Results</button>
+                    </div>
+                    
+                    <div id="lodHeatmapContainer" class="heatmap-container" style="display: none;">
+                        <div class="heatmap-title">🔥 Spatial Heatmap Preview (First 5 Affected Rows)</div>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0;">Identifies structural shifts or widespread column errors.</p>
+                        <div class="table-container" style="max-height: none; overflow-x: auto;">
+                            <table class="heatmap-table" id="heatmapTable">
+                                <thead id="heatmapHead"></thead>
+                                <tbody id="heatmapBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <section class="section-card">
+            <h2 class="section-header">Reference: Applied Logic Rules</h2>
+            
+            <div class="rules-grid">
+                <div class="rule-group">
+                    <h3>Core Identifiers</h3>
+                    <ul>
+                        <li><strong>Group Code</strong>: All caps (e.g., <code>SAMS</code>).</li>
+                        <li><strong>Customer Number</strong>: Numeric; cannot end in <code>00</code>.</li>
+                        <li><strong>Quantity</strong>: Numeric, > 0.</li>
+                        <li><strong>Order Type</strong>: <code>GO</code>, <code>GR</code>, <code>PA</code>, or <code>DO</code> (unless bypassed).</li>
+                        <li><strong>Allocation Rule</strong>: Strictly <code>O</code>.</li>
+                    </ul>
+                </div>
+                
+                <div class="rule-group">
+                    <h3>PA & PALOD Strict Logic</h3>
+                    <ul>
+                        <li><strong>LOD:</strong> If Order Type is <code>PA</code>, PO must start with <code>1NAPR-</code>.</li>
+                        <li><strong>PALOD:</strong> ALL rows require PO to start with <code>1NAPR-</code>.</li>
+                        <li><strong>Uniqueness:</strong> Customer PO must be different for each order, but the same for one order consolidated by location.</li>
+                        <li><strong>Item Duplication:</strong> Multiple lines on the same Customer PO cannot share the exact same Item Number.</li>
+                    </ul>
+                </div>
+
+                <div class="rule-group">
+                    <h3>Data Quality & Logistics</h3>
+                    <ul>
+                        <li><strong>Whitespace & Artifacts:</strong> Cells containing leading/trailing spaces or backticks (<code>`</code>) are flagged (unless bypassed).</li>
+                        <li><strong>State/Country</strong>: 2-char uppercase (<code>NY</code>, <code>US</code>).</li>
+                        <li><strong>ZIP</strong>: 4, 5, 8, or 9 digits (accommodating zero cut-off).</li>
+                        <li><strong>Service Level</strong>: ALL CAPS exactly: <code>BEST</code>, <code>NEXT</code>, <code>2DAY</code>, <code>3DAY</code>, <code>MAIL</code>, <code>GND</code>, <code>ITG</code>, <code>ITGF</code>, <code>ATLAS</code>, <code>NDS</code>, <code>TTI</code>, <code>STORU</code>, <code>UPS</code>, or <code>PCL</code>.</li>
+                    </ul>
+                </div>
+
+                <div class="rule-group">
+                    <h3>Communications</h3>
+                    <ul>
+                        <li><strong>Phone</strong>: Exactly 10 digits (no spaces/hyphens).</li>
+                        <li><strong>Emails</strong>: Splits multiple addresses by semicolon (<code>;</code>). Strictly blocks international/invalid domains (e.g., <code>.ora</code>, <code>.uk</code>). Restricts TLDs to standard US/Enterprise (<code>.com</code>, <code>.org</code>, <code>.net</code>, <code>.edu</code>, <code>.gov</code>, <code>.mil</code>, etc.).</li>
+                        <li><strong>Site</strong>: Required when using either confirmation email.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <div id="floatingNotepad">
+        <div id="fnHeader">
+            <span>⚡ Command Palette (Autosaved)</span>
+            <button id="fnClose">&times;</button>
+        </div>
+        <textarea id="fnContent" placeholder="Jot notes, paste regex, or type '- [ ] Task name' to push to tracker..."></textarea>
+        <div class="fn-toolbar">
+            <span id="fnStatus" style="font-size: 0.8rem; color: var(--text-secondary);">Ready</span>
+            <button id="fnPushBtn" class="fn-push-btn">Push To-Do to Tracker ➔</button>
+        </div>
+    </div>
+
+    <footer class="global-footer">
+        <div style="margin-bottom: 8px;">💡 Press <strong>Alt + N</strong> anywhere to open the Global Command Palette.</div>
+        &copy; 2026 Kore | Enterprise Cloud Vault Connected.
+    </footer>
+
+    <script>
+        // --- Microsoft Entra ID Integration ---
+        let cloudIdentity = { userId: "local-dev", userName: "Local Developer" };
+
+        async function fetchSecureIdentity() {
+            try {
+                const response = await fetch('/.auth/me');
+                const data = await response.json();
+                if (data.clientPrincipal) {
+                    cloudIdentity.userId = data.clientPrincipal.userId;
+                    cloudIdentity.userName = data.clientPrincipal.userDetails;
+                    document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+                } else {
+                    document.getElementById('userIdentityBadge').innerText = "Running Locally (Unauthenticated)";
+                }
+            } catch (error) {
+                console.log("Auth fetch bypassed - Local execution.");
+                document.getElementById('userIdentityBadge').innerText = "System Admin Offline Mode";
+            }
+        }
+
+        // --- COMMAND PALETTE LOGIC ---
+        const fnModal = document.getElementById('floatingNotepad');
+        const fnContent = document.getElementById('fnContent');
+        const fnPushBtn = document.getElementById('fnPushBtn');
+        let isDragging = false, currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
+
+        document.addEventListener('keydown', (e) => {
+            if (e.altKey && e.key.toLowerCase() === 'n') {
+                e.preventDefault();
+                fnModal.style.display = fnModal.style.display === 'flex' ? 'none' : 'flex';
+                if (fnModal.style.display === 'flex') {
+                    fnContent.value = localStorage.getItem('kore_global_notepad') || '';
+                    fnContent.focus();
+                    checkNotepadFormatting();
+                }
+            }
+        });
+
+        document.getElementById('fnClose').addEventListener('click', () => { fnModal.style.display = 'none'; });
+
+        document.getElementById('fnHeader').addEventListener('mousedown', dragStart);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', dragEnd);
+
+        function dragStart(e) { initialX = e.clientX - xOffset; initialY = e.clientY - yOffset; isDragging = true; }
+        function drag(e) {
+            if (isDragging) {
+                e.preventDefault();
+                currentX = e.clientX - initialX; currentY = e.clientY - initialY;
+                xOffset = currentX; yOffset = currentY;
+                fnModal.style.transform = `translate(${currentX}px, ${currentY}px)`;
+            }
+        }
+        function dragEnd(e) { initialX = currentX; initialY = currentY; isDragging = false; }
+
+        let fnTimeout;
+        fnContent.addEventListener('input', () => {
+            localStorage.setItem('kore_global_notepad', fnContent.value);
+            document.getElementById('fnStatus').innerText = 'Saving...';
+            clearTimeout(fnTimeout);
+            fnTimeout = setTimeout(() => { document.getElementById('fnStatus').innerText = 'Saved locally.'; checkNotepadFormatting(); }, 800);
+        });
+
+        function checkNotepadFormatting() {
+            const val = fnContent.value;
+            if (val.startsWith('```')) { fnContent.classList.add('code-mode'); } else { fnContent.classList.remove('code-mode'); }
+            const hasTodo = /-\s?\[\s?\]\s?.+/i.test(val);
+            fnPushBtn.style.display = hasTodo ? 'block' : 'none';
+        }
+
+        async function loadCloudData(dataType) {
+            try {
+                const res = await fetch(`/api/get_user_data?userId=${cloudIdentity.userId}&dataType=${dataType}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && (Object.keys(data).length > 0 || data.length > 0)) return data;
+                }
+            } catch(e) {}
+            return null;
+        }
+
+        fnPushBtn.addEventListener('click', async () => {
+            const lines = fnContent.value.split('\n');
+            let newTasks = []; let remainingLines = [];
+            lines.forEach((line, index) => {
+                const match = line.match(/-\s?\[\s?\]\s?(.+)/i);
+                if (match) { 
+                    newTasks.push({ id: 'todo_' + Date.now() + '_' + index, title: match[1].trim(), priority: "Medium", completed: false, dueDate: new Date().toISOString().split('T')[0] }); 
+                } else { remainingLines.push(line); }
+            });
+            if (newTasks.length > 0) {
+                let existingTodos = await loadCloudData('todos') || [];
+                existingTodos = existingTodos.concat(newTasks);
+                try {
+                    await fetch('/api/save_user_data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: cloudIdentity.userId, dataType: 'todos', data: existingTodos }) });
+                } catch(e) {}
+                fnContent.value = remainingLines.join('\n');
+                localStorage.setItem('kore_global_notepad', fnContent.value);
+                document.getElementById('fnStatus').innerText = `Pushed ${newTasks.length} tasks!`;
+                fnPushBtn.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchSecureIdentity();
+        });
+
+        // --- Drag and Drop UI Logic ---
+        var dropZone = document.getElementById('dropZone');
+        var fileInput = document.getElementById('lodFileInput');
+        var selectedFileName = document.getElementById('selectedFileName');
+        var currentFile = null;
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                handleFileSelect(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        function handleFileSelect(file) {
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                setStatus('Error: Please upload a valid .CSV file.', true);
+                return;
+            }
+            currentFile = file;
+            selectedFileName.textContent = `Attached: ${file.name}`;
+            selectedFileName.style.display = 'block';
+            setStatus('File loaded and ready for execution.', false, true);
+        }
+
+        // --- Validation Logic Initialization ---
+        var validateBtn = document.getElementById('lodValidateBtn');
+        var healBtn = document.getElementById('lodHealBtn');
+        var modeSelect = document.getElementById('lodMode');
+        
+        // Toggles
+        var stopOnFatalCheckbox = document.getElementById('lodStopOnFatal');
+        var ignoreServiceLevelCheckbox = document.getElementById('ignoreServiceLevel');
+        var ignoreEmailValidationCheckbox = document.getElementById('ignoreEmailValidation');
+        var ignorePoUniquenessCheckbox = document.getElementById('ignorePoUniqueness');
+        var ignoreZipValidationCheckbox = document.getElementById('ignoreZipValidation');
+        var ignoreCountryValidationCheckbox = document.getElementById('ignoreCountryValidation');
+
+        var statusEl = document.getElementById('lodStatus');
+
+        var totalRowsEl = document.getElementById('lodTotalRows');
+        var errorRowCountEl = document.getElementById('lodErrorRowCount');
+        var totalIssuesEl = document.getElementById('lodTotalIssues');
+
+        var noErrorsMessageEl = document.getElementById('lodNoErrorsMessage');
+        var errorsContainerEl = document.getElementById('lodErrorsContainer');
+        var errorsTableBodyEl = document.getElementById('lodErrorsTableBody');
+
+        var heatmapContainerEl = document.getElementById('lodHeatmapContainer');
+        var heatmapHeadEl = document.getElementById('heatmapHead');
+        var heatmapBodyEl = document.getElementById('heatmapBody');
+
+        var downloadErrorCsvBtn = document.getElementById('lodDownloadErrorCsvBtn');
+        var downloadHtmlReportBtn = document.getElementById('lodDownloadHtmlReportBtn');
+        var copyResultsBtn = document.getElementById('lodCopyResultsBtn');
+
+        var lastValidation = null;
+
+        validateBtn.addEventListener('click', function () {
+            processFile(false);
+        });
+
+        healBtn.addEventListener('click', function() {
+            processFile(true);
+        });
+
+        function processFile(doHeal) {
+            if (!currentFile) {
+                setStatus('Error: Please select or drop a CSV file first.', true);
+                return;
+            }
+
+            var reader = new FileReader();
+            setStatus('Parsing file data...', false);
+
+            reader.onload = function (e) {
+                try {
+                    var text = e.target.result || '';
+                    
+                    if (doHeal) {
+                        text = healCsvData(text);
+                        setStatus('Auto-Heal applied. Re-validating...', false);
+                    }
+
+                    var mode = (modeSelect && modeSelect.value) || 'lod';
+                    var config = {
+                        stopOnFatal: !!(stopOnFatalCheckbox && stopOnFatalCheckbox.checked),
+                        ignoreServiceLevel: !!(ignoreServiceLevelCheckbox && ignoreServiceLevelCheckbox.checked),
+                        ignoreEmailValidation: !!(ignoreEmailValidationCheckbox && ignoreEmailValidationCheckbox.checked),
+                        ignorePoUniqueness: !!(ignorePoUniquenessCheckbox && ignorePoUniquenessCheckbox.checked),
+                        ignoreZipValidation: !!(ignoreZipValidationCheckbox && ignoreZipValidationCheckbox.checked),
+                        ignoreCountryValidation: !!(ignoreCountryValidationCheckbox && ignoreCountryValidationCheckbox.checked),
+                        ignoreOrderType: !!(document.getElementById('ignoreOrderType') && document.getElementById('ignoreOrderType').checked),
+                        ignoreWhitespace: !!(document.getElementById('ignoreWhitespace') && document.getElementById('ignoreWhitespace').checked)
+                    };
+
+                    var result = validateLodCsv(text, mode, config);
+                    lastValidation = result;
+                    renderValidation(result);
+                    
+                    if (doHeal) {
+                        downloadTextFile(text, buildSuggestedFilename(result, 'HEALED.csv'), 'text/csv');
+                        setStatus('Engine executed with Auto-Heal. Clean file downloading.', false, true);
+                    } else {
+                        setStatus('Engine execution complete.', false, true);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    lastValidation = null;
+                    renderEmpty();
+                    setStatus('Fatal Error: ' + (err && err.message ? err.message : String(err)), true);
+                }
+            };
+
+            reader.onerror = function () {
+                setStatus('IO Error: Unable to read file payload.', true);
+            };
+
+            reader.readAsText(currentFile);
+        }
+
+        if (downloadErrorCsvBtn) {
+            downloadErrorCsvBtn.addEventListener('click', function () {
+                if (!lastValidation || !lastValidation.issues || !lastValidation.issues.length) return;
+                var csv = buildIssueCsv(lastValidation);
+                downloadTextFile(csv, buildSuggestedFilename(lastValidation, 'Issues.csv'), 'text/csv');
+            });
+        }
+
+        if (downloadHtmlReportBtn) {
+            downloadHtmlReportBtn.addEventListener('click', function () {
+                if (!lastValidation || !lastValidation.rows || !lastValidation.rows.length) return;
+                var html = buildHtmlReport(lastValidation);
+                downloadTextFile(html, buildSuggestedFilename(lastValidation, 'Report.html'), 'text/html');
+            });
+        }
+
+        if (copyResultsBtn) {
+            copyResultsBtn.addEventListener('click', function () {
+                if (!lastValidation) return;
+                var text = buildClipboardSummary(lastValidation);
+                if (!text) return;
+
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text)
+                        .then(function () { setStatus('Results copied to clipboard.', false, true); })
+                        .catch(function (err) { console.error(err); fallbackCopyText(text); });
+                } else {
+                    fallbackCopyText(text);
+                }
+            });
+        }
+
+        function setStatus(message, isError, isSuccess = false) {
+            if (!statusEl) return;
+            statusEl.textContent = message || '';
+            statusEl.className = 'status-text active';
+            if (isError) statusEl.classList.add('error');
+            if (isSuccess) statusEl.classList.add('success');
+            
+            if (!isError) {
+                setTimeout(() => { statusEl.classList.remove('active', 'success'); }, 4000);
+            }
+        }
+
+        function renderEmpty() {
+            totalRowsEl.textContent = '0';
+            errorRowCountEl.textContent = '0';
+            totalIssuesEl.textContent = '0';
+            noErrorsMessageEl.style.display = 'none';
+            errorsContainerEl.style.display = 'none';
+            heatmapContainerEl.style.display = 'none';
+            errorsTableBodyEl.innerHTML = '';
+        }
+
+        function renderValidation(result) {
+            if (!result) { renderEmpty(); return; }
+
+            totalRowsEl.textContent = String(result.dataRowCount || 0);
+            errorRowCountEl.textContent = String(result.errorRowCount || 0);
+            totalIssuesEl.textContent = String(result.issues.length || 0);
+
+            if (!result.issues.length) {
+                noErrorsMessageEl.style.display = 'block';
+                errorsContainerEl.style.display = 'none';
+                errorsTableBodyEl.innerHTML = '';
+                return;
+            }
+
+            noErrorsMessageEl.style.display = 'none';
+            errorsContainerEl.style.display = 'block';
+
+            var rowsHtml = [];
+            for (var i = 0; i < result.issues.length; i++) {
+                var issue = result.issues[i];
+                rowsHtml.push(
+                    '<tr>' +
+                        '<td><strong style="color:var(--text-main);">' + escapeHtml(String(issue.row)) + '</strong></td>' +
+                        '<td><span style="font-weight:600;">' + escapeHtml(issue.columnName || '') + '</span></td>' +
+                        '<td><code style="background:rgba(14, 165, 233, 0.1); padding:2px 6px; border-radius:4px; border:1px solid var(--border-subtle); font-family:monospace; white-space:pre; color:var(--text-main);">' + escapeHtml(issue.value == null ? '' : String(issue.value)) + '</code></td>' +
+                        '<td><span class="error-pill">' + escapeHtml(issue.message || '') + '</span></td>' +
+                    '</tr>'
+                );
+            }
+            errorsTableBodyEl.innerHTML = rowsHtml.join('');
+
+            renderHeatmap(result);
+        }
+
+        function renderHeatmap(result) {
+            heatmapContainerEl.style.display = 'block';
+            
+            // Build Bad Cell Map for quick lookup
+            var badCellMap = {};
+            var errorRowsList = [];
+            var errorRowTracker = {};
+
+            for (var i = 0; i < result.issues.length; i++) {
+                var rowIdx = result.issues[i].row;
+                badCellMap[rowIdx + ':' + result.issues[i].columnIndex] = true;
+                if (!errorRowTracker[rowIdx]) {
+                    errorRowTracker[rowIdx] = true;
+                    errorRowsList.push(rowIdx);
+                }
+            }
+
+            // Limit to first 5 rows with errors for the preview
+            var previewRows = errorRowsList.sort((a, b) => a - b).slice(0, 5);
+
+            // Render Header
+            var headHtml = '<tr><th>Row #</th>';
+            for (var h = 0; h < result.header.length; h++) {
+                headHtml += '<th>' + escapeHtml(result.header[h] || 'Col ' + (h+1)) + '</th>';
+            }
+            headHtml += '</tr>';
+            heatmapHeadEl.innerHTML = headHtml;
+
+            // Render Body
+            var bodyHtml = '';
+            for (var i = 0; i < previewRows.length; i++) {
+                var actualRowIndex = previewRows[i];
+                var dataRow = result.dataRows[actualRowIndex - 2]; // offset for header and 0-index
+                
+                bodyHtml += '<tr><td><strong>' + actualRowIndex + '</strong></td>';
+                for (var c = 0; c < result.header.length; c++) {
+                    var isBad = badCellMap[actualRowIndex + ':' + c];
+                    var cellClass = isBad ? ' class="heatmap-bad-cell"' : '';
+                    var cellVal = dataRow[c] == null ? '' : String(dataRow[c]);
+                    bodyHtml += '<td' + cellClass + '>' + escapeHtml(cellVal) + '</td>';
+                }
+                bodyHtml += '</tr>';
+            }
+            heatmapBodyEl.innerHTML = bodyHtml;
+        }
+
+        // --- Core File Parsers & Fixers ---
+        function parseCsv(text) {
+            var rows = []; var row = []; var cur = ''; var inQuotes = false;
+            for (var i = 0; i < text.length; i++) {
+                var ch = text[i];
+                if (inQuotes) {
+                    if (ch === '"') {
+                        if (text[i + 1] === '"') { cur += '"'; i++; } 
+                        else { inQuotes = false; }
+                    } else { cur += ch; }
+                } else {
+                    if (ch === '"') { inQuotes = true; } 
+                    else if (ch === ',') { row.push(cur); cur = ''; } 
+                    else if (ch === '\r') {} 
+                    else if (ch === '\n') { row.push(cur); rows.push(row); row = []; cur = ''; } 
+                    else { cur += ch; }
+                }
+            }
+            if (cur.length || row.length) { row.push(cur); rows.push(row); }
+
+            var cleaned = [];
+            for (var r = 0; r < rows.length; r++) {
+                var cells = rows[r]; var allEmpty = true;
+                for (var c = 0; c < cells.length; c++) {
+                    if (String(cells[c]).trim() !== '') { allEmpty = false; break; }
+                }
+                if (!allEmpty) { cleaned.push(cells); }
+            }
+            return cleaned;
+        }
+
+        function healCsvData(text) {
+            var rows = parseCsv(text || '');
+            if (!rows.length) return text;
+            var header = rows[0];
+            var dataRows = rows.slice(1);
+            
+            for(var i=0; i<dataRows.length; i++) {
+                // Global trim & backtick removal for all columns
+                for (var j=0; j<dataRows[i].length; j++) {
+                    if (dataRows[i][j] != null) {
+                        dataRows[i][j] = String(dataRows[i][j]).replace(/`/g, '').trim();
+                    }
+                }
+                
+                // 0: Group Code uppercase
+                if(dataRows[i][0]) dataRows[i][0] = String(dataRows[i][0]).toUpperCase();
+                
+                // 10: State uppercase
+                if(dataRows[i][10]) dataRows[i][10] = String(dataRows[i][10]).toUpperCase();
+                
+                // 12: Country uppercase
+                if(dataRows[i][12]) dataRows[i][12] = String(dataRows[i][12]).toUpperCase();
+                
+                // 14: Contact Phone (strip non-numeric)
+                if(dataRows[i][14]) dataRows[i][14] = String(dataRows[i][14]).replace(/\D/g, '');
+
+                // 15: Order Type uppercase
+                if(dataRows[i][15]) dataRows[i][15] = String(dataRows[i][15]).toUpperCase();
+                
+                // 16: Service Level uppercase
+                if(dataRows[i][16]) dataRows[i][16] = String(dataRows[i][16]).toUpperCase();
+                
+                // 17: Allocation Rule (must be O)
+                if(!dataRows[i][17] || String(dataRows[i][17]).toUpperCase() !== 'O') {
+                    dataRows[i][17] = 'O';
+                }
+                
+                // 19: Indicator uppercase
+                if(dataRows[i][19]) dataRows[i][19] = String(dataRows[i][19]).toUpperCase();
+                
+                // 21: Address Over-Ride uppercase
+                if(dataRows[i][21]) dataRows[i][21] = String(dataRows[i][21]).toUpperCase();
+
+                // 25: Confirmation Email (replace ,com with .com, remove spaces)
+                if(dataRows[i][25]) dataRows[i][25] = String(dataRows[i][25]).replace(/,com/g, '.com').replace(/\s+/g, '');
+                
+                // 26: Ship Confirmation Email
+                if(dataRows[i][26]) dataRows[i][26] = String(dataRows[i][26]).replace(/,com/g, '.com').replace(/\s+/g, '');
+            }
+            
+            var lines = [header.map(csvQuote).join(',')];
+            for(var i=0; i<dataRows.length; i++) {
+                lines.push(dataRows[i].map(csvQuote).join(','));
+            }
+            return lines.join('\r\n');
+        }
+
+        function validateLodCsv(text, mode, config) {
+            var rows = parseCsv(text || '');
+            if (!rows.length) throw new Error('The file appears to be empty.');
+
+            var header = rows[0];
+            var dataRows = rows.slice(1);
+            var EXPECTED_COLUMNS = 28;
+
+            if (header.length !== EXPECTED_COLUMNS) {
+                if (config.stopOnFatal) throw new Error('Unexpected column layout. Expected ' + EXPECTED_COLUMNS + ' columns but found ' + header.length + '.');
+            }
+
+            var DISPLAY_COLUMN_NAMES = [
+                'Group Code', 'Customer #', 'Item Number', 'Quantity', 'Customer PO', 'Name', 'Ship-to-Address 1', 'Ship-to Address 2', 'Ship-to Address 3', 'City', 'State', 'ZIP', 'Country', 'Contact name', 'Contact', 'Order Type', 'Service Level of Shipment', 'Allocation Rule', 'Customer In Hands Date', 'On or Before Indicator (O or B)', 'Must Ship Date', 'Address Over-Ride', 'Carrier', 'Ship From Warehouse', 'GL-Code', 'Confirmation Email', 'Ship Confirmation Email', 'Site'
+            ];
+
+            function getColName(index) {
+                if (header[index] && String(header[index]).trim()) return String(header[index]).trim();
+                return DISPLAY_COLUMN_NAMES[index] || ('Column ' + (index + 1));
+            }
+
+            var issues = [];
+            var errorRowSet = {};
+
+            function addIssue(rowIndex, colIndex, message, value) {
+                issues.push({ 
+                    row: rowIndex, 
+                    columnIndex: colIndex, 
+                    columnName: getColName(colIndex), 
+                    message: message, 
+                    value: value 
+                });
+                errorRowSet[rowIndex] = true;
+            }
+
+            var poAddressMap = {};
+            var poItemMap = {};
+
+            for (var i = 0; i < dataRows.length; i++) {
+                var row = dataRows[i] || [];
+                var rowIndex = i + 2; 
+
+                var nonEmpty = false;
+                for (var c = 0; c < row.length; c++) {
+                    if (String(row[c] || '').trim() !== '') { nonEmpty = true; break; }
+                }
+                if (!nonEmpty) continue;
+                
+                // Pre-Validation Loop: Global check for trailing spaces and backticks
+                if (!config.ignoreWhitespace) {
+                    for (var c = 0; c < row.length; c++) {
+                        var rawVal = row[c] == null ? '' : String(row[c]);
+                        if (rawVal !== rawVal.trim()) {
+                            addIssue(rowIndex, c, 'Contains leading or trailing spaces.', rawVal);
+                        }
+                        if (rawVal.indexOf('`') !== -1) {
+                            addIssue(rowIndex, c, 'Contains invalid backtick (`) character.', rawVal);
+                        }
+                    }
+                }
+
+                // Core value retrieval helper (auto-trims for the logic checks below)
+                function val(idx) { return (row[idx] == null ? '' : String(row[idx])).trim(); }
+
+                // 0: Group Code
+                (function () {
+                    var v = val(0);
+                    if (!v) addIssue(rowIndex, 0, 'Group Code is required.', v);
+                    else if (v !== v.toUpperCase()) addIssue(rowIndex, 0, 'Group Code must be uppercase.', v);
+                })();
+                
+                // 1: Customer Number
+                (function () {
+                    var v = val(1);
+                    if (!v) { addIssue(rowIndex, 1, 'Customer # is required.', v); return; }
+                    if (!/^\d+$/.test(v)) addIssue(rowIndex, 1, 'Customer # must be numeric.', v);
+                    if (v.slice(-2) === '00') addIssue(rowIndex, 1, 'Customer # cannot end in "00".', v);
+                })();
+                
+                // 2: Item Number & 3: Quantity
+                (function () { 
+                    var v2 = val(2); if (!v2) addIssue(rowIndex, 2, 'Item Number is required.', v2); 
+                    var v3 = val(3);
+                    if (!v3) { addIssue(rowIndex, 3, 'Quantity is required.', v3); }
+                    else if (!/^\d+$/.test(v3)) addIssue(rowIndex, 3, 'Quantity must be a whole number.', v3);
+                    else if (parseInt(v3, 10) <= 0) addIssue(rowIndex, 3, 'Quantity must be greater than zero.', v3);
+                })();
+                
+                // 4: Customer PO & Duplicate Line Logic
+                (function () {
+                    var v = val(4);
+                    if (!v) { addIssue(rowIndex, 4, 'Customer PO is required.', v); return; }
+                    if (v.length > 20) addIssue(rowIndex, 4, 'Customer PO max 20 chars.', v);
+
+                    var orderType = val(15);
+                    if (mode === 'palod') {
+                        if (v.indexOf('1NAPR-') !== 0) addIssue(rowIndex, 4, 'PALOD requires PO to start with 1NAPR-.', v);
+                    } else {
+                        if (orderType === 'PA' && v.indexOf('1NAPR-') !== 0) addIssue(rowIndex, 4, 'PA orders must have PO starting with 1NAPR-.', v);
+                    }
+
+                    // Duplicate Item per PO Check
+                    var currentItem = val(2);
+                    if (currentItem) {
+                        if (!poItemMap[v]) poItemMap[v] = {};
+                        if (poItemMap[v][currentItem]) {
+                            addIssue(rowIndex, 2, 'Duplicate Item Number detected for the same Customer PO.', currentItem);
+                        } else {
+                            poItemMap[v][currentItem] = true;
+                        }
+                    }
+
+                    // Address Uniqueness per PO
+                    if (!config.ignorePoUniqueness && v) {
+                        var addrKey = [val(1), val(5), val(6), val(7), val(8), val(9), val(10), val(11), val(12)].join('|').toUpperCase();
+                        if (poAddressMap[v] && poAddressMap[v] !== addrKey) {
+                            addIssue(rowIndex, 4, 'Customer PO reused for a different address (Not consolidated).', v);
+                        } else if (!poAddressMap[v]) {
+                            poAddressMap[v] = addrKey;
+                        }
+                    }
+                })();
+                
+                // 5, 6, 7: Name and Address
+                (function () { 
+                    if (!val(5)) addIssue(rowIndex, 5, 'Customer name is required.', val(5)); 
+                    if (val(6) && val(6).length > 35) addIssue(rowIndex, 6, 'Address 1 max 35 characters.', val(6)); 
+                    var v7 = val(7);
+                    if (!v7) { addIssue(rowIndex, 7, 'Ship-to Address 2 is required.', v7); }
+                    else if (/PO\s*BOX/i.test(v7) && /,/.test(v7) && /\d/.test(v7.split(',')[1] || '')) {
+                        addIssue(rowIndex, 7, 'Contains multiple addresses.', v7);
+                    }
+                })();
+                
+                // 9, 10, 11, 12: City, State, ZIP, Country
+                (function () { 
+                    if (!val(9)) addIssue(rowIndex, 9, 'City is required.', val(9)); 
+                    var state = val(10);
+                    if (!state) { addIssue(rowIndex, 10, 'State is required.', state); }
+                    else if (!/^[A-Z]{2}$/.test(state)) addIssue(rowIndex, 10, 'State must be 2 uppercase letters.', state);
+                    
+                    var zip = val(11);
+                    if (!zip) { addIssue(rowIndex, 11, 'ZIP is required.', zip); }
+                    else if (!config.ignoreZipValidation) {
+                        var cleaned = String(zip).replace(/-/g, '').trim();
+                        if (!/^\d+$/.test(cleaned)) { addIssue(rowIndex, 11, 'ZIP must be numeric.', zip); }
+                        else if (![4, 5, 8, 9].includes(cleaned.length)) { addIssue(rowIndex, 11, 'ZIP must be 4, 5, 8, or 9 digits.', zip); }
+                    }
+
+                    var ctry = val(12);
+                    if (!ctry) { addIssue(rowIndex, 12, 'Country is required.', ctry); }
+                    else if (!config.ignoreCountryValidation && !/^[A-Z]{2}$/.test(ctry)) { 
+                        addIssue(rowIndex, 12, 'Country must be 2 uppercase letters.', ctry); 
+                    }
+                })();
+                
+                // 14: Contact Phone
+                (function () {
+                    var v = val(14);
+                    if (v && v.replace(/\D/g, '').length !== 10) addIssue(rowIndex, 14, 'Contact must be exactly 10 digits.', v);
+                })();
+                
+                // 15: Order Type & 16: Service Level
+                (function () {
+                    var ot = val(15);
+                    if (!ot) { addIssue(rowIndex, 15, 'Order Type is required.', ot); }
+                    else if (!config.ignoreOrderType && !{GO:1, GR:1, PA:1, DO:1}[ot]) addIssue(rowIndex, 15, 'Must be GO, GR, PA, or DO.', ot);
+                    
+                    var sl = val(16);
+                    if (sl && !config.ignoreServiceLevel) {
+                        var allowedSL = ['BEST', 'NEXT', '2DAY', '3DAY', 'MAIL', 'GND', 'ITG', 'ITGF', 'ATLAS', 'NDS', 'TTI', 'STORU', 'UPS', 'PCL'];
+                        if (allowedSL.indexOf(sl) === -1) {
+                            addIssue(rowIndex, 16, 'Strict Service Level required (BEST, NEXT, 2DAY, 3DAY, MAIL, GND, ITG, ITGF, ATLAS, NDS, TTI, STORU, UPS, PCL).', sl); 
+                        }
+                    }
+                })();
+                
+                // 17, 18, 19, 20: Dates and Logic
+                (function () { 
+                    if (val(17) !== 'O') addIssue(rowIndex, 17, 'Allocation Rule must be "O".', val(17)); 
+                    
+                    var inHands = val(18), mustShip = val(20);
+                    if (!inHands && !mustShip) { addIssue(rowIndex, 18, 'Customer In Hands or Must Ship Date required.', ''); } 
+                    else {
+                        if (inHands && !/^\d{2}\.\d{2}\.\d{4}$/.test(inHands)) addIssue(rowIndex, 18, 'Format must be MM.DD.YYYY.', inHands);
+                        if (mustShip && !/^\d{2}\.\d{2}\.\d{4}$/.test(mustShip)) addIssue(rowIndex, 20, 'Format must be MM.DD.YYYY.', mustShip);
+                    }
+                    var ind = val(19); if (ind !== 'O' && ind !== 'B') addIssue(rowIndex, 19, 'Indicator must be O or B.', ind); 
+                    var ao = val(21); if (ao !== 'Y' && ao !== 'N') addIssue(rowIndex, 21, 'Must be Y or N.', ao); 
+                    if (val(23)) addIssue(rowIndex, 23, 'Should be blank for standard LOD.', val(23)); 
+                })();
+                
+                // 25, 26, 27: Strict Emails and Site
+                (function () {
+                    var conf = val(25), shipConf = val(26), site = val(27);
+                    var allowedTLDs = ['com', 'org', 'net', 'edu', 'gov', 'mil', 'us', 'info', 'biz'];
+
+                    function validateEmailField(v, colIndex) {
+                        if (!v) return;
+                        var parts = v.split(';');
+                        for (var j = 0; j < parts.length; j++) {
+                            var email = parts[j].trim();
+                            if (!email) continue;
+                            if (email.indexOf(' ') !== -1) addIssue(rowIndex, colIndex, 'Email cannot contain spaces.', email);
+                            
+                            if (!config.ignoreEmailValidation) {
+                                if (email.indexOf(',com') !== -1) addIssue(rowIndex, colIndex, 'Contains invalid comma (,com).', email);
+                                if (email.indexOf('@') === -1) {
+                                    addIssue(rowIndex, colIndex, 'Missing "@" symbol.', email);
+                                } else {
+                                    var domainPart = email.split('@')[1] || '';
+                                    if (domainPart.indexOf('.') === -1) {
+                                        addIssue(rowIndex, colIndex, 'Domain missing dot (e.g. .com, .org).', email);
+                                    } else {
+                                        var tld = domainPart.split('.').pop().toLowerCase();
+                                        if (allowedTLDs.indexOf(tld) === -1) {
+                                            addIssue(rowIndex, colIndex, 'Invalid or International TLD (.' + tld + '). Allowed: .com, .org, .net, .edu, .gov, .mil, .us', email);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    validateEmailField(conf, 25);
+                    validateEmailField(shipConf, 26);
+                    if ((conf || shipConf) && !site) addIssue(rowIndex, 27, 'Site required when email is provided.', site);
+                })();
+            }
+
+            return { 
+                mode: mode, 
+                header: header, 
+                rows: rows, 
+                dataRows: dataRows, 
+                dataRowCount: dataRows.length, 
+                errorRowCount: Object.keys(errorRowSet).length, 
+                issues: issues 
+            };
+        }
+
+        // --- Export Utilities ---
+        function buildClipboardSummary(result) {
+            if (!result) return '';
+            var lines = [
+                'LOD Validation Results', 
+                'Mode: ' + (result.mode || 'LOD'), 
+                'Total data rows: ' + (result.dataRowCount || 0), 
+                'Rows with issues: ' + (result.errorRowCount || 0), 
+                'Total issues: ' + ((result.issues && result.issues.length) || 0), 
+                ''
+            ];
+            if (!result.issues || !result.issues.length) { lines.push('Passed.'); return lines.join('\n'); }
+            lines.push('Issues:');
+            for (var i = 0; i < result.issues.length; i++) {
+                var issue = result.issues[i];
+                var line = 'Row ' + issue.row + ' – ' + (issue.columnName || ('Column ' + (issue.columnIndex + 1))) + ' – ' + issue.message;
+                if (issue.value != null && String(issue.value).trim() !== '') {
+                    line += ' (Value: ' + String(issue.value) + ')';
+                }
+                lines.push(line);
+            }
+            return lines.join('\n');
+        }
+
+        function fallbackCopyText(text) {
+            var textarea = document.createElement('textarea'); 
+            textarea.value = text; 
+            document.body.appendChild(textarea); 
+            textarea.select(); 
+            document.execCommand('copy'); 
+            document.body.removeChild(textarea); 
+            setStatus('Results copied.', false, true);
+        }
+
+        function buildIssueCsv(result) {
+            var lines = ['Row,Column,Value,Issue'];
+            for (var i = 0; i < result.issues.length; i++) {
+                var issue = result.issues[i];
+                lines.push([
+                    String(issue.row), 
+                    csvQuote(issue.columnName || ''), 
+                    csvQuote(issue.value == null ? '' : String(issue.value)), 
+                    csvQuote(issue.message || '')
+                ].join(','));
+            }
+            return lines.join('\r\n');
+        }
+
+        function csvQuote(value) {
+            var v = String(value == null ? '' : value);
+            return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+        }
+
+        function buildHtmlReport(result) {
+            var badCellMap = {};
+            for (var i = 0; i < result.issues.length; i++) {
+                badCellMap[result.issues[i].row + ':' + result.issues[i].columnIndex] = true;
+            }
+            
+            var html = [
+                '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>LOD Validation Report</title>',
+                '<style>body { font-family: system-ui, sans-serif; background:#f8fafc; color:#0f172a; padding:2rem; } ',
+                'table { width:100%; border-collapse:collapse; margin-top:1rem; font-size:0.85rem; background:#fff; white-space:nowrap; } ',
+                'th, td { border:1px solid #e2e8f0; padding:6px 10px; text-align:left; } ',
+                'th { background:#0f172a; color:#fff; position:sticky; top:0; } ',
+                'td.bad-cell { background:#fef2f2; color:#ef4444; font-weight:700; }</style></head><body>',
+                '<h1>Validation Report</h1><div style="overflow-x:auto;"><table><thead><tr><th>Line</th>'
+            ];
+            
+            for (var h = 0; h < result.header.length; h++) { html.push('<th>' + escapeHtml(String(result.header[h] || '')) + '</th>'); }
+            html.push('</tr></thead><tbody>');
+
+            for (var r = 1; r < result.rows.length; r++) {
+                var row = result.rows[r] || []; var rowIndex = r + 1;
+                html.push('<tr><td>' + String(rowIndex) + '</td>');
+                for (var c = 0; c < result.header.length; c++) {
+                    var cellValue = String(row[c] == null ? '' : row[c]).replace(/[\uFFFD]/g, '').replace(/[^\x20-\x7E]/g, '');
+                    html.push('<td' + (badCellMap[rowIndex + ':' + c] ? ' class="bad-cell"' : '') + '>' + escapeHtml(cellValue) + '</td>');
+                }
+                html.push('</tr>');
+            }
+            return html.join('') + '</tbody></table></div></body></html>';
+        }
+
+        function downloadTextFile(content, filename, mimeType) {
+            var blob = new Blob([content], { type: mimeType || 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a'); 
+            a.href = url; 
+            a.download = filename || 'download.txt';
+            document.body.appendChild(a); 
+            a.click(); 
+            document.body.removeChild(a); 
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        function buildSuggestedFilename(result, fallback) { 
+            return (result && result.mode ? String(result.mode).toUpperCase() : 'LOD') + '-' + fallback; 
+        }
+        
+        function escapeHtml(str) { 
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); 
+        }
+    </script>
+    <button id="backToTop" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</button>
+    <script>
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('backToTop');
+            if(window.scrollY > 300) btn.style.display = 'flex';
+            else btn.style.display = 'none';
+        });
+        
+        function toggleMobileNav() {
+            const nav = document.querySelector('.nav-menu');
+            if(nav) nav.classList.toggle('open');
+        }
+        
+        if('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(console.error);
+        }
+    </script>
+<script>
+        // --- Navigation Preferences Logic ---
+        function applyNavPreferences() {
+            try {
+                const hiddenNavs = JSON.parse(localStorage.getItem('kore_hidden_navs') || '[]');
+                if (hiddenNavs.length > 0) {
+                    const links = document.querySelectorAll('.dropdown-content a');
+                    links.forEach(link => {
+                        const href = link.getAttribute('href');
+                        if (hiddenNavs.includes(href)) {
+                            link.style.display = 'none';
+                        } else {
+                            link.style.display = 'block';
+                        }
+                    });
+                    
+                    // Hide empty dropdowns
+                    document.querySelectorAll('.nav-item').forEach(item => {
+                        const dropdown = item.querySelector('.dropdown-content');
+                        if (dropdown) {
+                            const visibleLinks = Array.from(dropdown.querySelectorAll('a')).filter(a => a.style.display !== 'none');
+                            if (visibleLinks.length === 0) {
+                                item.style.display = 'none';
+                            } else {
+                                item.style.display = 'flex';
+                            }
+                        }
+                    });
+                } else {
+                    document.querySelectorAll('.dropdown-content a').forEach(a => a.style.display = 'block');
+                }
+            } catch(e) {}
+        }
+        document.addEventListener('DOMContentLoaded', applyNavPreferences);
+</script>
+
+<!-- Mobile Nav Script (Injected) -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        if (item.querySelector('.dropdown-content')) {
+            item.addEventListener('click', (e) => {
+                if (window.innerWidth <= 1023) {
+                    if (e.target.tagName.toLowerCase() === 'a' && e.target.closest('.dropdown-content')) {
+                        return;
+                    }
+                    e.preventDefault();
+                    item.classList.toggle('open-mobile');
+                }
+            });
+        }
+    });
+});
+</script>
+</body>
+</html>

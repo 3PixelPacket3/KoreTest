@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kore | Personal To-Do</title>
+    <style>
+        :root {
+            --accent-primary: #0ea5e9; --accent-hover: #0284c7;
+            --bg-app: #f8fafc; --bg-surface: #ffffff;
+            --text-main: #0f172a; --text-secondary: #475569;
+            --border-subtle: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.05);
+            --radius-md: 12px; --radius-sm: 8px;
+            --priority-high: #ef4444; --priority-med: #f59e0b; --priority-low: #10b981;
+            --success: #10b981;
+        }
+
+        /* --- GLOBAL WORKSPACE THEMES --- */
+        body[data-theme="midnight"] {
+            --bg-app: #0f172a; --bg-surface: #1e293b; --text-main: #f8fafc; --text-secondary: #94a3b8;
+            --border-subtle: #334155; --accent-primary: #38bdf8; --accent-hover: #7dd3fc;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5); --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+        body[data-theme="cyberpunk"] {
+            --bg-app: #000000; --bg-surface: #121212; --text-main: #00ff41; --text-secondary: #ff00ff;
+            --border-subtle: #00ff41; --accent-primary: #ff00ff; --accent-hover: #ff00aa;
+            --radius-md: 0px; --radius-sm: 0px; --shadow-sm: 0 0 5px rgba(0, 255, 65, 0.2);
+            --shadow-md: 0 0 10px rgba(255, 0, 255, 0.2);
+        }
+        body[data-theme="corporate"] {
+            --bg-app: #e2e8f0; --bg-surface: #ffffff; --text-main: #1e293b; --text-secondary: #475569;
+            --border-subtle: #cbd5e1; --accent-primary: #1d4ed8; --accent-hover: #1e40af;
+            --radius-md: 4px; --radius-sm: 2px;
+        }
+        body[data-theme="earthy"] {
+            --bg-app: #fdf8f5; --bg-surface: #ffffff; --text-main: #3f3e3a; --text-secondary: #6b7280;
+            --border-subtle: #e5e5e5; --accent-primary: #5c7f67; --accent-hover: #4a6652;
+            --radius-md: 24px; --radius-sm: 16px;
+        }
+        body[data-theme="oceanic"] {
+            --bg-app: #e0f2fe; --bg-surface: #f0f9ff; --text-main: #0c4a6e; --text-secondary: #0369a1;
+            --border-subtle: #bae6fd; --accent-primary: #0284c7; --accent-hover: #0369a1;
+            --radius-md: 16px; --radius-sm: 12px;
+        }
+        /* THEME: Midnight Dark */
+        body[data-theme="midnight"] {
+            --bg-app: #0f172a; --bg-surface: #1e293b; --text-main: #f8fafc; --text-secondary: #94a3b8;
+            --border-subtle: #334155; --accent-primary: #38bdf8; --accent-hover: #7dd3fc;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5); --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+        /* THEME: Cyberpunk */
+        body[data-theme="cyberpunk"] {
+            --bg-app: #000000; --bg-surface: #121212; --text-main: #00ff41; --text-secondary: #ff00ff;
+            --border-subtle: #00ff41; --accent-primary: #ff00ff; --accent-hover: #ff00aa;
+            --radius-md: 0px; --radius-sm: 0px; --shadow-sm: 0 0 5px rgba(0, 255, 65, 0.2);
+            --shadow-md: 0 0 10px rgba(255, 0, 255, 0.2);
+        }
+        /* THEME: Corporate Classic */
+        body[data-theme="corporate"] {
+            --bg-app: #e2e8f0; --bg-surface: #ffffff; --text-main: #1e293b; --text-secondary: #475569;
+            --border-subtle: #cbd5e1; --accent-primary: #1d4ed8; --accent-hover: #1e40af;
+            --radius-md: 4px; --radius-sm: 2px;
+        }
+        /* THEME: Earthy Minimal */
+        body[data-theme="earthy"] {
+            --bg-app: #fdf8f5; --bg-surface: #ffffff; --text-main: #3f3e3a; --text-secondary: #6b7280;
+            --border-subtle: #e5e5e5; --accent-primary: #5c7f67; --accent-hover: #4a6652;
+            --radius-md: 24px; --radius-sm: 16px;
+        }
+        /* THEME: Oceanic */
+        body[data-theme="oceanic"] {
+            --bg-app: #e0f2fe; --bg-surface: #f0f9ff; --text-main: #0c4a6e; --text-secondary: #0369a1;
+            --border-subtle: #bae6fd; --accent-primary: #0284c7; --accent-hover: #0369a1;
+            --radius-md: 16px; --radius-sm: 12px;
+        }
+
+        body {
+            margin: 0; font-family: 'Inter', system-ui, sans-serif; background-color: var(--bg-app); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh;  transition: background-color 0.3s, color 0.3s; }
+
+        .global-header { background-color: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 64px; box-shadow: var(--shadow-sm); flex-shrink: 0; position: sticky; top: 0; z-index: 100;}
+        .header-left { display: flex; align-items: center; gap: 40px; height: 100%; }
+        .kore-logo { font-size: 1.5rem; font-weight: 800; color: var(--text-main); margin: 0; display: flex; gap: 8px; }
+        .kore-logo span { color: var(--accent-primary); }
+        .nav-menu { display: flex; gap: 8px; height: 100%; }
+        .nav-item { text-decoration: none; color: var(--text-secondary); padding: 0 16px; display: flex; align-items: center; height: 100%; font-weight: 500; font-size: 0.95rem; border-bottom: 3px solid transparent; cursor: pointer; position: relative; transition: all 0.2s ease;}
+        .nav-item:hover, .nav-item.active { color: var(--accent-primary); border-bottom-color: var(--accent-primary); background-color: rgba(14, 165, 233, 0.08); }
+        .dropdown-content { display: none; position: absolute; top: 64px; left: 0; background-color: var(--bg-surface); min-width: 200px; box-shadow: var(--shadow-md); border: 1px solid var(--border-subtle); border-radius: 0 0 var(--radius-sm) var(--radius-sm); overflow: hidden; z-index: 101; }
+        .nav-item:hover .dropdown-content { display: block; }
+        .dropdown-content a { white-space: nowrap; color: var(--text-secondary); padding: 14px 20px; text-decoration: none; display: block; border-bottom: 1px solid var(--bg-app); font-weight: 500; }
+        .dropdown-content a:hover { background-color: rgba(14, 165, 233, 0.08); color: var(--accent-primary); padding-left: 24px; transition: all 0.2s ease; }
+        .user-badge { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); background: var(--bg-app); padding: 6px 12px; border-radius: 99px; border: 1px solid var(--border-subtle);}
+
+        .main-container { padding: 40px 32px; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; flex-grow: 1; }
+        
+        .hero-banner { background: var(--bg-surface); border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm); height: 180px; position: relative; margin-bottom: 32px; }
+        .hero-banner img { width: 100%; height: 100%; object-fit: cover; }
+        .hero-overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(15,23,42,0.9), transparent); padding: 30px; box-sizing: border-box; color: white; }
+        .hero-title { margin: 0; font-size: 1.8rem; font-weight: 700; }
+        
+        .page-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; }
+        
+        .btn { background-color: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-subtle); padding: 10px 18px; border-radius: 99px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; font-size: 0.95rem; }
+        .btn:hover { background-color: var(--bg-app); border-color: var(--text-secondary); }
+        .btn-primary { background-color: var(--accent-primary); color: white; border: none; box-shadow: var(--shadow-sm); }
+        .btn-primary:hover { background-color: var(--accent-hover); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+        .add-task-panel { background: var(--bg-surface); border-radius: var(--radius-md); padding: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-subtle); margin-bottom: 24px; display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 16px; align-items: end; }
+        .input-group { display: flex; flex-direction: column; gap: 6px; }
+        .input-group label { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .input { padding: 12px 16px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); font-size: 0.95rem; outline: none; background: var(--bg-surface); color: var(--text-main); font-family: inherit; width: 100%; box-sizing: border-box; transition: all 0.2s; }
+        .input:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); }
+
+        .progress-container { background: var(--border-subtle); border-radius: 99px; height: 8px; width: 100%; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { background: var(--accent-primary); height: 100%; width: 0%; transition: width 0.5s ease; }
+
+        .task-list { display: flex; flex-direction: column; gap: 16px; }
+        .task-card { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 20px; display: flex; align-items: flex-start; gap: 20px; box-shadow: var(--shadow-sm); transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .task-card:hover { transform: translateX(4px); border-color: var(--accent-primary); box-shadow: var(--shadow-md); }
+        .task-card.completed { opacity: 0.6; background: var(--bg-app); border-color: transparent; }
+        .task-card.completed .task-title { text-decoration: line-through; color: var(--text-secondary); }
+
+        .check-container { padding-top: 4px; }
+        .custom-checkbox { appearance: none; width: 24px; height: 24px; border: 2px solid var(--border-subtle); border-radius: 50%; outline: none; cursor: pointer; position: relative; transition: all 0.2s; background: var(--bg-surface); flex-shrink: 0; }
+        .custom-checkbox:hover { border-color: var(--accent-primary); }
+        .custom-checkbox:checked { background: var(--success); border-color: var(--success); animation: pop 0.3s ease;}
+        @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        .custom-checkbox:checked::after { content: '✓'; position: absolute; color: white; font-size: 14px; font-weight: bold; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+        .task-content { flex-grow: 1; display: flex; flex-direction: column; gap: 8px; }
+        .task-header { display: flex; justify-content: space-between; align-items: center; }
+        .task-title { margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--text-main); transition: color 0.3s; }
+        .task-meta { display: flex; gap: 12px; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); align-items: center; }
+        
+        .tag { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .tag-priority-High { background: #fef2f2; color: var(--priority-high); border: 1px solid #fecaca; }
+        .tag-priority-Medium { background: #fffbeb; color: var(--priority-med); border: 1px solid #fde68a; }
+        .tag-priority-Low { background: #ecfdf5; color: var(--priority-low); border: 1px solid #a7f3d0; }
+        
+        .due-date { display: flex; align-items: center; gap: 4px; }
+        .due-date.past-due { color: var(--priority-high); }
+        .due-date.today { color: var(--accent-primary); }
+
+        .delete-btn { background: transparent; border: none; color: #cbd5e1; cursor: pointer; font-size: 1.2rem; transition: color 0.2s; }
+        .task-card:hover .delete-btn { color: #ef4444; }
+
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-secondary); background: var(--bg-surface); border: 1px dashed var(--border-subtle); border-radius: var(--radius-md); }
+
+        .global-footer { background-color: var(--bg-surface); border-top: 1px solid var(--border-subtle); padding: 24px; text-align: center; color: var(--text-secondary); font-size: 0.9rem; flex-shrink: 0; font-weight: 500; margin-top: auto;}
+
+        /* --- FLOATING COMMAND PALETTE NOTEPAD --- */
+        #floatingNotepad { 
+            position: fixed; top: 15%; left: 50%; transform: translateX(-50%); 
+            width: 600px; max-width: 90vw; background: var(--bg-surface); border: 1px solid var(--border-subtle); 
+            border-radius: var(--radius-md); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); 
+            z-index: 9999; display: none; flex-direction: column; overflow: hidden; 
+        }
+        #fnHeader { 
+            background: var(--bg-app); padding: 12px 20px; cursor: move; display: flex; 
+            justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); 
+            font-weight: 600; color: var(--text-main); user-select: none;
+        }
+        #fnClose { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary); }
+        #fnContent { 
+            width: 100%; height: 300px; padding: 16px; border: none; outline: none; resize: none; 
+            font-family: 'Inter', system-ui, sans-serif; font-size: 0.95rem; line-height: 1.5; 
+            color: var(--text-main); background: var(--bg-surface); box-sizing: border-box; 
+        }
+        #fnContent.code-mode { font-family: monospace; background: #1e293b; color: #f8fafc; }
+        .fn-toolbar { 
+            display: flex; justify-content: space-between; padding: 10px 16px; 
+            background: var(--bg-app); border-top: 1px solid var(--border-subtle); align-items: center;
+        }
+        .fn-push-btn { 
+            background: var(--success); color: white; border: none; padding: 6px 12px; 
+            border-radius: 4px; font-weight: 600; cursor: pointer; display: none; 
+        }
+        .fn-push-btn:hover { background: #059669; }
+    
+        
+    
+    
+            pre, code { white-space: pre-wrap; word-break: break-word; overflow-x: auto; max-width: 100%; }
+    
+    </style>
+
+    <!-- SEO & Mobile Optimization -->
+    <meta name="description" content="Kore Enterprise Workspace - Advanced Cloud Management System">
+    <meta name="keywords" content="Kore, Workspace, Enterprise, Management, LOD">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' font-family='Arial' fill='%230ea5e9' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' font-family='Arial' fill='%230ea5e9' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+
+    <style>
+        /* Mobile Layout & Back-to-Top */
+        
+        
+        .mobile-toggle { display: none; }
+        
+        #backToTop {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s, background 0.3s;
+        }
+        #backToTop:hover { background: var(--accent-hover); }
+    </style>
+
+
+<style>
+/* --- RESPONSIVE MOBILE & TABLET (Injected) --- */
+* { box-sizing: border-box; }
+img, video, iframe, canvas { max-width: 100%; height: auto; }
+body { overflow-x: hidden; width: 100%; }
+
+@media (max-width: 1023px) {
+    .modal-content, .system-modal, .storage-tracker { max-width: 95vw !important; }
+
+    .global-header {
+        flex-direction: column;
+        height: auto;
+        padding: 10px 16px;
+        gap: 10px;
+    }
+    .header-left {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .search-container {
+        width: 100%;
+    }
+    .search-bar {
+        width: 100%;
+    }
+    .mobile-toggle {
+        display: flex !important;
+        align-items: center;
+        background: none;
+        border: none;
+        color: var(--text-main);
+        cursor: pointer;
+    }
+    .nav-menu {
+        display: none !important;
+        flex-direction: column;
+        width: 100%;
+        background: var(--bg-surface);
+        position: absolute;
+        top: 100%;
+        left: 0;
+        box-shadow: var(--shadow-md);
+        z-index: 200;
+        max-height: 70vh;
+        overflow-y: auto;
+        border-top: 1px solid var(--border-subtle);
+    }
+    .nav-menu.open {
+        display: flex !important;
+    }
+    .nav-item {
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--border-subtle);
+        width: 100%;
+        flex-wrap: wrap;
+        height: auto;
+    }
+    .nav-item:last-child {
+        border-bottom: none;
+    }
+    .dropdown-content {
+        position: static;
+        display: none;
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        width: 100%;
+        padding-left: 20px;
+        margin-top: 10px;
+    }
+    .nav-item.open-mobile .dropdown-content {
+        display: block !important;
+    }
+    /* Hide hover effects on mobile */
+    .nav-item:hover .dropdown-content, 
+    .nav-item:focus-within .dropdown-content,
+    .nav-item:active .dropdown-content {
+        display: none;
+    }
+    .nav-item.open-mobile:hover .dropdown-content,
+    .nav-item.open-mobile:focus-within .dropdown-content,
+    .nav-item.open-mobile:active .dropdown-content {
+        display: block !important;
+    }
+    
+    .dashboard-grid, .dashboard-layout, .apps-grid, .grid-container,
+    .layout-grid, .chart-grid, .library-controls, .add-task-panel,
+    .controls-grid, .content-grid, .layout-split, .form-grid,
+    .metrics-bar, .view-boxes, .grid-2, .workspace-grid,
+    .kpi-grid, .nav-pref-grid, .color-target-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .metrics-bar, .form-grid {
+        gap: 16px !important;
+    }
+    .main-container {
+        padding: 15px !important;
+    }
+    .hero-banner {
+        padding: 30px 15px !important;
+        height: auto !important;
+        min-height: 160px;
+    }
+    .hero-title {
+        font-size: 1.8rem !important;
+    }
+    
+    /* Make tables scrollable */
+    table, .table-container, .data-table-container {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    /* Ensure containers don't overflow */
+    .panel, .card, .widget, .card-body, .intel-panel, .info-panel {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    /* Layout fixes for sidebars */
+    .workspace-layout {
+        flex-direction: column !important;
+    }
+    .sidebar {
+        width: 100% !important;
+        max-height: none !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border-subtle);
+        position: static !important;
+    }
+}
+</style>
+
+</head>
+<body>
+    <script>
+        // Theme Initializer to prevent flash on load
+        const savedTheme = localStorage.getItem('kore_theme') || 'default';
+        if(savedTheme !== 'default') {
+            document.body.setAttribute('data-theme', savedTheme);
+        }
+    </script>
+
+<header class="global-header">
+        <div class="header-left">
+            <h1 class="kore-logo">Kore<span>.</span></h1>
+        <button class="mobile-toggle" aria-label="Toggle Menu" onclick="toggleMobileNav()"><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 12h18M3 6h18M3 18h18"></path></svg></button>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">Dashboard</a>
+                
+                <div class="nav-item active">Operations ▼
+                    <div class="dropdown-content">
+                        <a href="apps.html">Apps</a>
+                        <a href="file-converter.html">File to LOAD Converter</a>
+                        <a href="lod.html">LOD Validation Tool</a>
+                        <a href="macros.html">Macro Library</a>
+                        <a href="nebula.html">Nebula HTML Forge</a>
+                        <a href="passwords.html">Password Generator</a>
+                    <a href="business-tools.html">Business & Sec Tools</a>
+                        <a href="todo.html">Personal To-Do</a>
+                        <a href="product-html.html">Product HTML Converter</a>
+                        <a href="scanner.html">Vulnerability Scanner</a>
+                        <a href="work.html">Work Tracker</a>
+                    </div>
+                </div>
+                
+                <div class="nav-item">Resources ▼
+                    <div class="dropdown-content">
+                        <a href="info-archive.html">Archive</a>
+                        <a href="reports.html">Data/Reports</a>
+                        <a href="docs.html">Document Library</a>
+                        <a href="info-hub.html">Info Hub</a>
+                    </div>
+                </div>
+                
+                <a href="about.html" class="nav-item">About</a>
+                <a href="settings.html" class="nav-item">Settings</a>
+            </nav>
+        </div>
+        <div id="userIdentityBadge" class="user-badge">Authenticating...</div>
+    </header>
+
+    <main class="main-container">
+        
+        <section class="hero-banner">
+            <img src="images/ToDoBanner.jpg" alt="To Do" onerror="this.onerror=null; this.src='https://picsum.photos/1200/300?grayscale&blur=2';">
+            <div class="hero-overlay">
+                <h2 class="hero-title">Personal Action Items</h2>
+            </div>
+        </section>
+
+        <div class="page-header">
+            <div><span id="progressText" style="font-weight: 600; color: var(--text-secondary);">0% Completed</span></div>
+            <div><button class="btn" onclick="clearCompleted()">Sweep Completed</button></div>
+        </div>
+
+        <div class="progress-container"><div id="progressFill" class="progress-fill"></div></div>
+
+        <form class="add-task-panel" onsubmit="event.preventDefault(); addTask();">
+            <div class="input-group">
+                <label for="newTaskTitle">New Task</label>
+                <input type="text" id="newTaskTitle" class="input" placeholder="What needs to be done?" required autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label for="newTaskDate">Due Date</label>
+                <input type="date" id="newTaskDate" class="input">
+            </div>
+            <div class="input-group">
+                <label for="newTaskPriority">Priority</label>
+                <select id="newTaskPriority" class="input">
+                    <option value="Low">Low</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="High">High</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary" style="height: 46px; padding: 0 24px;" id="addBtn">Add Task</button>
+        </form>
+
+        <div id="taskList" class="task-list"></div>
+    </main>
+
+    <div id="floatingNotepad">
+        <div id="fnHeader">
+            <span>⚡ Command Palette (Autosaved)</span>
+            <button id="fnClose">&times;</button>
+        </div>
+        <textarea id="fnContent" placeholder="Jot notes, paste regex, or type '- [ ] Task name' to push to tracker..."></textarea>
+        <div class="fn-toolbar">
+            <span id="fnStatus" style="font-size: 0.8rem; color: var(--text-secondary);">Ready</span>
+            <button id="fnPushBtn" class="fn-push-btn">Push To-Do to Tracker ➔</button>
+        </div>
+    </div>
+
+    <footer class="global-footer">
+        <div style="margin-bottom: 8px;">💡 Press <strong>Alt + N</strong> anywhere to open the Global Command Palette.</div>
+        &copy; 2026 Kore | Enterprise Cloud Vault Connected.
+    </footer>
+
+    <script>
+        let cloudIdentity = { userId: "local-dev", userName: "Local Developer" };
+        let activeTasks = [];
+
+        async function fetchSecureIdentity() {
+            try {
+                const response = await fetch('/.auth/me');
+                const data = await response.json();
+                if (data.clientPrincipal) {
+                    cloudIdentity.userId = data.clientPrincipal.userId;
+                    cloudIdentity.userName = data.clientPrincipal.userDetails;
+                    document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+                }
+            } catch (error) {}
+        }
+
+        // 3pixelpacket3/kore-cloud-migration/Kore-Cloud-Migration-872780c2077a849acd28dc7619dc5f10c1aa727b/Kore/todo.html
+
+        async function loadData() {
+            let cloudSuccess = false;
+            try {
+                const res = await fetch(`/api/get_user_data?userId=${cloudIdentity.userId}&dataType=todos`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && Array.isArray(data)) { 
+                        activeTasks = data;
+                        cloudSuccess = true;
+                    }
+                }
+            } catch(e) {}
+            
+            // Reinstating robust redundancy architecture
+            if (cloudSuccess) {
+                localStorage.setItem('kore_todo_items', JSON.stringify(activeTasks));
+            } else {
+                const localData = localStorage.getItem('kore_todo_items');
+                if (localData) {
+                    activeTasks = JSON.parse(localData);
+                } else {
+                    activeTasks = [];
+                }
+            }
+
+            // --- DATA SANITIZATION: Self-Healing Routine ---
+            let dataWasRepaired = false;
+            activeTasks.forEach(task => {
+                // If a legacy task is missing an ID, generate one for it now
+                if (!task.id) {
+                    task.id = generateId(); 
+                    dataWasRepaired = true;
+                }
+            });
+            
+            // If we fixed any broken tasks, immediately sync the repaired data back to the cloud
+            if (dataWasRepaired) {
+                saveData();
+            }
+            // -----------------------------------------------
+
+            renderTasks();
+        }
+
+        async function saveData() {
+            // Immediate local caching for zero-latency UI interaction
+            localStorage.setItem('kore_todo_items', JSON.stringify(activeTasks));
+            try {
+                await fetch('/api/save_user_data', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: cloudIdentity.userId, dataType: 'todos', data: activeTasks })
+                });
+            } catch(e) {
+                console.warn("Cloud sync delayed. Tasks are safely cached locally.");
+            }
+        }
+
+        function generateId() { return 'todo_' + Date.now() + '_' + Math.floor(Math.random() * 1000); }
+
+        function formatDateLogic(dateStr) {
+            if (!dateStr) return { text: 'No Due Date', class: '' };
+            const due = new Date(dateStr + 'T00:00:00');
+            const today = new Date(); today.setHours(0,0,0,0);
+            const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+            if (diffDays < 0) return { text: `Past Due (${Math.abs(diffDays)}d)`, class: 'past-due' };
+            if (diffDays === 0) return { text: 'Due Today', class: 'today' };
+            if (diffDays === 1) return { text: 'Due Tomorrow', class: '' };
+            return { text: due.toLocaleDateString(), class: '' };
+        }
+
+        function renderTasks() {
+            const container = document.getElementById('taskList');
+            container.innerHTML = '';
+
+            let completedCount = 0;
+            activeTasks.forEach(t => { if(t.completed) completedCount++; });
+            const pct = activeTasks.length === 0 ? 0 : Math.round((completedCount / activeTasks.length) * 100);
+            document.getElementById('progressFill').style.width = `${pct}%`;
+            document.getElementById('progressText').innerText = `${pct}% Completed`;
+
+            const sorted = [...activeTasks].sort((a, b) => {
+                if (a.completed !== b.completed) return a.completed ? 1 : -1;
+                const dateA = a.dueDate ? new Date(a.dueDate).getTime() : Infinity;
+                const dateB = b.dueDate ? new Date(b.dueDate).getTime() : Infinity;
+                if (dateA !== dateB) return dateA - dateB;
+                const prioWeight = { 'High': 3, 'Medium': 2, 'Low': 1 };
+                return prioWeight[b.priority] - prioWeight[a.priority];
+            });
+
+            if (sorted.length === 0) {
+                container.innerHTML = `<div class="empty-state"><h3>No Action Items</h3><p>Your workspace is clear.</p></div>`;
+                return;
+            }
+
+            sorted.forEach(task => {
+                const dateLogic = formatDateLogic(task.dueDate);
+                const dateHtml = task.dueDate ? `<span class="due-date ${dateLogic.class}">🗓️ ${dateLogic.text}</span>` : '';
+                container.innerHTML += `
+                    <div class="task-card ${task.completed ? 'completed' : ''}">
+                        <div class="check-container"><input type="checkbox" class="custom-checkbox" aria-label="Toggle task completion" ${task.completed ? 'checked' : ''} onchange="toggleTask('${task.id}')"></div>
+                        <div class="task-content">
+                            <div class="task-header"><h3 class="task-title">${escapeHtml(task.title)}</h3><button class="delete-btn" aria-label="Delete Task" onclick="deleteTask('${task.id}')">&times;</button></div>
+                            <div class="task-meta"><span class="tag tag-priority-${task.priority}">${task.priority}</span>${dateHtml}</div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        async function addTask() {
+            const titleInput = document.getElementById('newTaskTitle');
+            const dateInput = document.getElementById('newTaskDate');
+            const priorityInput = document.getElementById('newTaskPriority');
+            if (!titleInput.value.trim()) return;
+            
+            const btn = document.getElementById('addBtn'); btn.innerText = "Saving...";
+            
+            activeTasks.push({ id: generateId(), title: titleInput.value.trim(), dueDate: dateInput.value, priority: priorityInput.value, completed: false });
+            await saveData();
+            
+            titleInput.value = ''; dateInput.value = ''; priorityInput.value = 'Medium'; titleInput.focus();
+            btn.innerText = "Add Task";
+            renderTasks();
+        }
+
+        async function toggleTask(id) { const t = activeTasks.find(x => x.id === id); if (t) { t.completed = !t.completed; renderTasks(); await saveData(); } }
+        async function deleteTask(id) { activeTasks = activeTasks.filter(x => x.id !== id); renderTasks(); await saveData(); }
+        async function clearCompleted() { activeTasks = activeTasks.filter(x => !x.completed); renderTasks(); await saveData(); }
+        function escapeHtml(str) { return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('newTaskDate').valueAsDate = new Date();
+            await fetchSecureIdentity(); 
+            loadData();
+        });
+
+        // --- FLOATING COMMAND PALETTE LOGIC ---
+        const fnModal = document.getElementById('floatingNotepad');
+        const fnContent = document.getElementById('fnContent');
+        const fnPushBtn = document.getElementById('fnPushBtn');
+        let isDragging = false, currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
+
+        document.addEventListener('keydown', (e) => {
+            if (e.altKey && e.key.toLowerCase() === 'n') {
+                e.preventDefault();
+                fnModal.style.display = fnModal.style.display === 'flex' ? 'none' : 'flex';
+                if (fnModal.style.display === 'flex') {
+                    fnContent.value = localStorage.getItem('kore_global_notepad') || '';
+                    fnContent.focus();
+                    checkNotepadFormatting();
+                }
+            }
+        });
+
+        document.getElementById('fnClose').addEventListener('click', () => {
+            fnModal.style.display = 'none';
+        });
+
+        document.getElementById('fnHeader').addEventListener('mousedown', dragStart);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', dragEnd);
+
+        function dragStart(e) { initialX = e.clientX - xOffset; initialY = e.clientY - yOffset; isDragging = true; }
+        function drag(e) {
+            if (isDragging) {
+                e.preventDefault();
+                currentX = e.clientX - initialX; currentY = e.clientY - initialY;
+                xOffset = currentX; yOffset = currentY;
+                fnModal.style.transform = `translate(${currentX}px, ${currentY}px)`;
+            }
+        }
+        function dragEnd(e) { initialX = currentX; initialY = currentY; isDragging = false; }
+
+        let fnTimeout;
+        fnContent.addEventListener('input', () => {
+            localStorage.setItem('kore_global_notepad', fnContent.value);
+            document.getElementById('fnStatus').innerText = 'Saving...';
+            clearTimeout(fnTimeout);
+            fnTimeout = setTimeout(() => { 
+                document.getElementById('fnStatus').innerText = 'Saved locally.'; 
+                checkNotepadFormatting(); 
+            }, 800);
+        });
+
+        function checkNotepadFormatting() {
+            const val = fnContent.value;
+            if (val.startsWith('```')) { 
+                fnContent.classList.add('code-mode'); 
+            } else { 
+                fnContent.classList.remove('code-mode'); 
+            }
+            
+            const hasTodo = /-\s?\[\s?\]\s?.+/i.test(val);
+            fnPushBtn.style.display = hasTodo ? 'block' : 'none';
+        }
+
+        fnPushBtn.addEventListener('click', async () => {
+            const lines = fnContent.value.split('\n');
+            let newTasks = [];
+            let remainingLines = [];
+            
+            lines.forEach((line, index) => {
+                const match = line.match(/-\s?\[\s?\]\s?(.+)/i);
+                if (match) { 
+                    newTasks.push({ 
+                        id: 'todo_' + Date.now() + '_' + index,
+                        title: match[1].trim(), 
+                        priority: "Medium", 
+                        completed: false, 
+                        dueDate: new Date().toISOString().split('T')[0] 
+                    }); 
+                } else { 
+                    remainingLines.push(line); 
+                }
+            });
+
+            if (newTasks.length > 0) {
+                let existingTodos = await loadCloudData('todos') || [];
+                existingTodos = existingTodos.concat(newTasks);
+                
+                try {
+                    await fetch('/api/save_user_data', { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId: cloudIdentity.userId, dataType: 'todos', data: existingTodos }) 
+                    });
+                } catch(e) {}
+                
+                fnContent.value = remainingLines.join('\n');
+                localStorage.setItem('kore_global_notepad', fnContent.value);
+                document.getElementById('fnStatus').innerText = `Pushed ${newTasks.length} tasks!`;
+                fnPushBtn.style.display = 'none';
+                
+                // Refresh tasks instantly if we are on the todo page
+                activeTasks = existingTodos;
+                renderTasks();
+            }
+        });
+    </script>
+
+    <button id="backToTop" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</button>
+    <script>
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('backToTop');
+            if(window.scrollY > 300) btn.style.display = 'flex';
+            else btn.style.display = 'none';
+        });
+        
+        function toggleMobileNav() {
+            const nav = document.querySelector('.nav-menu');
+            if(nav) nav.classList.toggle('open');
+        }
+        
+        if('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(console.error);
+        }
+    </script>
+
+<script>
+        // --- Navigation Preferences Logic ---
+        function applyNavPreferences() {
+            try {
+                const hiddenNavs = JSON.parse(localStorage.getItem('kore_hidden_navs') || '[]');
+                if (hiddenNavs.length > 0) {
+                    const links = document.querySelectorAll('.dropdown-content a');
+                    links.forEach(link => {
+                        const href = link.getAttribute('href');
+                        if (hiddenNavs.includes(href)) {
+                            link.style.display = 'none';
+                        } else {
+                            link.style.display = 'block';
+                        }
+                    });
+                    
+                    // Hide empty dropdowns
+                    document.querySelectorAll('.nav-item').forEach(item => {
+                        const dropdown = item.querySelector('.dropdown-content');
+                        if (dropdown) {
+                            const visibleLinks = Array.from(dropdown.querySelectorAll('a')).filter(a => a.style.display !== 'none');
+                            if (visibleLinks.length === 0) {
+                                item.style.display = 'none';
+                            } else {
+                                item.style.display = 'flex';
+                            }
+                        }
+                    });
+                } else {
+                    document.querySelectorAll('.dropdown-content a').forEach(a => a.style.display = 'block');
+                }
+            } catch(e) {}
+        }
+        document.addEventListener('DOMContentLoaded', applyNavPreferences);
+</script>
+
+
+<!-- Mobile Nav Script (Injected) -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        if (item.querySelector('.dropdown-content')) {
+            item.addEventListener('click', (e) => {
+                if (window.innerWidth <= 1023) {
+                    if (e.target.tagName.toLowerCase() === 'a' && e.target.closest('.dropdown-content')) {
+                        return;
+                    }
+                    e.preventDefault();
+                    item.classList.toggle('open-mobile');
+                }
+            });
+        }
+    });
+});
+</script>
+</body>
+</html>
+ 

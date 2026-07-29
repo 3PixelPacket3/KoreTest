@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kore | Document Library</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        :root {
+            --accent-primary: #0ea5e9; --accent-hover: #0284c7;
+            --bg-app: #f8fafc; --bg-surface: #ffffff;
+            --text-main: #0f172a; --text-secondary: #475569;
+            --border-subtle: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.05);
+            --shadow-hover: 0 10px 15px -3px rgba(15, 23, 42, 0.08);
+            --radius-md: 12px; --radius-sm: 8px;
+            --danger: #ef4444; --success: #10b981;
+            --global-badge: #8b5cf6;
+        }
+        /* THEME: Midnight Dark */
+        body[data-theme="midnight"] {
+            --bg-app: #0f172a; --bg-surface: #1e293b; --text-main: #f8fafc; --text-secondary: #94a3b8;
+            --border-subtle: #334155; --accent-primary: #38bdf8; --accent-hover: #7dd3fc;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5); --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+        /* THEME: Cyberpunk */
+        body[data-theme="cyberpunk"] {
+            --bg-app: #000000; --bg-surface: #121212; --text-main: #00ff41; --text-secondary: #ff00ff;
+            --border-subtle: #00ff41; --accent-primary: #ff00ff; --accent-hover: #ff00aa;
+            --radius-md: 0px; --radius-sm: 0px; --shadow-sm: 0 0 5px rgba(0, 255, 65, 0.2);
+            --shadow-md: 0 0 10px rgba(255, 0, 255, 0.2);
+        }
+        /* THEME: Corporate Classic */
+        body[data-theme="corporate"] {
+            --bg-app: #e2e8f0; --bg-surface: #ffffff; --text-main: #1e293b; --text-secondary: #475569;
+            --border-subtle: #cbd5e1; --accent-primary: #1d4ed8; --accent-hover: #1e40af;
+            --radius-md: 4px; --radius-sm: 2px;
+        }
+        /* THEME: Earthy Minimal */
+        body[data-theme="earthy"] {
+            --bg-app: #fdf8f5; --bg-surface: #ffffff; --text-main: #3f3e3a; --text-secondary: #6b7280;
+            --border-subtle: #e5e5e5; --accent-primary: #5c7f67; --accent-hover: #4a6652;
+            --radius-md: 24px; --radius-sm: 16px;
+        }
+        /* THEME: Oceanic */
+        body[data-theme="oceanic"] {
+            --bg-app: #e0f2fe; --bg-surface: #f0f9ff; --text-main: #0c4a6e; --text-secondary: #0369a1;
+            --border-subtle: #bae6fd; --accent-primary: #0284c7; --accent-hover: #0369a1;
+            --radius-md: 16px; --radius-sm: 12px;
+        }
+
+        body {
+            margin: 0; font-family: 'Inter', system-ui, sans-serif; background-color: var(--bg-app); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh;  }
+
+        .global-header { background-color: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 64px; box-shadow: var(--shadow-sm); flex-shrink: 0; position: sticky; top: 0; z-index: 100;}
+        .header-left { display: flex; align-items: center; gap: 40px; height: 100%; }
+        .kore-logo { font-size: 1.5rem; font-weight: 800; color: var(--text-main); margin: 0; display: flex; gap: 8px; }
+        .kore-logo span { color: var(--accent-primary); }
+        .nav-menu { display: flex; gap: 8px; height: 100%; }
+        .nav-item { text-decoration: none; color: var(--text-secondary); padding: 0 16px; display: flex; align-items: center; height: 100%; font-weight: 500; font-size: 0.95rem; border-bottom: 3px solid transparent; cursor: pointer; position: relative; transition: all 0.2s ease;}
+        .nav-item:hover, .nav-item.active { color: var(--accent-primary); border-bottom-color: var(--accent-primary); background-color: rgba(14, 165, 233, 0.08); }
+        .dropdown-content { display: none; position: absolute; top: 64px; left: 0; background-color: var(--bg-surface); min-width: 200px; box-shadow: var(--shadow-md); border: 1px solid var(--border-subtle); border-radius: 0 0 var(--radius-sm) var(--radius-sm); overflow: hidden; z-index: 101; }
+        .nav-item:hover .dropdown-content { display: block; }
+        .dropdown-content a { white-space: nowrap; color: var(--text-secondary); padding: 14px 20px; text-decoration: none; display: block; border-bottom: 1px solid var(--bg-app); font-weight: 500; }
+        .dropdown-content a:hover { background-color: rgba(14, 165, 233, 0.08); color: var(--accent-primary); padding-left: 24px; transition: all 0.2s ease; }
+        .user-badge { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); background: var(--bg-app); padding: 6px 12px; border-radius: 99px; border: 1px solid var(--border-subtle); margin-left: auto; margin-right: 24px;}
+
+        .main-container { padding: 40px 32px; max-width: 1400px; margin: 0 auto; width: 100%; box-sizing: border-box; flex-grow: 1; }
+
+        .hero-banner { background: var(--bg-surface); border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm); height: 160px; position: relative; margin-bottom: 24px; display: flex; align-items: stretch; }
+        .hero-banner img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;}
+        .hero-overlay { position: relative; z-index: 2; width: 100%; background: linear-gradient(to right, rgba(15,23,42,0.95), rgba(15,23,42,0.6)); padding: 24px 30px; box-sizing: border-box; color: white; display: flex; justify-content: space-between; align-items: center;}
+        .hero-title { margin: 0; font-size: 1.8rem; font-weight: 700; }
+        
+        .storage-tracker { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: var(--radius-sm); padding: 12px 20px; width: 300px; backdrop-filter: blur(4px); }
+        .storage-text { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: #f8fafc; }
+        .storage-bar-bg { width: 100%; height: 8px; background: rgba(0,0,0,0.3); border-radius: 99px; overflow: hidden; }
+        .storage-bar-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.5s ease; }
+        .storage-bar-fill.warning { background: #f59e0b; }
+        .storage-bar-fill.danger { background: var(--danger); }
+
+        .library-controls { display: grid; grid-template-columns: 1fr 360px; gap: 24px; margin-bottom: 24px; align-items: start; }
+        
+        .upload-container { display: flex; flex-direction: column; gap: 12px; height: 100%; }
+        .upload-zone { background: var(--bg-surface); border: 2px dashed var(--accent-primary); border-radius: var(--radius-md); padding: 30px 20px; text-align: center; transition: all 0.2s; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-grow: 1; box-sizing: border-box;}
+        .upload-zone:hover, .upload-zone.dragover { background: rgba(14, 165, 233, 0.08); box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1); }
+        .upload-icon { font-size: 2.4rem; color: var(--accent-primary); margin-bottom: 8px; }
+        .upload-text { font-weight: 700; color: var(--text-main); margin-bottom: 4px; font-size: 1.1rem; }
+        .upload-subtext { font-size: 0.85rem; color: var(--text-secondary); }
+        #fileInput { display: none; }
+        
+        .controls-row { display: flex; gap: 12px; }
+        .global-push-toggle { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; box-shadow: var(--shadow-sm); flex-grow: 1; }
+        .global-push-toggle input { width: 18px; height: 18px; cursor: pointer; accent-color: var(--global-badge); }
+        .global-push-toggle span { font-weight: 600; font-size: 0.9rem; color: var(--text-main); }
+        
+        .btn-primary { background-color: var(--accent-primary); color: white; border: none; padding: 12px 20px; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem;}
+        .btn-primary:hover { background-color: var(--accent-hover); box-shadow: var(--shadow-hover); }
+
+        .filters-panel { background: var(--bg-surface); border-radius: var(--radius-md); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm); padding: 20px; display: flex; flex-direction: column; gap: 16px; height: 100%; box-sizing: border-box; overflow: hidden; }
+        .filter-row { display: flex; gap: 12px; align-items: center; width: 100%; box-sizing: border-box; }
+        .search-bar { flex-grow: 1; padding: 10px 16px; border: 1px solid var(--border-subtle); border-radius: 99px; font-size: 0.9rem; outline: none; background: var(--bg-app); transition: all 0.2s; box-sizing: border-box; width: 100%; }
+        .search-bar:focus { border-color: var(--accent-primary); background: var(--bg-surface); box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); }
+        .select-filter { padding: 10px 12px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); font-size: 0.9rem; outline: none; background: var(--bg-app); color: var(--text-main); cursor: pointer; flex-grow: 1; box-sizing: border-box; width: 50%; max-width: 100%; }
+
+        .breadcrumb-container { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; font-weight: 600; color: var(--text-secondary); font-size: 0.95rem; }
+        .breadcrumb-link { cursor: pointer; color: var(--accent-primary); transition: color 0.2s; }
+        .breadcrumb-link:hover { color: var(--accent-hover); text-decoration: underline; }
+
+        .view-toggles { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 16px; }
+        .view-btn { background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.85rem; cursor: pointer; color: var(--text-secondary); transition: all 0.2s; }
+        .view-btn.active { background: var(--accent-primary); color: white; border-color: var(--accent-primary); }
+
+        /* Error/System Overlays */
+        .system-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); z-index: 2000; display: none; align-items: center; justify-content: center; flex-direction: column; backdrop-filter: blur(8px); }
+        .system-modal { background: var(--bg-surface); padding: 32px; border-radius: var(--radius-md); max-width: 500px; width: 90%; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        .error-icon { font-size: 3rem; color: var(--danger); margin-bottom: 16px; }
+        .spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.2); border-top-color: var(--accent-primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 16px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Grid View */
+        .doc-container.grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+        .doc-container.grid-view .doc-card { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm); transition: all 0.2s ease; display: flex; flex-direction: column; position: relative; }
+        .doc-container.grid-view .doc-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: var(--accent-primary); }
+        .doc-container.grid-view .doc-icon-wrapper { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 16px; }
+        .doc-container.grid-view .doc-title { font-weight: 700; color: var(--text-main); font-size: 0.95rem; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .doc-container.grid-view .doc-meta { font-size: 0.8rem; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .doc-container.grid-view .doc-actions { display: flex; gap: 8px; border-top: 1px solid var(--border-subtle); padding-top: 16px; margin-top: auto; }
+
+        /* List View */
+        .doc-container.list-view { display: flex; flex-direction: column; gap: 12px; }
+        .doc-container.list-view .doc-card { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px 24px; box-shadow: var(--shadow-sm); transition: all 0.2s ease; display: flex; align-items: center; justify-content: space-between; position: relative;}
+        .doc-container.list-view .doc-card:hover { border-color: var(--accent-primary); }
+        .doc-container.list-view .doc-icon-wrapper { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-right: 16px; flex-shrink: 0;}
+        .doc-container.list-view .doc-info-group { display: flex; align-items: center; flex-grow: 1; overflow: hidden;}
+        .doc-container.list-view .doc-title { font-weight: 700; color: var(--text-main); font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 24px;}
+        .doc-container.list-view .doc-meta { font-size: 0.85rem; color: var(--text-secondary); display: flex; gap: 32px; margin-right: 24px; white-space: nowrap; flex-shrink: 0;}
+        .doc-container.list-view .doc-actions { display: flex; gap: 12px; border-left: 1px solid var(--border-subtle); padding-left: 24px; flex-shrink: 0;}
+
+        /* Icon Colors */
+        .doc-type-folder { background: #fef08a; color: #ca8a04; }
+        .doc-type-pdf { background: #fee2e2; color: #ef4444; }
+        .doc-type-image { background: #dcfce7; color: #10b981; }
+        .doc-type-word { background: #e0e7ff; color: #4f46e5; }
+        .doc-type-excel { background: #dcfce7; color: #16a34a; }
+        .doc-type-archive { background: #fef3c7; color: #d97706; }
+        .doc-type-code { background: #f3f4f6; color: #4b5563; }
+        .doc-type-default { background: #f1f5f9; color: #64748b; }
+
+        .btn-action { padding: 8px 12px; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600; cursor: pointer; text-align: center; border: 1px solid transparent; transition: all 0.2s; background: var(--bg-app); color: var(--text-main); }
+        .grid-view .btn-action { flex-grow: 1; }
+        .btn-action:hover { background: #e2e8f0; }
+        .btn-download { background: rgba(14, 165, 233, 0.08); color: var(--accent-primary); border-color: #bae6fd; }
+        .btn-download:hover { background: var(--accent-primary); color: white; }
+        .btn-delete { color: var(--danger); background: transparent; }
+        .btn-delete:hover { background: #fee2e2; }
+
+        .global-badge { position: absolute; top: -10px; right: -10px; background: var(--global-badge); color: white; font-size: 0.7rem; font-weight: 800; padding: 4px 10px; border-radius: 99px; box-shadow: var(--shadow-sm); text-transform: uppercase; letter-spacing: 0.05em; border: 2px solid white; z-index: 5;}
+        .list-view .global-badge { position: relative; top: 0; right: 0; margin-right: 16px; border: none;}
+
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-secondary); grid-column: 1 / -1; background: var(--bg-surface); border: 1px dashed var(--border-subtle); border-radius: var(--radius-md); }
+        
+        .preview-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 40px; box-sizing: border-box; cursor: zoom-out;}
+        .preview-modal img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: var(--radius-sm); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        .preview-close { position: absolute; top: 20px; right: 30px; color: white; font-size: 2rem; cursor: pointer; font-weight: bold; }
+
+        .global-footer { background-color: var(--bg-surface); border-top: 1px solid var(--border-subtle); padding: 24px; text-align: center; color: var(--text-secondary); font-size: 0.9rem; flex-shrink: 0; font-weight: 500; }
+    
+        
+    
+    
+            pre, code { white-space: pre-wrap; word-break: break-word; overflow-x: auto; max-width: 100%; }
+    
+    </style>
+
+    <!-- SEO & Mobile Optimization -->
+    <meta name="description" content="Kore Enterprise Workspace - Advanced Cloud Management System">
+    <meta name="keywords" content="Kore, Workspace, Enterprise, Management, LOD">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' font-family='Arial' fill='%230ea5e9' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' font-family='Arial' fill='%230ea5e9' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+
+    <style>
+        /* Mobile Layout & Back-to-Top */
+        
+        
+        .mobile-toggle { display: none; }
+        
+        #backToTop {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s, background 0.3s;
+        }
+        #backToTop:hover { background: var(--accent-hover); }
+    </style>
+
+    <script>
+        
+        window.uiPrompt = function(msg) {
+            return new Promise(resolve => {
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:99999;display:flex;align-items:center;justify-content:center;';
+                const box = document.createElement('div');
+                box.style.cssText = 'background:var(--bg-surface,#fff);padding:24px;border-radius:8px;max-width:400px;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,0.2);border:1px solid var(--border-subtle,#ccc);color:var(--text-main,#000);font-family:sans-serif;width:90%;';
+                box.innerHTML = '<p style="margin-top:0;margin-bottom:16px;font-size:1.1rem;">' + msg + '</p>' +
+                                '<input type="text" id="uiPromptInput" style="width:100%;padding:10px;margin-bottom:24px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box;">' +
+                                '<div style="display:flex;gap:12px;justify-content:center;">' +
+                                '<button id="uiPromptCancel" style="padding:8px 16px;border:1px solid #ccc;background:transparent;cursor:pointer;border-radius:4px;color:var(--text-main,#000);">Cancel</button>' +
+                                '<button id="uiPromptOk" style="padding:8px 16px;border:none;background:#0ea5e9;color:#fff;cursor:pointer;border-radius:4px;">OK</button>' +
+                                '</div>';
+                overlay.appendChild(box);
+                document.body.appendChild(overlay);
+                document.getElementById('uiPromptInput').focus();
+                document.getElementById('uiPromptCancel').onclick = () => { document.body.removeChild(overlay); resolve(null); };
+                document.getElementById('uiPromptOk').onclick = () => { const val = document.getElementById('uiPromptInput').value; document.body.removeChild(overlay); resolve(val); };
+                document.getElementById('uiPromptInput').onkeydown = (e) => { if(e.key === 'Enter') document.getElementById('uiPromptOk').click(); };
+            });
+        };
+
+        window.uiConfirm = function(msg) {
+            return new Promise(resolve => {
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:99999;display:flex;align-items:center;justify-content:center;';
+                const box = document.createElement('div');
+                box.style.cssText = 'background:var(--bg-surface,#fff);padding:24px;border-radius:8px;max-width:400px;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,0.2);border:1px solid var(--border-subtle,#ccc);color:var(--text-main,#000);font-family:sans-serif;';
+                box.innerHTML = '<p style="margin-top:0;margin-bottom:24px;font-size:1.1rem;">' + msg + '</p>' +
+                                '<div style="display:flex;gap:12px;justify-content:center;">' +
+                                '<button id="uiConfirmCancel" style="padding:8px 16px;border:1px solid #ccc;background:transparent;cursor:pointer;border-radius:4px;color:var(--text-main,#000);">Cancel</button>' +
+                                '<button id="uiConfirmOk" style="padding:8px 16px;border:none;background:#ef4444;color:#fff;cursor:pointer;border-radius:4px;">Confirm</button>' +
+                                '</div>';
+                overlay.appendChild(box);
+                document.body.appendChild(overlay);
+                document.getElementById('uiConfirmCancel').onclick = () => { document.body.removeChild(overlay); resolve(false); };
+                document.getElementById('uiConfirmOk').onclick = () => { document.body.removeChild(overlay); resolve(true); };
+            });
+        };
+</script>
+
+<style>
+/* --- RESPONSIVE MOBILE & TABLET (Injected) --- */
+* { box-sizing: border-box; }
+img, video, iframe, canvas { max-width: 100%; height: auto; }
+body { overflow-x: hidden; width: 100%; }
+
+@media (max-width: 1023px) {
+    .modal-content, .system-modal, .storage-tracker { max-width: 95vw !important; }
+
+    .global-header {
+        flex-direction: column;
+        height: auto;
+        padding: 10px 16px;
+        gap: 10px;
+    }
+    .header-left {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .search-container {
+        width: 100%;
+    }
+    .search-bar {
+        width: 100%;
+    }
+    .mobile-toggle {
+        display: flex !important;
+        align-items: center;
+        background: none;
+        border: none;
+        color: var(--text-main);
+        cursor: pointer;
+    }
+    .nav-menu {
+        display: none !important;
+        flex-direction: column;
+        width: 100%;
+        background: var(--bg-surface);
+        position: absolute;
+        top: 100%;
+        left: 0;
+        box-shadow: var(--shadow-md);
+        z-index: 200;
+        max-height: 70vh;
+        overflow-y: auto;
+        border-top: 1px solid var(--border-subtle);
+    }
+    .nav-menu.open {
+        display: flex !important;
+    }
+    .nav-item {
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--border-subtle);
+        width: 100%;
+        flex-wrap: wrap;
+        height: auto;
+    }
+    .nav-item:last-child {
+        border-bottom: none;
+    }
+    .dropdown-content {
+        position: static;
+        display: none;
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        width: 100%;
+        padding-left: 20px;
+        margin-top: 10px;
+    }
+    .nav-item.open-mobile .dropdown-content {
+        display: block !important;
+    }
+    /* Hide hover effects on mobile */
+    .nav-item:hover .dropdown-content, 
+    .nav-item:focus-within .dropdown-content,
+    .nav-item:active .dropdown-content {
+        display: none;
+    }
+    .nav-item.open-mobile:hover .dropdown-content,
+    .nav-item.open-mobile:focus-within .dropdown-content,
+    .nav-item.open-mobile:active .dropdown-content {
+        display: block !important;
+    }
+    
+    .dashboard-grid, .dashboard-layout, .apps-grid, .grid-container,
+    .layout-grid, .chart-grid, .library-controls, .add-task-panel,
+    .controls-grid, .content-grid, .layout-split, .form-grid,
+    .metrics-bar, .view-boxes, .grid-2, .workspace-grid,
+    .kpi-grid, .nav-pref-grid, .color-target-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .metrics-bar, .form-grid {
+        gap: 16px !important;
+    }
+    .main-container {
+        padding: 15px !important;
+    }
+    .hero-banner {
+        padding: 30px 15px !important;
+        height: auto !important;
+        min-height: 160px;
+    }
+    .hero-title {
+        font-size: 1.8rem !important;
+    }
+    
+    /* Make tables scrollable */
+    table, .table-container, .data-table-container {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    /* Ensure containers don't overflow */
+    .panel, .card, .widget, .card-body, .intel-panel, .info-panel {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    /* Layout fixes for sidebars */
+    .workspace-layout {
+        flex-direction: column !important;
+    }
+    .sidebar {
+        width: 100% !important;
+        max-height: none !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border-subtle);
+        position: static !important;
+    }
+}
+</style>
+
+</head>
+
+<body>
+<script>
+    // Theme Initializer to prevent flash on load
+    const savedTheme = localStorage.getItem('kore_theme') || 'default';
+    if(savedTheme !== 'default') {
+        document.body.setAttribute('data-theme', savedTheme);
+    }
+</script>
+
+    <header class="global-header">
+        <div class="header-left">
+            <h1 class="kore-logo">Kore<span>.</span></h1>
+        <button class="mobile-toggle" aria-label="Toggle Menu" onclick="toggleMobileNav()"><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 12h18M3 6h18M3 18h18"></path></svg></button>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">Dashboard</a>
+                <div class="nav-item">Operations ▼
+                    <div class="dropdown-content">
+                        <a href="apps.html">Apps</a>
+                        <a href="file-converter.html">File to LOAD Converter</a>
+                        <a href="lod.html">LOD Validation Tool</a>
+                        <a href="macros.html">Macro Library</a>
+                        <a href="nebula.html">Nebula HTML Forge</a>
+                        <a href="passwords.html">Password Generator</a>
+                    <a href="business-tools.html">Business & Sec Tools</a>
+                        <a href="todo.html">Personal To-Do</a>
+                        <a href="product-html.html">Product HTML Converter</a>
+                        <a href="scanner.html">Vulnerability Scanner</a>
+                        <a href="work.html">Work Tracker</a>
+                    </div>
+                </div>
+                <div class="nav-item active">Resources ▼
+                    <div class="dropdown-content">
+                        <a href="info-archive.html">Archive</a>
+                        <a href="reports.html">Data/Reports</a>
+                        <a href="docs.html">Document Library</a>
+                        <a href="info-hub.html">Info Hub</a>
+                    </div>
+                </div>
+                <a href="about.html" class="nav-item">About</a>
+                <a href="settings.html" class="nav-item">Settings</a>
+            </nav>
+        </div>
+        <div id="userIdentityBadge" class="user-badge">Authenticating...</div>
+    </header>
+
+    <div class="system-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <h3 id="overlayText" style="color: white; margin-top: 16px;">Encrypting & Saving to Vault...</h3>
+    </div>
+
+    <div class="system-overlay" id="errorOverlay">
+        <div class="system-modal">
+            <div class="error-icon">⚠️</div>
+            <h2 id="errorTitle">System Conflict</h2>
+            <p id="errorMsg" style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px;"></p>
+            <button class="btn-primary" style="width: 100%;" onclick="closeError()">Understood</button>
+        </div>
+    </div>
+
+    <div class="preview-modal" id="imagePreviewModal" onclick="closePreview()">
+        <div class="preview-close">&times;</div>
+        <img id="previewImgSrc" src="" alt="File Preview">
+    </div>
+
+    <main class="main-container">
+        
+        <section class="hero-banner">
+            <img src="images/InfoHubBanner.jpg" alt="Document Library Banner" onerror="this.onerror=null; this.src='https://picsum.photos/1200/300?grayscale&blur=2';">
+            <div class="hero-overlay">
+                <div>
+                    <h2 class="hero-title">Enterprise Document Vault</h2>
+                    <div style="font-size: 0.9rem; font-weight: 600; opacity: 0.9; margin-top: 4px;" id="fileCountDisplay">0 Files Stored</div>
+                </div>
+                <div class="storage-tracker">
+                    <div class="storage-text">
+                        <span>Vault Capacity</span>
+                        <span id="storageStats">0.00 MB / 100 MB</span>
+                    </div>
+                    <div class="storage-bar-bg">
+                        <div class="storage-bar-fill" id="storageProgressBar"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="library-controls">
+            <div class="upload-container">
+                <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Drag & Drop Files Here</div>
+                    <div class="upload-subtext">Individual file limit: 50 MB (Cloud Vault Segregated Chunking)</div>
+                    <input type="file" id="fileInput" multiple onchange="handleFilesSelected(event)">
+                </div>
+                <div class="controls-row">
+                    <label class="global-push-toggle" id="globalPushContainer" style="display: none;" title="Global vault updates require admin authorization">
+                        <input type="checkbox" id="isGlobalDoc">
+                        <span>🌐 Push to Global</span>
+                    </label>
+                    <button class="btn-primary" onclick="createFolder()">➕ New Folder</button>
+                </div>
+            </div>
+
+            <div class="filters-panel">
+                <div class="filter-row">
+                    <input type="text" class="search-bar" id="searchDocs" placeholder="Search by filename..." oninput="renderLibrary()">
+                </div>
+                <div class="filter-row">
+                    <select class="select-filter" id="filterType" onchange="renderLibrary()">
+                        <option value="all">All File Types</option>
+                        <option value="folder">Folders</option>
+                        <option value="pdf">PDF Documents</option>
+                        <option value="image">Images</option>
+                        <option value="doc">Word / Text</option>
+                        <option value="sheet">Spreadsheets</option>
+                        <option value="archive">Archives (ZIP/RAR)</option>
+                        <option value="code">Code Snippets</option>
+                    </select>
+                    <select class="select-filter" id="sortOrder" onchange="renderLibrary()">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="name_asc">Name (A-Z)</option>
+                        <option value="name_desc">Name (Z-A)</option>
+                        <option value="size_desc">Largest Size</option>
+                        <option value="size_asc">Smallest Size</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+            <div class="breadcrumb-container" id="breadcrumbNav">
+                <span class="breadcrumb-link" onclick="navigateToFolder(null)">Vault Root</span>
+            </div>
+            <div class="view-toggles">
+                <button class="view-btn active" id="btnGrid" onclick="setLibraryView('grid')">▦ Grid View</button>
+                <button class="view-btn" id="btnList" onclick="setLibraryView('list')">☰ List View</button>
+            </div>
+        </div>
+
+        <div class="doc-container grid-view" id="libraryContainer"></div>
+
+    </main>
+
+    <footer class="global-footer">&copy; 2026 Kore | Enterprise Cloud Vault Connected.</footer>
+
+    <script>
+        let cloudIdentity = { userId: "local-dev", userName: "Local Developer" };
+        let personalVault = []; 
+        let globalVault = [];
+        let combinedVault = [];
+        let currentView = 'grid';
+        let currentFolderId = null;
+        
+        // Revised limits for Table Storage Architecture
+        const MAX_STORAGE_MB = 10000; 
+        const MAX_SINGLE_FILE_MB = 50; // Reduced to 5MB to strictly respect Azure Table Entity column limits (252 properties)
+        const MAX_PAYLOAD_LIMIT_MB = 10000; 
+
+        async function fetchSecureIdentity() {
+            try {
+                const response = await fetch('/.auth/me');
+                const data = await response.json();
+                if (data.clientPrincipal) {
+                    cloudIdentity.userId = data.clientPrincipal.userId;
+                    cloudIdentity.userName = data.clientPrincipal.userDetails;
+                    document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+                    window.isAdminUser = data.clientPrincipal.userRoles && data.clientPrincipal.userRoles.includes('admin');
+                }
+            } catch (error) {}
+            
+            try {
+                const adminData = await loadCloudDataAs(cloudIdentity.userId, 'admin_settings') || { admins: [] };
+                if (!adminData.admins) adminData.admins = [];
+                const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                if (!window.isAdminUser) {
+                    window.isAdminUser = isLocal || adminData.admins.length === 0 || adminData.admins.includes(cloudIdentity.userName);
+                }
+            } catch (e) {}
+
+            if (window.isAdminUser) {
+                document.getElementById('globalPushContainer').style.display = 'flex';
+            }
+        }
+
+        async function loadCloudDataAs(uid, dataType) {
+            try {
+                const res = await fetch(`/api/get_user_data?userId=${uid}&dataType=${dataType}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && (Object.keys(data).length > 0 || data.length > 0)) return data;
+                }
+            } catch(e) {}
+            return [];
+        }
+
+        async function saveCloudDataAs(uid, dataType, data) {
+            const payloadString = JSON.stringify({ userId: uid, dataType: dataType, data: data });
+            const payloadSizeMB = new Blob([payloadString]).size / (1024 * 1024);
+            
+            if (payloadSizeMB > MAX_PAYLOAD_LIMIT_MB) {
+                showError("Cloud Capacity Exhausted", 
+                    `Vault threshold reached, please clear old items.`);
+                return false;
+            }
+
+            try {
+                const res = await fetch('/api/save_user_data', {
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: payloadString
+                });
+                if (!res.ok) throw new Error("API rejection");
+                return true;
+            } catch(e) {
+                showError("Vault Sync Failed", "The server rejected the sync request. This usually happens if the total vault data is too heavy for a single transmission.");
+                return false;
+            }
+        }
+
+        function showError(title, msg) {
+            document.getElementById('errorTitle').innerText = title;
+            document.getElementById('errorMsg').innerText = msg;
+            document.getElementById('errorOverlay').style.display = 'flex';
+        }
+
+        function closeError() {
+            document.getElementById('errorOverlay').style.display = 'none';
+        }
+
+        async function loadAllVaults() {
+            // Load only metadata arrays. Base64 content is now isolated.
+            personalVault = await loadCloudDataAs(cloudIdentity.userId, 'document_library') || [];
+            globalVault = await loadCloudDataAs('GLOBAL_DOCS', 'document_library') || [];
+            combinedVault = [...globalVault, ...personalVault];
+            
+            // Clean up legacy monolithic files to prevent lock-outs
+            let requiresMigration = false;
+            combinedVault.forEach(doc => {
+                if (doc.dataUri && doc.dataUri.length > 100) {
+                    doc.dataUri = ''; // Strip heavy data from the library index
+                    requiresMigration = true;
+                }
+            });
+            if(requiresMigration){
+                await saveCloudDataAs(cloudIdentity.userId, 'document_library', personalVault);
+                await saveCloudDataAs('GLOBAL_DOCS', 'document_library', globalVault);
+            }
+        }
+
+        // --- Drag and Drop Logic ---
+        const dropZone = document.getElementById('dropZone');
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); });
+        dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); if (e.dataTransfer.files.length) processFiles(e.dataTransfer.files); });
+        
+        function handleFilesSelected(event) { 
+            if (event.target.files.length) processFiles(event.target.files); 
+        }
+
+        function formatBytes(bytes, decimals = 2) {
+            if (!+bytes) return '0 Bytes';
+            const k = 1024; const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+        }
+
+        function getFileTypeCategory(mime, filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            if (mime === 'folder' || ext === 'folder') return 'folder';
+            if (mime.includes('pdf') || ext === 'pdf') return 'pdf';
+            if (mime.includes('image') || ['jpg','jpeg','png','gif','svg','webp'].includes(ext)) return 'image';
+            if (mime.includes('word') || mime.includes('document') || ['doc','docx','txt','rtf'].includes(ext)) return 'doc';
+            if (mime.includes('excel') || mime.includes('spreadsheet') || ['xls','xlsx','csv'].includes(ext)) return 'sheet';
+            if (mime.includes('zip') || mime.includes('compressed') || ['zip','rar','7z','tar'].includes(ext)) return 'archive';
+            if (['html','css','js','py','json','xml'].includes(ext)) return 'code';
+            return 'default';
+        }
+
+        function getFileIcon(category) {
+            switch(category) {
+                case 'folder': return '📁';
+                case 'pdf': return '📄';
+                case 'image': return '🖼️';
+                case 'doc': return '📝';
+                case 'sheet': return '📊';
+                case 'archive': return '🗜️';
+                case 'code': return '⌨️';
+                default: return '🗎';
+            }
+        }
+
+        async function processFiles(files) {
+            const isGlobal = document.getElementById('isGlobalDoc').checked;
+            
+            // Limit checks
+            for (let f of files) {
+                if (f.size > MAX_SINGLE_FILE_MB * 1024 * 1024) {
+                    showError("File Too Large", `"${f.name}" exceeds the ${MAX_SINGLE_FILE_MB}MB safety limit for individual uploads. Azure Table rows cannot support this file size.`);
+                    return;
+                }
+            }
+
+            const overlay = document.getElementById('loadingOverlay');
+            document.getElementById('overlayText').innerText = "Encrypting & Sharding to Vault...";
+            overlay.style.display = 'flex';
+
+            const readPromises = Array.from(files).map(file => {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve({ file, base64: e.target.result });
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            const fileResults = await Promise.all(readPromises);
+            const tempVault = isGlobal ? [...globalVault] : [...personalVault];
+            const identityId = isGlobal ? 'GLOBAL_DOCS' : cloudIdentity.userId;
+
+            // Save individual contents as independent payload chunks
+            for (let {file, base64} of fileResults) {
+                const uniqueId = 'DOC-' + Date.now() + '-' + Math.random().toString(36).substring(2, 9);
+                
+                // Add Metadata Only to array
+                tempVault.push({
+                    id: uniqueId,
+                    name: file.name,
+                    sizeRaw: file.size,
+                    sizeStr: formatBytes(file.size),
+                    mimeType: file.type || 'application/octet-stream',
+                    category: getFileTypeCategory(file.type, file.name),
+                    uploadDate: new Date().toISOString(),
+                    dataUri: '', // Intentionally left blank in library array
+                    isGlobal: isGlobal,
+                    authorId: cloudIdentity.userId,
+                    parentId: currentFolderId 
+                });
+
+                // Push heavy payload independently
+                await saveCloudDataAs(identityId, 'DOC_CONTENT_' + uniqueId, { base64: base64 });
+            }
+
+            // Save lightweight metadata library
+            const success = await saveCloudDataAs(identityId, 'document_library', tempVault);
+            
+            if (success) {
+                if (isGlobal) globalVault = tempVault; else personalVault = tempVault;
+                combinedVault = [...globalVault, ...personalVault];
+                updateStorageTracker();
+                renderLibrary();
+            }
+
+            document.getElementById('fileInput').value = '';
+            overlay.style.display = 'none';
+        }
+
+        async function createFolder() {
+            const name = await window.uiPrompt("Enter new folder name:");
+            if (!name || name.trim() === '') return;
+
+            const isGlobal = document.getElementById('isGlobalDoc').checked;
+            const uniqueId = 'FOLD-' + Date.now() + '-' + Math.random().toString(36).substring(2, 9);
+            
+            const newFolder = {
+                id: uniqueId,
+                name: name.trim(),
+                sizeRaw: 0, sizeStr: '--',
+                mimeType: 'folder', category: 'folder',
+                uploadDate: new Date().toISOString(),
+                dataUri: '', isGlobal: isGlobal,
+                authorId: cloudIdentity.userId, parentId: currentFolderId
+            };
+
+            const tempVault = isGlobal ? [...globalVault, newFolder] : [...personalVault, newFolder];
+            const success = await saveCloudDataAs(isGlobal ? 'GLOBAL_DOCS' : cloudIdentity.userId, 'document_library', tempVault);
+
+            if (success) {
+                if (isGlobal) globalVault = tempVault; else personalVault = tempVault;
+                combinedVault = [...globalVault, ...personalVault];
+                renderLibrary();
+            }
+        }
+
+        function navigateToFolder(folderId) {
+            currentFolderId = folderId;
+            renderLibrary();
+        }
+
+        function navigateUp() {
+            if (!currentFolderId) return;
+            const current = combinedVault.find(d => d.id === currentFolderId);
+            currentFolderId = current ? (current.parentId || null) : null;
+            renderLibrary();
+        }
+
+        // Modified: Fetches payload dynamically
+        async function triggerDownload(docId, event) {
+            if (event) event.stopPropagation();
+            const doc = combinedVault.find(d => d.id === docId);
+            if (!doc || doc.category === 'folder') return;
+            
+            document.getElementById('overlayText').innerText = "Retrieving Payload...";
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            const identityId = doc.isGlobal ? 'GLOBAL_DOCS' : cloudIdentity.userId;
+            const payload = await loadCloudDataAs(identityId, 'DOC_CONTENT_' + doc.id);
+            
+            document.getElementById('loadingOverlay').style.display = 'none';
+
+            if (payload && payload.base64) {
+                const link = document.createElement("a");
+                link.href = payload.base64; link.download = doc.name;
+                document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            } else {
+                showError("File Unavailable", "Could not retrieve the Base64 file string from the database shard.");
+            }
+        }
+
+        // Modified: Fetches payload dynamically
+        async function previewImage(docId, event) {
+            if (event) event.stopPropagation();
+            const doc = combinedVault.find(d => d.id === docId);
+            if (doc && doc.category === 'image') {
+                document.getElementById('overlayText').innerText = "Loading Image Shard...";
+                document.getElementById('loadingOverlay').style.display = 'flex';
+
+                const identityId = doc.isGlobal ? 'GLOBAL_DOCS' : cloudIdentity.userId;
+                const payload = await loadCloudDataAs(identityId, 'DOC_CONTENT_' + doc.id);
+                
+                document.getElementById('loadingOverlay').style.display = 'none';
+
+                if (payload && payload.base64) {
+                    document.getElementById('previewImgSrc').src = payload.base64;
+                    document.getElementById('imagePreviewModal').style.display = 'flex';
+                } else {
+                    showError("File Unavailable", "Image payload could not be located in the vault.");
+                }
+            }
+        }
+
+        function closePreview() {
+            document.getElementById('imagePreviewModal').style.display = 'none';
+            document.getElementById('previewImgSrc').src = '';
+        }
+
+        async function deleteDocument(docId, event) {
+            if (event) event.stopPropagation();
+            const doc = combinedVault.find(d => d.id === docId);
+            if (!doc) return;
+
+            if (doc.isGlobal) {
+                if (!window.isAdminUser) { alert("Authorization Denied. Admin access required."); return; }
+                if (!(await uiConfirm(`Delete this Global document?`))) return;
+            } else if (!(await uiConfirm(`Are you certain you wish to delete this document?`))) {
+                return;
+            }
+
+            document.getElementById('overlayText').innerText = "Scrubbing from Vault...";
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            const idsToRemove = getIdsToDelete(docId, combinedVault);
+            const targetVault = doc.isGlobal ? globalVault : personalVault;
+            const filteredVault = targetVault.filter(d => !idsToRemove.includes(d.id));
+            const identityId = doc.isGlobal ? 'GLOBAL_DOCS' : cloudIdentity.userId;
+
+            // Delete metadata library
+            const success = await saveCloudDataAs(identityId, 'document_library', filteredVault);
+            
+            // Delete payload shards to free up table size
+            for(let id of idsToRemove) {
+                await saveCloudDataAs(identityId, 'DOC_CONTENT_' + id, {});
+            }
+            
+            if (success) {
+                if (doc.isGlobal) globalVault = filteredVault; else personalVault = filteredVault;
+                combinedVault = [...globalVault, ...personalVault];
+                updateStorageTracker();
+                renderLibrary();
+            }
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function getIdsToDelete(targetId, vault) {
+            let ids = [targetId];
+            const children = vault.filter(d => d.parentId === targetId);
+            children.forEach(c => ids = ids.concat(getIdsToDelete(c.id, vault)));
+            return ids;
+        }
+
+        function updateStorageTracker() {
+            let totalBytes = 0;
+            personalVault.forEach(doc => totalBytes += (doc.sizeRaw || 0));
+            
+            const totalMB = totalBytes / (1024 * 1024);
+            let displaySize = totalMB < 1 ? (totalBytes / 1024).toFixed(1) + ' KB' : totalMB.toFixed(2) + ' MB';
+            if (totalBytes === 0) displaySize = '0.00 MB';
+
+            let percent = (totalMB / MAX_STORAGE_MB) * 100;
+            if (percent > 100) percent = 100;
+
+            document.getElementById('storageStats').innerText = `${displaySize} / ${MAX_STORAGE_MB} MB`;
+            const bar = document.getElementById('storageProgressBar');
+            bar.style.width = `${percent}%`;
+            bar.className = 'storage-bar-fill';
+            if (percent > 85) bar.classList.add('danger');
+            else if (percent > 65) bar.classList.add('warning');
+            
+            document.getElementById('fileCountDisplay').innerText = `${combinedVault.length} Vault Assets`;
+        }
+
+        function setLibraryView(view) {
+            currentView = view;
+            document.getElementById('btnGrid').classList.toggle('active', view === 'grid');
+            document.getElementById('btnList').classList.toggle('active', view === 'list');
+            document.getElementById('libraryContainer').className = `doc-container ${view}-view`;
+        }
+
+        function updateBreadcrumbs() {
+            const nav = document.getElementById('breadcrumbNav');
+            let html = `<span class="breadcrumb-link" onclick="navigateToFolder(null)">Vault Root</span>`;
+            if (currentFolderId) {
+                let path = [];
+                let current = combinedVault.find(d => d.id === currentFolderId);
+                while (current) {
+                    path.unshift(current);
+                    current = combinedVault.find(d => d.id === current.parentId);
+                }
+                path.forEach(folder => {
+                    html += ` <span>/</span> <span class="breadcrumb-link" onclick="navigateToFolder('${folder.id}')">${folder.name}</span>`;
+                });
+            }
+            nav.innerHTML = html;
+        }
+
+        function renderLibrary() {
+            const container = document.getElementById('libraryContainer');
+            container.innerHTML = '';
+            updateBreadcrumbs();
+
+            const searchQ = document.getElementById('searchDocs').value.toLowerCase();
+            const filterType = document.getElementById('filterType').value;
+            const sortOrder = document.getElementById('sortOrder').value;
+
+            let filteredDocs = combinedVault.filter(doc => {
+                const matchSearch = doc.name.toLowerCase().includes(searchQ);
+                const matchType = (filterType === 'all') || (doc.category === filterType);
+                const matchFolder = searchQ ? true : ((doc.parentId || null) === currentFolderId);
+                return matchSearch && matchType && matchFolder;
+            });
+
+            filteredDocs.sort((a, b) => {
+                if (sortOrder !== 'size_desc' && sortOrder !== 'size_asc') {
+                    if (a.category === 'folder' && b.category !== 'folder') return -1;
+                    if (a.category !== 'folder' && b.category === 'folder') return 1;
+                }
+                switch(sortOrder) {
+                    case 'newest': return new Date(b.uploadDate) - new Date(a.uploadDate);
+                    case 'oldest': return new Date(a.uploadDate) - new Date(b.uploadDate);
+                    case 'name_asc': return a.name.localeCompare(b.name);
+                    case 'name_desc': return b.name.localeCompare(a.name);
+                    case 'size_desc': return (b.sizeRaw||0) - (a.sizeRaw||0);
+                    case 'size_asc': return (a.sizeRaw||0) - (b.sizeRaw||0);
+                    default: return 0;
+                }
+            });
+
+            if (currentFolderId && !searchQ) {
+                container.innerHTML += `
+                    <div class="doc-card" onclick="navigateUp()" style="cursor:pointer; border-style: dashed;">
+                        <div class="doc-info-group"><div class="doc-icon-wrapper doc-type-default">⤴️</div><div class="doc-title">... Go Up</div></div>
+                    </div>`;
+            }
+
+            if (filteredDocs.length === 0 && !currentFolderId) {
+                container.innerHTML = `<div class="empty-state"><h3>No documents found.</h3><p>Upload files or adjust your filters.</p></div>`;
+                return;
+            }
+
+            filteredDocs.forEach(doc => {
+                const dDate = new Date(doc.uploadDate).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'});
+                const globalBadge = doc.isGlobal ? `<div class="global-badge">Global</div>` : '';
+                const isFolder = doc.category === 'folder';
+                const clickAttr = isFolder ? `onclick="navigateToFolder('${doc.id}')"` : (doc.category === 'image' ? `onclick="previewImage('${doc.id}', event)"` : '');
+
+                container.innerHTML += `
+                    <div class="doc-card">
+                        ${globalBadge}
+                        <div class="doc-info-group">
+                            <div class="doc-icon-wrapper doc-type-${doc.category}" ${clickAttr} style="cursor:pointer">${getFileIcon(doc.category)}</div>
+                            <div class="doc-title" title="${doc.name}" ${clickAttr} style="cursor:pointer">${doc.name}</div>
+                        </div>
+                        <div class="doc-meta"><span style="font-weight: 600;">${doc.sizeStr}</span><span>${dDate}</span></div>
+                        <div class="doc-actions">
+                            ${!isFolder ? `<button class="btn-action btn-download" onclick="triggerDownload('${doc.id}', event)">⬇️ Download</button>` : ''}
+                            <button class="btn-action btn-delete" onclick="deleteDocument('${doc.id}', event)">Delete</button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchSecureIdentity();
+            await loadAllVaults();
+            updateStorageTracker();
+            setLibraryView('grid');
+            renderLibrary();
+        });
+    </script>
+
+    <button id="backToTop" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</button>
+    <script>
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('backToTop');
+            if(window.scrollY > 300) btn.style.display = 'flex';
+            else btn.style.display = 'none';
+        });
+        
+        function toggleMobileNav() {
+            const nav = document.querySelector('.nav-menu');
+            if(nav) nav.classList.toggle('open');
+        }
+        
+        if('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(console.error);
+        }
+    </script>
+
+<script>
+        // --- Navigation Preferences Logic ---
+        function applyNavPreferences() {
+            try {
+                const hiddenNavs = JSON.parse(localStorage.getItem('kore_hidden_navs') || '[]');
+                if (hiddenNavs.length > 0) {
+                    const links = document.querySelectorAll('.dropdown-content a');
+                    links.forEach(link => {
+                        const href = link.getAttribute('href');
+                        if (hiddenNavs.includes(href)) {
+                            link.style.display = 'none';
+                        } else {
+                            link.style.display = 'block';
+                        }
+                    });
+                    
+                    // Hide empty dropdowns
+                    document.querySelectorAll('.nav-item').forEach(item => {
+                        const dropdown = item.querySelector('.dropdown-content');
+                        if (dropdown) {
+                            const visibleLinks = Array.from(dropdown.querySelectorAll('a')).filter(a => a.style.display !== 'none');
+                            if (visibleLinks.length === 0) {
+                                item.style.display = 'none';
+                            } else {
+                                item.style.display = 'flex';
+                            }
+                        }
+                    });
+                } else {
+                    document.querySelectorAll('.dropdown-content a').forEach(a => a.style.display = 'block');
+                }
+            } catch(e) {}
+        }
+        document.addEventListener('DOMContentLoaded', applyNavPreferences);
+</script>
+
+
+<!-- Mobile Nav Script (Injected) -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        if (item.querySelector('.dropdown-content')) {
+            item.addEventListener('click', (e) => {
+                if (window.innerWidth <= 1023) {
+                    if (e.target.tagName.toLowerCase() === 'a' && e.target.closest('.dropdown-content')) {
+                        return;
+                    }
+                    e.preventDefault();
+                    item.classList.toggle('open-mobile');
+                }
+            });
+        }
+    });
+});
+</script>
+</body>
+</html>

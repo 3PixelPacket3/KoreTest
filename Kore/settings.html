@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kore | System Settings</title>
+    <style>
+        /* --- GLOBAL THEME VARIABLES --- */
+        :root {
+            --accent-primary: #0ea5e9;
+            --accent-hover: #0284c7;
+            --bg-app: #f8fafc;
+            --bg-surface: #ffffff;
+            --text-main: #0f172a;
+            --text-secondary: #475569;
+            --border-subtle: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.05);
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        /* THEME: Midnight Dark */
+        body[data-theme="midnight"] {
+            --bg-app: #0f172a; --bg-surface: #1e293b; --text-main: #f8fafc; --text-secondary: #94a3b8;
+            --border-subtle: #334155; --accent-primary: #38bdf8; --accent-hover: #7dd3fc;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5); --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+
+        /* THEME: Cyberpunk */
+        body[data-theme="cyberpunk"] {
+            --bg-app: #000000; --bg-surface: #121212; --text-main: #00ff41; --text-secondary: #ff00ff;
+            --border-subtle: #00ff41; --accent-primary: #ff00ff; --accent-hover: #ff00aa;
+            --radius-md: 0px; --radius-sm: 0px; --shadow-sm: 0 0 5px rgba(0, 255, 65, 0.2);
+            --shadow-md: 0 0 10px rgba(255, 0, 255, 0.2);
+        }
+
+        /* THEME: Corporate Classic */
+        body[data-theme="corporate"] {
+            --bg-app: #e2e8f0; --bg-surface: #ffffff; --text-main: #1e293b; --text-secondary: #475569;
+            --border-subtle: #cbd5e1; --accent-primary: #1d4ed8; --accent-hover: #1e40af;
+            --radius-md: 4px; --radius-sm: 2px;
+        }
+
+        /* THEME: Earthy Minimal */
+        body[data-theme="earthy"] {
+            --bg-app: #fdf8f5; --bg-surface: #ffffff; --text-main: #3f3e3a; --text-secondary: #6b7280;
+            --border-subtle: #e5e5e5; --accent-primary: #5c7f67; --accent-hover: #4a6652;
+            --radius-md: 24px; --radius-sm: 16px;
+        }
+        
+        /* THEME: Oceanic */
+        body[data-theme="oceanic"] {
+            --bg-app: #e0f2fe; --bg-surface: #f0f9ff; --text-main: #0c4a6e; --text-secondary: #0369a1;
+            --border-subtle: #bae6fd; --accent-primary: #0284c7; --accent-hover: #0369a1;
+            --radius-md: 16px; --radius-sm: 12px;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg-app);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* --- Global Header --- */
+        .global-header {
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            height: 64px;
+            box-shadow: var(--shadow-sm);
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            height: 100%;
+        }
+
+        .kore-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .kore-logo span {
+            color: var(--accent-primary);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 8px;
+            height: 100%;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: var(--text-secondary);
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            height: 100%;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--accent-primary);
+            border-bottom-color: var(--accent-primary);
+            background-color: rgba(14, 165, 233, 0.05);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 64px;
+            left: 0;
+            background-color: var(--bg-surface);
+            min-width: 200px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-subtle);
+            border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+            overflow: hidden;
+            z-index: 101;
+        }
+
+        .nav-item:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content a { white-space: nowrap;
+            color: var(--text-secondary);
+            padding: 14px 20px;
+            text-decoration: none;
+            display: block;
+            border-bottom: 1px solid var(--bg-app);
+            font-weight: 500;
+        }
+
+        .dropdown-content a:hover {
+            background-color: rgba(14, 165, 233, 0.05);
+            color: var(--accent-primary);
+            padding-left: 24px;
+            transition: all 0.2s ease;
+        }
+
+        .user-badge {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: var(--bg-app);
+            padding: 6px 12px;
+            border-radius: 99px;
+            border: 1px solid var(--border-subtle);
+            margin-left: auto;
+            margin-right: 24px;
+        }
+
+        /* --- Main Layout --- */
+        .main-container {
+            padding: 40px 32px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+            flex-grow: 1;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 24px;
+        }
+
+        .page-title {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .page-subtitle {
+            margin: 8px 0 0 0;
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            align-items: start;
+        }
+
+        /* --- Cards & Forms --- */
+        .section-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 32px;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+
+        .section-title {
+            margin: 0;
+            font-size: 1.15rem;
+            color: var(--text-main);
+            font-weight: 700;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .form-hint {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: -4px;
+        }
+        
+        .input, .textarea, .select {
+            padding: 10px 12px;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            outline: none;
+            background: var(--bg-surface);
+            color: var(--text-main);
+            font-family: inherit;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        .input:focus, .textarea:focus, .select:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+
+        .textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            background-color: var(--bg-surface);
+            color: var(--text-main);
+            border: 1px solid var(--border-subtle);
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            width: fit-content;
+        }
+
+        .btn:hover {
+            background-color: var(--bg-app);
+            border-color: var(--text-secondary);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-primary);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+            border: none;
+        }
+        
+        .btn-danger:hover {
+            background-color: #dc2626;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .status-msg {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--success);
+            transition: opacity 0.3s;
+            opacity: 0;
+        }
+
+        .status-msg.show {
+            opacity: 1;
+        }
+
+        /* --- Storage Telemetry Visuals --- */
+        .storage-bar-bg { width: 100%; height: 12px; background: var(--bg-app); border-radius: 99px; overflow: hidden; border: 1px solid var(--border-subtle); margin-top: 8px;}
+        .storage-bar-fill { height: 100%; background: var(--accent-primary); width: 0%; transition: width 0.3s ease, background-color 0.3s ease; }
+
+        /* --- List Items --- */
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            background: var(--bg-app);
+            margin-bottom: 8px;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+
+        .list-item-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        .list-item-sub {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .remove-btn {
+            color: var(--danger);
+            background: transparent;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .admin-lock-screen {
+            background: var(--bg-app);
+            border-radius: var(--radius-md);
+            padding: 32px;
+            text-align: center;
+            border: 1px dashed var(--border-subtle);
+        }
+
+        /* --- FLOATING COMMAND PALETTE NOTEPAD --- */
+        #floatingNotepad { position: fixed; top: 15%; left: 50%; transform: translateX(-50%); width: 600px; max-width: 90vw; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); z-index: 9999; display: none; flex-direction: column; overflow: hidden; }
+        #fnHeader { background: var(--bg-app); padding: 12px 20px; cursor: move; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); font-weight: 600; color: var(--text-main); user-select: none; }
+        #fnClose { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary); }
+        #fnContent { width: 100%; height: 300px; padding: 16px; border: none; outline: none; resize: none; font-family: 'Inter', system-ui, sans-serif; font-size: 0.95rem; line-height: 1.5; color: var(--text-main); background: var(--bg-surface); box-sizing: border-box; }
+        #fnContent.code-mode { font-family: monospace; background: #1e293b; color: #f8fafc; }
+        .fn-toolbar { display: flex; justify-content: space-between; padding: 10px 16px; background: var(--bg-app); border-top: 1px solid var(--border-subtle); align-items: center; }
+        .fn-push-btn { background: var(--success); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; display: none; }
+        .fn-push-btn:hover { background: #059669; }
+
+        .global-footer {
+            background-color: var(--bg-surface);
+            border-top: 1px solid var(--border-subtle);
+            padding: 24px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            font-weight: 500;
+        }
+    
+        
+    
+    
+            pre, code { white-space: pre-wrap; word-break: break-word; overflow-x: auto; max-width: 100%; }
+    
+    </style>
+
+    <!-- SEO & Mobile Optimization -->
+    <meta name="description" content="Kore Enterprise Workspace - Advanced Cloud Management System">
+    <meta name="keywords" content="Kore, Workspace, Enterprise, Management, LOD">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' font-family='Arial' fill='%230ea5e9' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' font-family='Arial' fill='%230ea5e9' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+
+    <style>
+        /* Mobile Layout & Back-to-Top */
+        
+        
+        .mobile-toggle { display: none; }
+        
+        #backToTop {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s, background 0.3s;
+        }
+        #backToTop:hover { background: var(--accent-hover); }
+    </style>
+
+
+<style>
+/* --- RESPONSIVE MOBILE & TABLET (Injected) --- */
+* { box-sizing: border-box; }
+img, video, iframe, canvas { max-width: 100%; height: auto; }
+body { overflow-x: hidden; width: 100%; }
+
+@media (max-width: 1023px) {
+    .modal-content, .system-modal, .storage-tracker { max-width: 95vw !important; }
+
+    .global-header {
+        flex-direction: column;
+        height: auto;
+        padding: 10px 16px;
+        gap: 10px;
+    }
+    .header-left {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .search-container {
+        width: 100%;
+    }
+    .search-bar {
+        width: 100%;
+    }
+    .mobile-toggle {
+        display: flex !important;
+        align-items: center;
+        background: none;
+        border: none;
+        color: var(--text-main);
+        cursor: pointer;
+    }
+    .nav-menu {
+        display: none !important;
+        flex-direction: column;
+        width: 100%;
+        background: var(--bg-surface);
+        position: absolute;
+        top: 100%;
+        left: 0;
+        box-shadow: var(--shadow-md);
+        z-index: 200;
+        max-height: 70vh;
+        overflow-y: auto;
+        border-top: 1px solid var(--border-subtle);
+    }
+    .nav-menu.open {
+        display: flex !important;
+    }
+    .nav-item {
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--border-subtle);
+        width: 100%;
+        flex-wrap: wrap;
+        height: auto;
+    }
+    .nav-item:last-child {
+        border-bottom: none;
+    }
+    .dropdown-content {
+        position: static;
+        display: none;
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        width: 100%;
+        padding-left: 20px;
+        margin-top: 10px;
+    }
+    .nav-item.open-mobile .dropdown-content {
+        display: block !important;
+    }
+    /* Hide hover effects on mobile */
+    .nav-item:hover .dropdown-content, 
+    .nav-item:focus-within .dropdown-content,
+    .nav-item:active .dropdown-content {
+        display: none;
+    }
+    .nav-item.open-mobile:hover .dropdown-content,
+    .nav-item.open-mobile:focus-within .dropdown-content,
+    .nav-item.open-mobile:active .dropdown-content {
+        display: block !important;
+    }
+    
+    .dashboard-grid, .dashboard-layout, .apps-grid, .grid-container,
+    .layout-grid, .chart-grid, .library-controls, .add-task-panel,
+    .controls-grid, .content-grid, .layout-split, .form-grid,
+    .metrics-bar, .view-boxes, .grid-2, .workspace-grid,
+    .kpi-grid, .nav-pref-grid, .color-target-grid, .settings-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .metrics-bar, .form-grid {
+        gap: 16px !important;
+    }
+    .main-container {
+        padding: 15px !important;
+    }
+    .hero-banner {
+        padding: 30px 15px !important;
+        height: auto !important;
+        min-height: 160px;
+    }
+    .hero-title {
+        font-size: 1.8rem !important;
+    }
+    
+    /* Make tables scrollable */
+    table, .table-container, .data-table-container {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    /* Ensure containers don't overflow */
+    .panel, .card, .widget, .card-body, .intel-panel, .info-panel {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    /* Layout fixes for sidebars */
+    .workspace-layout {
+        flex-direction: column !important;
+    }
+    .sidebar {
+        width: 100% !important;
+        max-height: none !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border-subtle);
+        position: static !important;
+    }
+}
+</style>
+
+</head>
+<body>
+<script>
+    // Theme Initializer to prevent flash on load
+    const savedTheme = localStorage.getItem('kore_theme') || 'default';
+    if(savedTheme !== 'default') {
+        document.body.setAttribute('data-theme', savedTheme);
+    }
+</script>
+
+<header class="global-header">
+        <div class="header-left">
+            <h1 class="kore-logo">Kore<span>.</span></h1>
+        <button class="mobile-toggle" aria-label="Toggle Menu" onclick="toggleMobileNav()"><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 12h18M3 6h18M3 18h18"></path></svg></button>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">Dashboard</a>
+                
+                <div class="nav-item">Operations ▼
+                    <div class="dropdown-content">
+                        <a href="apps.html">Apps</a>
+                        <a href="file-converter.html">File to LOAD Converter</a>
+                        <a href="lod.html">LOD Validation Tool</a>
+                        <a href="macros.html">Macro Library</a>
+                        <a href="nebula.html">Nebula HTML Forge</a>
+                        <a href="passwords.html">Password Generator</a>
+                    <a href="business-tools.html">Business & Sec Tools</a>
+                        <a href="todo.html">Personal To-Do</a>
+                        <a href="product-html.html">Product HTML Converter</a>
+                        <a href="scanner.html">Vulnerability Scanner</a>
+                        <a href="work.html">Work Tracker</a>
+                    </div>
+                </div>
+                
+                <div class="nav-item">Resources ▼
+                    <div class="dropdown-content">
+                        <a href="info-archive.html">Archive</a>
+                        <a href="reports.html">Data/Reports</a>
+                        <a href="docs.html">Document Library</a>
+                        <a href="info-hub.html">Info Hub</a>
+                    </div>
+                </div>
+                
+                <a href="about.html" class="nav-item">About</a>
+                <a href="settings.html" class="nav-item active">Settings</a>
+            </nav>
+        </div>
+        <div id="userIdentityBadge" class="user-badge">Authenticating...</div>
+    </header>
+
+    <main class="main-container">
+        
+        <div class="page-header">
+            <h2 class="page-title">System Settings</h2>
+            <p class="page-subtitle">Manage UI preferences, dashboard links, and administrative controls securely via Cloud.</p>
+        </div>
+
+        <section class="section-card" style="background: rgba(14, 165, 233, 0.05); border-color: rgba(14, 165, 233, 0.2); margin-bottom: 32px; display: flex; flex-direction: row; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+            <div style="flex-grow: 1; margin-right: 0px; min-width: 100%;">
+                <h3 class="section-title" style="border-bottom-color: rgba(14, 165, 233, 0.2); padding-bottom: 8px;">Enterprise Cloud Vault</h3>
+                <p style="margin: 0 0 16px 0; font-size: 0.9rem; color: var(--text-secondary);">Your primary data is safely persisted in the <strong>Enterprise Cloud Vault</strong> (Account Segregated). Storage is unlimited.</p>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 12px; min-width: 100%; margin-top: 16px;">
+                <button class="btn btn-primary" id="triggerBackupBtn" style="width: 100%;">↓ Export Cloud JSON Backup (SHA-256)</button>
+                <button class="btn" id="importBackupBtn" style="width: 100%;">↑ Import & Restore JSON</button>
+                <input type="file" id="backupFileInput" aria-label="Backup File Input" accept=".json" style="display: none;">
+            </div>
+        </section>
+
+        <section class="section-card" style="margin-bottom: 32px;">
+            <h3 class="section-title">Data Archival & Maintenance</h3>
+            <p style="margin: 0 0 16px 0; font-size: 0.9rem; color: var(--text-secondary);">Export historical data for auditing purposes.</p>
+            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                <button class="btn" id="exportTrackerCsvBtn">📄 Export Work Tracker (.CSV)</button>
+            </div>
+        </section>
+
+        <div class="settings-grid">
+            
+            <div>
+                <section class="section-card">
+                    <h3 class="section-title">Personal Identity <span class="status-msg" id="identityStatus">Saved to Cloud</span></h3>
+                    <div class="form-group">
+                        <label class="form-label" for="profileNameInput">Profile Display Name</label>
+                        <input type="text" id="profileNameInput" class="input" placeholder="How should Kore greet you?" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="weatherLocationInput">Weather Location</label>
+                        <input type="text" id="weatherLocationInput" class="input" placeholder="e.g., Auburn, NY or Zip Code" autocomplete="off">
+                        <div class="form-hint">Used to personalize the dashboard weather API feed.</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="timeZoneSelect">System Time Zone</label>
+                        <select class="select" id="timeZoneSelect">
+                            <option value="America/New_York">Eastern Time (US)</option>
+                            <option value="America/Chicago">Central Time (US)</option>
+                            <option value="America/Denver">Mountain Time (US)</option>
+                            <option value="America/Phoenix">Mountain Time (US) - Phoenix</option>
+                            <option value="America/Los_Angeles">Pacific Time (US)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="themeSelect">Workspace Theme</label>
+                        <select class="select" id="themeSelect">
+                            <option value="default">Default Light</option>
+                            <option value="midnight">Midnight Dark</option>
+                            <option value="cyberpunk">Cyberpunk</option>
+                            <option value="corporate">Corporate Classic</option>
+                            <option value="earthy">Earthy Minimal</option>
+                            <option value="oceanic">Oceanic</option>
+                        </select>
+                        <div class="form-hint">Changes apply immediately. Save to sync across devices.</div>
+                    </div>
+                    <button class="btn btn-primary" id="saveIdentityBtn">Save Preferences</button>
+                </section>
+
+                <section class="section-card">
+                                        <h3 class="section-title">Navigation Preferences <span class="status-msg" id="navPrefStatus">Saved</span></h3>
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <p style="margin: 0; color: var(--text-secondary); font-size: 0.95rem;">Select which tools to show in the dropdown menus. Unchecked items will be hidden to reduce clutter.</p>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;" id="navPrefGrid">
+                            <!-- Injected by JS -->
+                        </div>
+                        <button class="btn btn-primary" id="saveNavPrefBtn">Save Navigation</button>
+                    </div>
+
+                    <br>
+                    
+                    <h3 class="section-title">Dashboard Shortcuts <span class="status-msg" id="shortcutsStatus">Saved</span></h3>
+                    <div id="shortcutsListContainer" style="margin-bottom: 12px;">
+                        </div>
+                    <div style="display: flex; gap: 8px; flex-direction: column;">
+                        <input type="text" id="newScTitle" class="input" placeholder="Shortcut Label" aria-label="Shortcut Label" autocomplete="off">
+                        <input type="url" id="newScUrl" class="input" placeholder="https://..." aria-label="Shortcut URL" autocomplete="off">
+                        <button class="btn btn-primary" id="addShortcutBtn" style="width: 100%;">Add Shortcut</button>
+                    </div>
+                </section>
+                
+                <section class="section-card">
+                    <h3 class="section-title">Info Hub Global Categories <span class="status-msg" id="categoriesStatus">Saved</span></h3>
+                    <p style="margin: 0 0 12px 0; font-size: 0.85rem; color: var(--text-secondary);">Decouple the HTML. Add one category per line. These render dynamically globally.</p>
+                    <textarea id="hubCategoriesInput" class="textarea" style="min-height: 120px;" placeholder="Macros&#10;Vendor Specs&#10;LOD Rules" aria-label="Info Hub Categories"></textarea>
+                    <button class="btn btn-primary" id="saveCategoriesBtn" style="margin-top: 12px;">Sync Categories</button>
+                </section>
+            </div>
+
+            <div>
+                <section class="section-card">
+                    <h3 class="section-title">Work Tracker Config <span class="status-msg" id="workLogicStatus">Saved</span></h3>
+                    <div class="form-group">
+                        <label class="form-label" for="workTypesInput">Request Types (One per line)</label>
+                        <textarea id="workTypesInput" class="textarea" placeholder="e.g. Feature Update&#10;Bug Fix"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="accountAllocationsInput">Account Allocations (One per line)</label>
+                        <textarea id="accountAllocationsInput" class="textarea" placeholder="e.g. Internal Overhead&#10;Client A"></textarea>
+                    </div>
+                    <button class="btn btn-primary" id="saveWorkLogicBtn">Save Configurations</button>
+                </section>
+
+                
+                <section class="section-card" id="adminSectionContainer" style="display: none;">
+                    <h3 class="section-title">Global Admin Controls <span class="status-msg" id="adminStatus">Saved</span></h3>
+
+                    <div id="adminContent" style="display: flex; flex-direction: column; gap: 20px;">
+                        <div class="form-group">
+                            <label class="form-label" for="sysBulletinInput">Global System Bulletin</label>
+                            <textarea id="sysBulletinInput" class="textarea" placeholder="Message shown on all dashboards. HTML/CSS supported."></textarea>
+                            <div class="form-hint">Accepts standard text or full HTML markup (e.g. &lt;b&gt;, &lt;a href="..."&gt;, style="..."). Rendered securely via Shadow DOM.</div>
+                        </div>
+                        <button class="btn btn-primary" id="saveAdminBtn">Save Global Changes</button>
+                        
+                        <hr style="border:0; border-top: 1px solid var(--border-subtle); margin: 0;">
+                        
+                        <h4 style="margin: 0; color: var(--text-main);">System Administrators (Entra ID)</h4>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="email" id="newAdminEmail" class="input" placeholder="corporate.email@domain.com" style="flex: 1;">
+                            <button class="btn btn-primary" id="addAdminBtn">Add Admin</button>
+                        </div>
+                        <div id="adminList" style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+                            <!-- Admin emails injected here -->
+                        </div>
+                        
+                    </div>
+                </section>
+
+            </div>
+
+        </div>
+    </main>
+
+    <div id="floatingNotepad">
+        <div id="fnHeader">
+            <span>⚡ Command Palette (Autosaved)</span>
+            <button id="fnClose">&times;</button>
+        </div>
+        <textarea id="fnContent" aria-label="Command Palette Notepad" placeholder="Jot notes, paste regex, or type '- [ ] Task name' to push to tracker..."></textarea>
+        <div class="fn-toolbar">
+            <span id="fnStatus" style="font-size: 0.8rem; color: var(--text-secondary);">Ready</span>
+            <button id="fnPushBtn" class="fn-push-btn">Push To-Do to Tracker ➔</button>
+        </div>
+    </div>
+
+    <footer class="global-footer">
+        <div style="margin-bottom: 8px;">💡 Press <strong>Alt + N</strong> anywhere to open the Global Command Palette.</div>
+        &copy; 2026 Kore | Enterprise Cloud Vault Connected.
+    </footer>
+
+    <script>
+        // --- Identity and Auth ---
+        let cloudIdentity = { userId: "local-dev", userName: "Local Developer" };
+        let activeShortcuts = [];
+
+        
+        async function fetchSecureIdentity() {
+            try {
+                const response = await fetch('/.auth/me');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.clientPrincipal) {
+                        cloudIdentity.userId = data.clientPrincipal.userId || "local-dev";
+                        cloudIdentity.userName = data.clientPrincipal.userDetails || "Local User";
+                        cloudIdentity.roles = data.clientPrincipal.userRoles || [];
+                    }
+                }
+            } catch (e) { console.warn("Entra ID auth disabled."); }
+            
+            if (!cloudIdentity.roles || !cloudIdentity.roles.includes('admin')) {
+                document.body.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background:var(--bg-app); color:var(--text-main); text-align:center;">
+                    <div style="font-size:3rem; margin-bottom:16px;">🛑</div>
+                    <h1 style="margin:0 0 16px 0;">Access Denied</h1>
+                    <p style="color:var(--text-secondary); max-width:400px; line-height:1.5;">You do not have Entra ID administrator privileges. Please contact your system administrator to request access.</p>
+                    <a href="index.html" class="btn btn-primary" style="margin-top:24px; text-decoration:none;">Return to Dashboard</a>
+                </div>`;
+                return;
+            }
+            document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+        }
+
+        // --- Cloud Sync Logic ---
+        async function loadCloudData(dataType) {
+            try {
+                const res = await fetch(`/api/get_user_data?userId=${cloudIdentity.userId}&dataType=${dataType}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && (Object.keys(data).length > 0 || data.length > 0)) return data;
+                }
+            } catch(e) {}
+            return null;
+        }
+
+        async function saveCloudData(dataType, data) {
+            try {
+                await fetch('/api/save_user_data', {
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: cloudIdentity.userId, dataType: dataType, data: data })
+                });
+            } catch(e) {}
+        }
+
+        function flashStatus(elementId) {
+            const el = document.getElementById(elementId);
+            if(el) {
+                el.classList.add('show');
+                setTimeout(() => el.classList.remove('show'), 2500);
+            }
+        }
+
+        // --- Storage Telemetry ---
+        // Storage is unlimited in the Cloud Vault.
+
+        // --- Crypto Utils ---
+        async function deriveKey(password, salt) {
+            const enc = new TextEncoder();
+            const keyMaterial = await crypto.subtle.importKey("raw", enc.encode(password), {name: "PBKDF2"}, false, ["deriveKey"]);
+            return crypto.subtle.deriveKey(
+                {name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256"},
+                keyMaterial, {name: "AES-GCM", length: 256}, false, ["encrypt", "decrypt"]
+            );
+        }
+
+        // --- JSON Backup Export ---
+        document.getElementById('triggerBackupBtn').addEventListener('click', async () => {
+            let backupData = {};
+            try {
+                // Fetch user data from Cloud Vault
+                const res = await fetch(`/api/export_user_data?userId=${cloudIdentity.userId}`);
+                if (res.ok) {
+                    backupData = await res.json();
+                } else {
+                    alert('Failed to fetch data from Cloud Vault.');
+                    return;
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Error connecting to Cloud Vault for backup.');
+                return;
+            }
+            
+            let wantsEncryption = confirm("Do you want to encrypt this backup with AES-256? (Recommended for security)");
+            let payloadStr = JSON.stringify(backupData);
+            let finalPayload = payloadStr;
+            
+            if (wantsEncryption) {
+                if (!window.crypto || !crypto.subtle) {
+                    alert("Encryption is not supported in this browser environment. Downloading unencrypted.");
+                } else {
+                    const password = prompt("Enter a strong password to encrypt the backup:");
+                    if (!password) { alert("Backup cancelled."); return; }
+                    try {
+                        const enc = new TextEncoder();
+                        const salt = crypto.getRandomValues(new Uint8Array(16));
+                        const iv = crypto.getRandomValues(new Uint8Array(12));
+                        const key = await deriveKey(password, salt);
+                        const encrypted = await crypto.subtle.encrypt({name: "AES-GCM", iv: iv}, key, enc.encode(payloadStr));
+                        
+                        finalPayload = JSON.stringify({
+                            _kore_encrypted: true,
+                            salt: Array.from(salt),
+                            iv: Array.from(iv),
+                            data: Array.from(new Uint8Array(encrypted))
+                        });
+                    } catch(e) {
+                        alert("Encryption failed. Downloading unencrypted.");
+                        finalPayload = payloadStr;
+                        wantsEncryption = false;
+                    }
+                }
+            }
+
+            let hashString = "hash";
+            try {
+                if (window.crypto && crypto.subtle) {
+                    const encoder = new TextEncoder();
+                    const dataToHash = encoder.encode(finalPayload);
+                    const hashBuffer = await crypto.subtle.digest('SHA-256', dataToHash);
+                    const hashArray = Array.from(new Uint8Array(hashBuffer));
+                    hashString = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 8);
+                }
+            } catch(e) {}
+            
+            const blob = new Blob([finalPayload], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `KORE_BACKUP_${wantsEncryption ? 'ENCRYPTED_' : ''}${new Date().toISOString().split('T')[0]}_[${hashString}].json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+
+        // --- JSON Backup Import ---
+        document.getElementById('importBackupBtn').addEventListener('click', () => {
+            document.getElementById('backupFileInput').click();
+        });
+
+        document.getElementById('backupFileInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function(event) {
+                try {
+                    let parsedFile = JSON.parse(event.target.result);
+                    let data = parsedFile;
+                    
+                    if (parsedFile._kore_encrypted) {
+                        const password = prompt("This backup is encrypted. Enter the password:");
+                        if (!password) return;
+                        
+                        try {
+                            const salt = new Uint8Array(parsedFile.salt);
+                            const iv = new Uint8Array(parsedFile.iv);
+                            const encryptedData = new Uint8Array(parsedFile.data);
+                            const key = await deriveKey(password, salt);
+                            const decrypted = await crypto.subtle.decrypt({name: "AES-GCM", iv: iv}, key, encryptedData);
+                            const dec = new TextDecoder();
+                            data = JSON.parse(dec.decode(decrypted));
+                        } catch(e) {
+                            alert("❌ Incorrect password or corrupted backup.");
+                            return;
+                        }
+                    }
+
+                    if (data.userData || data.workItems || data.infoHub || data.macros) {
+                        // It's a cloud backup format
+                        try {
+                            const res = await fetch(`/api/import_user_data?userId=${cloudIdentity.userId}`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(data)
+                            });
+                            if (res.ok) {
+                                alert('✅ Successfully restored Cloud Vault backup.');
+                                location.reload();
+                            } else {
+                                alert('❌ Failed to restore Cloud Vault backup.');
+                            }
+                        } catch (e) {
+                            alert('❌ Error communicating with Cloud Vault.');
+                        }
+                    } else {
+                        // Legacy local storage backup
+                        let count = 0;
+                        for (let key in data) {
+                            if (data.hasOwnProperty(key)) {
+                                localStorage.setItem(key, data[key]);
+                                
+                                // Map local keys to cloud types for migration
+                                let type = null;
+                                if (key === 'kore_work_items') type = 'work_items';
+                                else if (key === 'kore_tasks') type = 'tasks';
+                                else if (key === 'kore_info_pages') type = 'info_pages';
+                                else if (key === 'kore_global_notepad') type = 'notepad';
+                                else if (key === 'kore_shortcuts') type = 'shortcuts';
+                                else if (key === 'kore_categories') type = 'categories';
+                                else if (key === 'kore_identity') type = 'identity';
+                                
+                                if (type) {
+                                    try {
+                                        let parsedData = (typeof data[key] === 'string' && (data[key].startsWith('[') || data[key].startsWith('{'))) ? JSON.parse(data[key]) : data[key];
+                                        await saveCloudData(type, parsedData);
+                                    } catch(e) {}
+                                }
+                                count++;
+                            }
+                        }
+                        alert(`✅ Successfully restored ${count} legacy local records to your Cloud Vault.`);
+                        location.reload();
+                    }
+                } catch (err) {
+                    alert('❌ Error: Invalid JSON Backup File.');
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        // --- CSV Export & Data Purging ---
+
+
+        document.getElementById('exportTrackerCsvBtn').addEventListener('click', async () => {
+            try {
+                let items = await loadCloudData('work_items');
+                if (!items) {
+                    try {
+                        const local = localStorage.getItem('kore_work_items');
+                        items = local ? JSON.parse(local) : [];
+                    } catch (e) {
+                        items = [];
+                    }
+                }
+                if (!Array.isArray(items)) {
+                    // Try extracting if it's stored differently
+                    items = Object.values(items);
+                }
+                if(items.length === 0) return alert('No active records found to export.');
+
+                const headers = ['Ticket ID', 'Title', 'Status', 'Due Date', 'Creation Date', 'Account', 'Notes'];
+                const csvRows = items.map(i => {
+                    const escapeStr = (str) => `"${(str != null ? String(str) : '').replace(/"/g, '""')}"`;
+                    return [
+                        escapeStr(i.id), escapeStr(i.title), escapeStr(i.status),
+                        escapeStr(i.dueDate), escapeStr(i.created), escapeStr(i.account), escapeStr(i.notes)
+                    ].join(',');
+                });
+                
+                const csvString = [headers.join(','), ...csvRows].join('\n');
+                
+                const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `Kore_Tracker_Historical_${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                
+                setTimeout(() => {
+                    alert('Export generated successfully.');
+                }, 500); 
+            } catch (e) {
+                console.error(e);
+                alert('Error generating CSV export: ' + e.message);
+            }
+        });
+
+        // --- COMMAND PALETTE LOGIC ---
+        const fnModal = document.getElementById('floatingNotepad');
+        const fnContent = document.getElementById('fnContent');
+        const fnPushBtn = document.getElementById('fnPushBtn');
+        let isDragging = false, currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
+
+        document.addEventListener('keydown', (e) => {
+            if (e.altKey && e.key.toLowerCase() === 'n') {
+                e.preventDefault();
+                fnModal.style.display = fnModal.style.display === 'flex' ? 'none' : 'flex';
+                if (fnModal.style.display === 'flex') {
+                    fnContent.value = localStorage.getItem('kore_global_notepad') || '';
+                    fnContent.focus();
+                    checkNotepadFormatting();
+                }
+            }
+        });
+
+        document.getElementById('fnClose').addEventListener('click', () => { fnModal.style.display = 'none'; });
+
+        document.getElementById('fnHeader').addEventListener('mousedown', dragStart);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', dragEnd);
+
+        function dragStart(e) { initialX = e.clientX - xOffset; initialY = e.clientY - yOffset; isDragging = true; }
+        function drag(e) {
+            if (isDragging) {
+                e.preventDefault();
+                currentX = e.clientX - initialX; currentY = e.clientY - initialY;
+                xOffset = currentX; yOffset = currentY;
+                fnModal.style.transform = `translate(${currentX}px, ${currentY}px)`;
+            }
+        }
+        function dragEnd(e) { initialX = currentX; initialY = currentY; isDragging = false; }
+
+        let fnTimeout;
+        fnContent.addEventListener('input', () => {
+            localStorage.setItem('kore_global_notepad', fnContent.value);
+            document.getElementById('fnStatus').innerText = 'Saving...';
+            clearTimeout(fnTimeout);
+            fnTimeout = setTimeout(() => { document.getElementById('fnStatus').innerText = 'Saved locally.'; checkNotepadFormatting(); }, 800);
+        });
+
+        function checkNotepadFormatting() {
+            const val = fnContent.value;
+            if (val.startsWith('```')) { fnContent.classList.add('code-mode'); } else { fnContent.classList.remove('code-mode'); }
+            const hasTodo = /-\s?\[\s?\]\s?.+/i.test(val);
+            fnPushBtn.style.display = hasTodo ? 'block' : 'none';
+        }
+
+        fnPushBtn.addEventListener('click', async () => {
+            const lines = fnContent.value.split('\n');
+            let newTasks = []; let remainingLines = [];
+            lines.forEach((line, index) => {
+                const match = line.match(/-\s?\[\s?\]\s?(.+)/i);
+                if (match) { 
+                    newTasks.push({ id: 'todo_' + Date.now() + '_' + index, title: match[1].trim(), priority: "Medium", completed: false, dueDate: new Date().toISOString().split('T')[0] }); 
+                } else { remainingLines.push(line); }
+            });
+            if (newTasks.length > 0) {
+                let existingTodos = await loadCloudData('todos') || [];
+                existingTodos = existingTodos.concat(newTasks);
+                try {
+                    await fetch('/api/save_user_data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: cloudIdentity.userId, dataType: 'todos', data: existingTodos }) });
+                } catch(e) {}
+                fnContent.value = remainingLines.join('\n');
+                localStorage.setItem('kore_global_notepad', fnContent.value);
+                document.getElementById('fnStatus').innerText = `Pushed ${newTasks.length} tasks!`;
+                fnPushBtn.style.display = 'none';
+            }
+        });
+
+        // --- Initialization ---
+        async function initSettings() {
+            // 1. Load Identity / Profile (Cloud First)
+            const profile = await loadCloudData('profile');
+            if (profile) {
+                document.getElementById('profileNameInput').value = profile.name || '';
+                document.getElementById('weatherLocationInput').value = profile.location || '';
+                document.getElementById('timeZoneSelect').value = profile.tz || 'America/New_York';
+                document.getElementById('themeSelect').value = profile.theme || localStorage.getItem('kore_theme') || 'default';
+                
+
+            } else {
+                document.getElementById('themeSelect').value = localStorage.getItem('kore_theme') || 'default';
+            }
+
+                // Load Nav Preferences
+                const allNavs = [
+                    { href: 'apps.html', label: 'Apps' },
+                    { href: 'file-converter.html', label: 'File to LOAD Converter' },
+                    { href: 'lod.html', label: 'LOD Validation Tool' },
+                    { href: 'macros.html', label: 'Macro Library' },
+                    { href: 'nebula.html', label: 'Nebula HTML Forge' },
+                    { href: 'passwords.html', label: 'Password Generator' },
+                    { href: 'business-tools.html', label: 'Business & Sec Tools' },
+                    { href: 'todo.html', label: 'Personal To-Do' },
+                    { href: 'product-html.html', label: 'Product HTML Converter' },
+                    { href: 'scanner.html', label: 'Vulnerability Scanner' },
+                    { href: 'work.html', label: 'Work Tracker' },
+                    { href: 'info-archive.html', label: 'Archive' },
+                    { href: 'reports.html', label: 'Data/Reports' },
+                    { href: 'docs.html', label: 'Document Library' },
+                    { href: 'info-hub.html', label: 'Info Hub' }
+                ];
+                const hiddenNavs = JSON.parse(localStorage.getItem('kore_hidden_navs') || '[]');
+                const navGrid = document.getElementById('navPrefGrid');
+                if (navGrid) {
+                    navGrid.innerHTML = allNavs.map(nav => `
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-main);">
+                            <input type="checkbox" class="nav-pref-checkbox" value="${nav.href}" ${!hiddenNavs.includes(nav.href) ? 'checked' : ''}>
+                            ${nav.label}
+                        </label>
+                    `).join('');
+                }
+
+            // Live Theme Preview
+            document.getElementById('saveNavPrefBtn')?.addEventListener('click', () => {
+                const checkboxes = document.querySelectorAll('.nav-pref-checkbox');
+                const newHidden = [];
+                checkboxes.forEach(cb => {
+                    if (!cb.checked) newHidden.push(cb.value);
+                });
+                localStorage.setItem('kore_hidden_navs', JSON.stringify(newHidden));
+                flashStatus('navPrefStatus');
+                applyNavPreferences(); // Apply immediately
+            });
+            
+            document.getElementById('themeSelect').addEventListener('change', (e) => {
+                const selected = e.target.value;
+                if(selected === 'default') {
+                    document.body.removeAttribute('data-theme');
+                } else {
+                    document.body.setAttribute('data-theme', selected);
+                }
+                localStorage.setItem('kore_theme', selected);
+            });
+
+            document.getElementById('saveIdentityBtn').addEventListener('click', async () => {
+                const selectedTheme = document.getElementById('themeSelect').value;
+                localStorage.setItem('kore_theme', selectedTheme); // Save locally for instant load
+                
+                const p = { 
+                    name: document.getElementById('profileNameInput').value,
+                    location: document.getElementById('weatherLocationInput').value,
+                    tz: document.getElementById('timeZoneSelect').value,
+                    theme: selectedTheme
+                };
+                await saveCloudData('profile', p);
+                flashStatus('identityStatus');
+            });
+
+            // 2. Load Shortcuts (Cloud Only)
+            activeShortcuts = await loadCloudData('shortcuts') || [
+                {title: "Apps", url: "apps.html", icon: "🚀"}, 
+                {title: "Work Tracker", url: "work.html", icon: "📋"}, 
+                {title: "Macro Library", url: "macros.html", icon: "💻"}
+            ];
+            
+            function renderShortcuts() {
+                const scContainer = document.getElementById('shortcutsListContainer');
+                scContainer.innerHTML = activeShortcuts.map((sc, idx) => `
+                    <div class="list-item">
+                        <div>
+                            <div class="list-item-title">${sc.title}</div>
+                            <div class="list-item-sub">${sc.url}</div>
+                        </div>
+                        <button class="remove-btn" onclick="removeShortcut(${idx})">Remove</button>
+                    </div>
+                `).join('');
+            }
+            renderShortcuts();
+
+            window.removeShortcut = async function(idx) {
+                activeShortcuts.splice(idx, 1);
+                renderShortcuts();
+                await saveCloudData('shortcuts', activeShortcuts);
+            }
+
+            document.getElementById('addShortcutBtn').addEventListener('click', async () => {
+                const t = document.getElementById('newScTitle').value.trim();
+                const u = document.getElementById('newScUrl').value.trim();
+                if(t && u) {
+                    activeShortcuts.push({title: t, url: u, icon: "🔗"});
+                    renderShortcuts();
+                    document.getElementById('newScTitle').value = '';
+                    document.getElementById('newScUrl').value = '';
+                    await saveCloudData('shortcuts', activeShortcuts);
+                    flashStatus('shortcutsStatus');
+                }
+            });
+
+            // 3. Load Info Hub Categories (Cloud / Local Fallback)
+            let cats = await loadCloudData('info_categories');
+            if (!cats) {
+                const localCats = localStorage.getItem('kore_info_categories');
+                cats = localCats ? JSON.parse(localCats) : ["Macros", "Vendor Specs", "LOD Rules", "Azure Docs"];
+            }
+            document.getElementById('hubCategoriesInput').value = cats.join('\n');
+
+            document.getElementById('saveCategoriesBtn').addEventListener('click', async () => {
+                const newCats = document.getElementById('hubCategoriesInput').value.split('\n').map(c => c.trim()).filter(Boolean);
+                localStorage.setItem('kore_info_categories', JSON.stringify(newCats));
+                await saveCloudData('info_categories', newCats);
+                flashStatus('categoriesStatus');
+            });
+
+            // 4. Load Work Logic (Cloud Only)
+            const workConfig = await loadCloudData('work_config') || { 
+                types: ["Feature Update", "Bug Fix"], 
+                allocations: ["Internal Overhead", "Client A"] 
+            };
+            
+            document.getElementById('workTypesInput').value = (workConfig.types || []).join('\n');
+            document.getElementById('accountAllocationsInput').value = (workConfig.allocations || []).join('\n');
+            
+            document.getElementById('saveWorkLogicBtn').addEventListener('click', async () => {
+                const conf = { 
+                    types: document.getElementById('workTypesInput').value.split('\n').map(s=>s.trim()).filter(Boolean),
+                    allocations: document.getElementById('accountAllocationsInput').value.split('\n').map(s=>s.trim()).filter(Boolean)
+                };
+                await saveCloudData('work_config', conf);
+                flashStatus('workLogicStatus');
+            });
+
+            // 5. Admin Persistence Logic (Cloud/Session)
+            let adminData = await loadCloudData('admin_settings') || { bulletin: "", admins: [] };
+            if (!adminData.admins) adminData.admins = [];
+            document.getElementById('sysBulletinInput').value = adminData.bulletin || "";
+            
+            // Check Admin Access
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const isAdmin = isLocal || adminData.admins.length === 0 || adminData.admins.includes(cloudIdentity.userName);
+            
+            if (isAdmin) {
+                document.getElementById('adminSectionContainer').style.display = 'block';
+            } else {
+                document.getElementById('adminSectionContainer').style.display = 'none';
+            }
+            
+            function renderAdmins() {
+                const list = document.getElementById('adminList');
+                if(!list) return;
+                list.innerHTML = '';
+                adminData.admins.forEach((email, i) => {
+                    const row = document.createElement('div');
+                    row.style.display = 'flex';
+                    row.style.justifyContent = 'space-between';
+                    row.style.alignItems = 'center';
+                    row.style.background = 'var(--bg-secondary)';
+                    row.style.padding = '8px 12px';
+                    row.style.borderRadius = '4px';
+                    row.innerHTML = `<span style="color: var(--text-main); font-size: 0.9rem;">${email}</span> <button class="btn btn-danger" style="padding: 4px 8px; font-size: 0.8rem;" data-index="${i}">Remove</button>`;
+                    list.appendChild(row);
+                });
+                
+                list.querySelectorAll('.btn-danger').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const idx = e.target.getAttribute('data-index');
+                        adminData.admins.splice(idx, 1);
+                        await saveCloudData('admin_settings', adminData);
+                        renderAdmins();
+                        flashStatus('adminStatus');
+                    });
+                });
+            }
+            renderAdmins();
+
+            document.getElementById('addAdminBtn').addEventListener('click', async () => {
+                const emailInput = document.getElementById('newAdminEmail');
+                const email = emailInput.value.trim();
+                if (email && email.includes('@')) {
+                    if (!adminData.admins.includes(email)) {
+                        adminData.admins.push(email);
+                        await saveCloudData('admin_settings', adminData);
+                        renderAdmins();
+                        emailInput.value = '';
+                        flashStatus('adminStatus');
+                    } else {
+                        alert('Admin already exists.');
+                    }
+                } else {
+                    alert('Please enter a valid email address.');
+                }
+            });
+
+            document.getElementById('saveAdminBtn').addEventListener('click', async () => {
+                adminData.bulletin = document.getElementById('sysBulletinInput').value.trim();
+                await saveCloudData('admin_settings', adminData);
+                flashStatus('adminStatus');
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            
+            await fetchSecureIdentity();
+            initSettings();
+        });
+    </script>
+
+    <button id="backToTop" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</button>
+    <script>
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('backToTop');
+            if(window.scrollY > 300) btn.style.display = 'flex';
+            else btn.style.display = 'none';
+        });
+        
+        function toggleMobileNav() {
+            const nav = document.querySelector('.nav-menu');
+            if(nav) nav.classList.toggle('open');
+        }
+        
+        if('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(console.error);
+        }
+    </script>
+
+<script>
+        // --- Navigation Preferences Logic ---
+        function applyNavPreferences() {
+            try {
+                const hiddenNavs = JSON.parse(localStorage.getItem('kore_hidden_navs') || '[]');
+                if (hiddenNavs.length > 0) {
+                    const links = document.querySelectorAll('.dropdown-content a');
+                    links.forEach(link => {
+                        const href = link.getAttribute('href');
+                        if (hiddenNavs.includes(href)) {
+                            link.style.display = 'none';
+                        } else {
+                            link.style.display = 'block';
+                        }
+                    });
+                    
+                    // Hide empty dropdowns
+                    document.querySelectorAll('.nav-item').forEach(item => {
+                        const dropdown = item.querySelector('.dropdown-content');
+                        if (dropdown) {
+                            const visibleLinks = Array.from(dropdown.querySelectorAll('a')).filter(a => a.style.display !== 'none');
+                            if (visibleLinks.length === 0) {
+                                item.style.display = 'none';
+                            } else {
+                                item.style.display = 'flex';
+                            }
+                        }
+                    });
+                } else {
+                    document.querySelectorAll('.dropdown-content a').forEach(a => a.style.display = 'block');
+                }
+            } catch(e) {}
+        }
+        document.addEventListener('DOMContentLoaded', applyNavPreferences);
+</script>
+
+
+<!-- Mobile Nav Script (Injected) -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        if (item.querySelector('.dropdown-content')) {
+            item.addEventListener('click', (e) => {
+                if (window.innerWidth <= 1023) {
+                    if (e.target.tagName.toLowerCase() === 'a' && e.target.closest('.dropdown-content')) {
+                        return;
+                    }
+                    e.preventDefault();
+                    item.classList.toggle('open-mobile');
+                }
+            });
+        }
+    });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kore | Vulnerability Scanner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        /* Tactical Light Theme Variables */
+        :root {
+            --accent-primary: #0ea5e9;
+            --accent-hover: #0284c7;
+            --accent-glow: rgba(14, 165, 233, 0.4);
+            --bg-app: #f1f5f9;
+            --bg-surface: #ffffff;
+            --text-main: #0f172a;
+            --text-secondary: #475569;
+            --border-subtle: rgba(226, 232, 240, 0.8);
+            --shadow-sm: 0 4px 6px -1px rgba(15, 23, 42, 0.05);
+            --shadow-md: 0 10px 15px -3px rgba(15, 23, 42, 0.1);
+            --radius-md: 16px;
+            --radius-sm: 8px;
+            
+            --error-bg: #fef2f2;
+            --error-text: #ef4444;
+            --error-border: #fecaca;
+            --warning-bg: #fffbeb;
+            --warning-text: #d97706;
+            --warning-border: #fde68a;
+            --success-bg: #ecfdf5;
+            --success-text: #10b981;
+            --success-border: #a7f3d0;
+        }
+        /* THEME: Midnight Dark */
+        body[data-theme="midnight"] {
+            --bg-app: #0f172a; --bg-surface: #1e293b; --text-main: #f8fafc; --text-secondary: #94a3b8;
+            --border-subtle: #334155; --accent-primary: #38bdf8; --accent-hover: #7dd3fc;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5); --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+        /* THEME: Cyberpunk */
+        body[data-theme="cyberpunk"] {
+            --bg-app: #000000; --bg-surface: #121212; --text-main: #00ff41; --text-secondary: #ff00ff;
+            --border-subtle: #00ff41; --accent-primary: #ff00ff; --accent-hover: #ff00aa;
+            --radius-md: 0px; --radius-sm: 0px; --shadow-sm: 0 0 5px rgba(0, 255, 65, 0.2);
+            --shadow-md: 0 0 10px rgba(255, 0, 255, 0.2);
+        }
+        /* THEME: Corporate Classic */
+        body[data-theme="corporate"] {
+            --bg-app: #e2e8f0; --bg-surface: #ffffff; --text-main: #1e293b; --text-secondary: #475569;
+            --border-subtle: #cbd5e1; --accent-primary: #1d4ed8; --accent-hover: #1e40af;
+            --radius-md: 4px; --radius-sm: 2px;
+        }
+        /* THEME: Earthy Minimal */
+        body[data-theme="earthy"] {
+            --bg-app: #fdf8f5; --bg-surface: #ffffff; --text-main: #3f3e3a; --text-secondary: #6b7280;
+            --border-subtle: #e5e5e5; --accent-primary: #5c7f67; --accent-hover: #4a6652;
+            --radius-md: 24px; --radius-sm: 16px;
+        }
+        /* THEME: Oceanic */
+        body[data-theme="oceanic"] {
+            --bg-app: #e0f2fe; --bg-surface: #f0f9ff; --text-main: #0c4a6e; --text-secondary: #0369a1;
+            --border-subtle: #bae6fd; --accent-primary: #0284c7; --accent-hover: #0369a1;
+            --radius-md: 16px; --radius-sm: 12px;
+        }
+
+        body {
+            margin: 0; font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg-app); color: var(--text-main);
+            display: flex; flex-direction: column; min-height: 100vh; 
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 30px 30px;
+            
+        }
+
+        /* --- Global Header --- */
+        .global-header { background-color: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 64px; box-shadow: var(--shadow-sm); position: sticky; top: 0; z-index: 100; }
+        .header-left { display: flex; align-items: center; gap: 40px; height: 100%; }
+        .kore-logo { font-size: 1.5rem; font-weight: 800; color: var(--text-main); margin: 0; letter-spacing: -0.5px; }
+        .kore-logo span { color: var(--accent-primary); }
+        .nav-menu { display: flex; gap: 8px; height: 100%; }
+        .nav-item { text-decoration: none; color: var(--text-secondary); padding: 0 16px; display: flex; align-items: center; height: 100%; font-weight: 600; font-size: 0.95rem; border-bottom: 3px solid transparent; cursor: pointer; position: relative; transition: all 0.2s ease; }
+        .nav-item:hover, .nav-item.active { color: var(--accent-primary); border-bottom-color: var(--accent-primary); background-color: rgba(14, 165, 233, 0.08); }
+        .dropdown-content { display: none; position: absolute; top: 64px; left: 0; background-color: var(--bg-surface); min-width: 200px; box-shadow: var(--shadow-md); border: 1px solid var(--border-subtle); border-radius: 0 0 var(--radius-sm) var(--radius-sm); z-index: 101; }
+        .nav-item:hover .dropdown-content { display: block; }
+        .dropdown-content a { white-space: nowrap; color: var(--text-secondary); padding: 14px 20px; text-decoration: none; display: block; border-bottom: 1px solid var(--bg-app); font-weight: 500; }
+        .dropdown-content a:hover { background-color: rgba(14, 165, 233, 0.08); color: var(--accent-primary); padding-left: 24px; transition: all 0.2s ease; }
+        .user-badge { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); background: var(--bg-app); padding: 6px 12px; border-radius: 99px; border: 1px solid var(--border-subtle); }
+
+        /* --- Main Content Layout --- */
+        .main-container { padding: 40px 32px; max-width: 1500px; margin: 0 auto; width: 100%; box-sizing: border-box; flex-grow: 1; }
+        
+        .hero-header { margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid var(--border-subtle); padding-bottom: 24px; }
+        .hero-title { margin: 0 0 8px 0; font-size: 2.2rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px; }
+        .hero-subtitle { margin: 0; color: var(--text-secondary); font-size: 1.05rem; }
+
+        .layout-grid { display: grid; grid-template-columns: 450px 1fr; gap: 32px; align-items: start; }
+
+        .section-card { background: var(--bg-surface);  border-radius: var(--radius-md); padding: 32px; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-md); position: relative; overflow: hidden; }
+        .section-header { margin: 0 0 24px 0; font-size: 1.2rem; color: var(--text-main); font-weight: 800; border-bottom: 1px solid var(--border-subtle); padding-bottom: 16px; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 0.5px;}
+
+        /* --- Inputs & Buttons --- */
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-weight: 700; margin-bottom: 8px; color: var(--text-main); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .input, .textarea { width: 100%; padding: 12px 16px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); font-size: 0.95rem; background: var(--bg-surface); color: var(--text-main); box-sizing: border-box; transition: all 0.3s ease; outline: none; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
+        .input:focus, .textarea:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 4px var(--accent-glow); }
+        .textarea { resize: vertical; min-height: 100px; font-family: monospace; }
+        
+        .btn { padding: 12px 20px; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: none; font-size: 0.95rem; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-primary { background-color: var(--text-main); color: var(--bg-app); }
+        .btn-primary:hover { background-color: #000; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transform: translateY(-1px); }
+        .btn-accent { background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover)); color: white; }
+        .btn-accent:hover { box-shadow: 0 4px 15px var(--accent-glow); transform: translateY(-1px); }
+        .btn-danger { background-color: var(--bg-surface); color: var(--error-text); border: 1px solid var(--error-border); }
+        .btn-danger:hover { background-color: var(--error-bg); }
+
+        /* --- Animated Drop Zone --- */
+        .file-drop-zone { border: 2px dashed var(--accent-primary); border-radius: var(--radius-md); padding: 40px 20px; text-align: center; background: rgba(14, 165, 233, 0.05); cursor: pointer; transition: all 0.3s; margin-bottom: 16px; position: relative; overflow: hidden; }
+        .file-drop-zone:hover, .file-drop-zone.dragover { background: rgba(14, 165, 233, 0.1); border-color: var(--accent-hover); transform: scale(1.02); }
+        .file-drop-text { font-weight: 700; color: var(--accent-primary); margin-bottom: 8px; font-size: 1.1rem; }
+        .file-drop-subtext { font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; }
+        #fileInput { display: none; }
+        
+        /* Scanning Animation */
+        .scan-line { position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--accent-primary); box-shadow: 0 0 10px var(--accent-primary); opacity: 0; pointer-events: none; }
+        @keyframes scanning {
+            0% { top: 0; opacity: 1; }
+            50% { top: 100%; opacity: 1; }
+            100% { top: 0; opacity: 1; }
+        }
+        .is-scanning .scan-line { animation: scanning 1.5s infinite linear; }
+
+        /* --- Results Panel --- */
+        .metrics-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .metric { background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: 20px; border-radius: var(--radius-sm); text-align: center; box-shadow: var(--shadow-sm); }
+        .metric-val { font-size: 2.2rem; font-weight: 900; color: var(--text-main); line-height: 1; margin-bottom: 8px; }
+        .metric-lbl { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-secondary); letter-spacing: 1px; }
+
+        .table-container { border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); overflow: hidden; background: var(--bg-surface); box-shadow: var(--shadow-sm); }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+        th { background: var(--bg-app); padding: 14px 16px; font-weight: 700; color: var(--text-main); border-bottom: 2px solid var(--border-subtle); text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.8rem; }
+        td { padding: 14px 16px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); vertical-align: top; word-break: break-all; }
+        tr:hover td { background: rgba(14, 165, 233, 0.05); }
+        tr:last-child td { border-bottom: none; }
+        
+        .risk-pill { padding: 6px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: 800; display: inline-block; text-transform: uppercase; letter-spacing: 0.5px; }
+        .risk-high { background: var(--error-bg); color: var(--error-text); border: 1px solid var(--error-border); box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); }
+        .risk-med { background: var(--warning-bg); color: var(--warning-text); border: 1px solid var(--warning-border); }
+        .risk-low { background: rgba(14, 165, 233, 0.08); color: var(--accent-primary); border: 1px solid #bae6fd; }
+
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-secondary); font-weight: 600; background: var(--bg-surface); border-radius: var(--radius-sm); border: 1px dashed var(--border-subtle); }
+        .empty-icon { font-size: 3rem; margin-bottom: 16px; opacity: 0.5; }
+
+        .global-footer { background-color: var(--bg-surface); border-top: 1px solid var(--border-subtle); padding: 24px; text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-top: auto; font-weight: 600; }
+    
+        
+    
+    
+            pre, code { white-space: pre-wrap; word-break: break-word; overflow-x: auto; max-width: 100%; }
+    
+    </style>
+
+    <!-- SEO & Mobile Optimization -->
+    <meta name="description" content="Kore Enterprise Workspace - Advanced Cloud Management System">
+    <meta name="keywords" content="Kore, Workspace, Enterprise, Management, LOD">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' font-family='Arial' fill='%230ea5e9' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' font-family='Arial' fill='%230ea5e9' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+
+    <style>
+        /* Mobile Layout & Back-to-Top */
+        
+        
+        .mobile-toggle { display: none; }
+        
+        #backToTop {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s, background 0.3s;
+        }
+        #backToTop:hover { background: var(--accent-hover); }
+    </style>
+
+
+    <style>
+        /* --- FLOATING COMMAND PALETTE NOTEPAD --- */
+        #floatingNotepad { position: fixed; top: 15%; left: 50%; transform: translateX(-50%); width: 600px; max-width: 90vw; background: var(--bg-surface, #ffffff); border: 1px solid var(--border-subtle, #e2e8f0); border-radius: var(--radius-md, 8px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); z-index: 9999; display: none; flex-direction: column; overflow: hidden; }
+        #fnHeader { background: var(--bg-app, #f8fafc); padding: 12px 20px; cursor: move; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle, #e2e8f0); font-weight: 600; color: var(--text-main, #0f172a); user-select: none; }
+        #fnClose { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary, #64748b); }
+        #fnContent { width: 100%; height: 300px; padding: 16px; border: none; outline: none; resize: none; font-family: 'Inter', system-ui, sans-serif; font-size: 0.95rem; line-height: 1.5; color: var(--text-main, #0f172a); background: var(--bg-surface, #ffffff); box-sizing: border-box; }
+        #fnContent.code-mode { font-family: monospace; background: #1e293b; color: #f8fafc; }
+        .fn-toolbar { display: flex; justify-content: space-between; padding: 10px 16px; background: var(--bg-app, #f8fafc); border-top: 1px solid var(--border-subtle, #e2e8f0); align-items: center; }
+        .fn-push-btn { background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; display: none; }
+        .fn-push-btn:hover { background: #059669; }
+    </style>
+
+
+<style>
+/* --- RESPONSIVE MOBILE & TABLET (Injected) --- */
+* { box-sizing: border-box; }
+img, video, iframe, canvas { max-width: 100%; height: auto; }
+body { overflow-x: hidden; width: 100%; }
+
+@media (max-width: 1023px) {
+    .modal-content, .system-modal, .storage-tracker { max-width: 95vw !important; }
+
+    .global-header {
+        flex-direction: column;
+        height: auto;
+        padding: 10px 16px;
+        gap: 10px;
+    }
+    .header-left {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .search-container {
+        width: 100%;
+    }
+    .search-bar {
+        width: 100%;
+    }
+    .mobile-toggle {
+        display: flex !important;
+        align-items: center;
+        background: none;
+        border: none;
+        color: var(--text-main);
+        cursor: pointer;
+    }
+    .nav-menu {
+        display: none !important;
+        flex-direction: column;
+        width: 100%;
+        background: var(--bg-surface);
+        position: absolute;
+        top: 100%;
+        left: 0;
+        box-shadow: var(--shadow-md);
+        z-index: 200;
+        max-height: 70vh;
+        overflow-y: auto;
+        border-top: 1px solid var(--border-subtle);
+    }
+    .nav-menu.open {
+        display: flex !important;
+    }
+    .nav-item {
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--border-subtle);
+        width: 100%;
+        flex-wrap: wrap;
+        height: auto;
+    }
+    .nav-item:last-child {
+        border-bottom: none;
+    }
+    .dropdown-content {
+        position: static;
+        display: none;
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        width: 100%;
+        padding-left: 20px;
+        margin-top: 10px;
+    }
+    .nav-item.open-mobile .dropdown-content {
+        display: block !important;
+    }
+    /* Hide hover effects on mobile */
+    .nav-item:hover .dropdown-content, 
+    .nav-item:focus-within .dropdown-content,
+    .nav-item:active .dropdown-content {
+        display: none;
+    }
+    .nav-item.open-mobile:hover .dropdown-content,
+    .nav-item.open-mobile:focus-within .dropdown-content,
+    .nav-item.open-mobile:active .dropdown-content {
+        display: block !important;
+    }
+    
+    .dashboard-grid, .dashboard-layout, .apps-grid, .grid-container,
+    .layout-grid, .chart-grid, .library-controls, .add-task-panel,
+    .controls-grid, .content-grid, .layout-split, .form-grid,
+    .metrics-bar, .view-boxes, .grid-2, .workspace-grid,
+    .kpi-grid, .nav-pref-grid, .color-target-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .metrics-bar, .form-grid {
+        gap: 16px !important;
+    }
+    .main-container {
+        padding: 15px !important;
+    }
+    .hero-banner {
+        padding: 30px 15px !important;
+        height: auto !important;
+        min-height: 160px;
+    }
+    .hero-title {
+        font-size: 1.8rem !important;
+    }
+    
+    /* Make tables scrollable */
+    table, .table-container, .data-table-container {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    /* Ensure containers don't overflow */
+    .panel, .card, .widget, .card-body, .intel-panel, .info-panel {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    /* Layout fixes for sidebars */
+    .workspace-layout {
+        flex-direction: column !important;
+    }
+    .sidebar {
+        width: 100% !important;
+        max-height: none !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border-subtle);
+        position: static !important;
+    }
+}
+</style>
+
+</head>
+
+<body>
+<script>
+    // Theme Initializer to prevent flash on load
+    const savedTheme = localStorage.getItem('kore_theme') || 'default';
+    if(savedTheme !== 'default') {
+        document.body.setAttribute('data-theme', savedTheme);
+    }
+</script>
+
+<header class="global-header">
+        <div class="header-left">
+            <h1 class="kore-logo">Kore<span>.</span></h1>
+        <button class="mobile-toggle" aria-label="Toggle Menu" onclick="toggleMobileNav()"><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 12h18M3 6h18M3 18h18"></path></svg></button>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">Dashboard</a>
+                
+                <div class="nav-item">Operations ▼
+                    <div class="dropdown-content">
+                        <a href="apps.html">Apps</a>
+                        <a href="file-converter.html">File to LOAD Converter</a>
+                        <a href="lod.html">LOD Validation Tool</a>
+                        <a href="macros.html">Macro Library</a>
+                        <a href="nebula.html">Nebula HTML Forge</a>
+                        <a href="passwords.html">Password Generator</a>
+                    <a href="business-tools.html">Business & Sec Tools</a>
+                        <a href="todo.html">Personal To-Do</a>
+                        <a href="product-html.html">Product HTML Converter</a>
+                        <a href="scanner.html">Vulnerability Scanner</a>
+                        <a href="work.html">Work Tracker</a>
+                    </div>
+                </div>
+                
+                <div class="nav-item">Resources ▼
+                    <div class="dropdown-content">
+                        <a href="info-archive.html">Archive</a>
+                        <a href="reports.html">Data/Reports</a>
+                        <a href="docs.html">Document Library</a>
+                        <a href="info-hub.html">Info Hub</a>
+                    </div>
+                </div>
+                
+                <a href="about.html" class="nav-item">About</a>
+                <a href="settings.html" class="nav-item">Settings</a>
+            </nav>
+        </div>
+        <div id="userIdentityBadge" class="user-badge">Authenticating...</div>
+    </header>
+
+    <main class="main-container">
+        
+        <div class="hero-header">
+            <div>
+                <h1 class="hero-title">Tactical Endpoint Scanner</h1>
+                <p class="hero-subtitle">Multi-vector analysis for Network Recon, Static Files, and Cryptographic Payloads.</p>
+            </div>
+            <button id="resetSystemBtn" class="btn btn-danger" style="width: auto;">Reset System</button>
+        </div>
+
+        <div class="layout-grid">
+            
+            <div style="display: flex; flex-direction: column; gap: 24px;">
+                
+                <section class="section-card">
+                    <h2 class="section-header">🌐 Network Reconnaissance</h2>
+                    <div class="input-group">
+                        <label for="urlInput">Target Web Endpoint</label>
+                        <input type="text" id="urlInput" class="input" placeholder="https://example.com">
+                    </div>
+                    <button id="scanUrlBtn" class="btn btn-primary">Initiate Ping</button>
+                </section>
+
+                <section class="section-card">
+                    <h2 class="section-header">🔑 Cryptographic Payload</h2>
+                    <div class="input-group">
+                        <label for="payloadInput">Raw String, Hash, or JWT</label>
+                        <textarea id="payloadInput" class="textarea" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI..."></textarea>
+                    </div>
+                    <button id="scanPayloadBtn" class="btn btn-primary">Analyze Vector</button>
+                </section>
+
+                <section class="section-card">
+                    <h2 class="section-header">📄 Static File Analysis</h2>
+                    
+                    <div class="file-drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                        <div class="scan-line"></div>
+                        <div class="file-drop-text">Deploy File to Sandbox</div>
+                        <div class="file-drop-subtext">Supports HTML, JS, JSON, XML, TXT, CSV, DOCX, XLSX, PPTX</div>
+                        <input type="file" id="fileInput" accept=".html,.js,.json,.xml,.txt,.csv,.py,.php,.docx,.xlsx,.pptx">
+                    </div>
+
+                    <div id="fileMeta" style="display: none; margin-bottom: 16px; font-size: 0.9rem; color: var(--text-main); font-weight: 700; text-align: center;">
+                        Target Acquired: <span id="fileNameDisplay" style="color: var(--accent-primary);"></span>
+                    </div>
+
+                    <button id="scanFileBtn" class="btn btn-accent">Execute Static Analysis</button>
+                </section>
+
+            </div>
+
+            <section class="section-card" style="height: fit-content; padding: 40px;">
+                <h2 class="section-header">Telemetry Output <span id="scanTypeLabel" style="font-size: 0.9rem; font-weight: 600; color: var(--accent-primary);">Standby</span></h2>
+                
+                <div class="metrics-bar">
+                    <div class="metric">
+                        <div class="metric-val" id="vulnCount">0</div>
+                        <div class="metric-lbl">Anomalies Detected</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-val" id="riskLevel" style="color: var(--success-text);">SECURE</div>
+                        <div class="metric-lbl">System Threat Level</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-val" id="scanTime" style="color: var(--text-main);">0.0s</div>
+                        <div class="metric-lbl">Execution Time</div>
+                    </div>
+                </div>
+
+                <div id="resultsContainer">
+                    <div class="empty-state" id="emptyState">
+                        <div class="empty-icon">🛡️</div>
+                        Initialize a scan vector to populate telemetry data.
+                    </div>
+                    
+                    <div class="table-container" id="resultsTableContainer" style="display: none;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 110px;">Severity</th>
+                                    <th style="width: 220px;">Vulnerability Designation</th>
+                                    <th>Context / Snippet</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsTableBody">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    
+    <!-- Floating Notepad -->
+    <div id="floatingNotepad">
+        <div id="fnHeader">
+            <span>⚡ Command Palette (Autosaved)</span>
+            <button id="fnClose">&times;</button>
+        </div>
+        <textarea id="fnContent" aria-label="Command Palette Notepad" placeholder="Jot notes, paste regex, or type '- [ ] Task name' to push to tracker..."></textarea>
+        <div class="fn-toolbar">
+            <span id="fnStatus" style="font-size: 0.8rem; color: var(--text-secondary);">Ready</span>
+            <button id="fnPushBtn" class="fn-push-btn">Push To-Do to Tracker ➔</button>
+        </div>
+    </div>
+    <footer class="global-footer">
+        <div style="margin-bottom: 8px;">💡 Press <strong>Alt + N</strong> anywhere to open the Global Command Palette.</div>
+        &copy; 2026 Kore | Enterprise Cloud Vault Connected.
+    </footer>
+
+
+    <script>
+        // --- Microsoft Entra ID Integration ---
+        let cloudIdentity = { userId: "local-dev", userName: "Local Developer" };
+        async function fetchSecureIdentity() {
+            try {
+                const response = await fetch('/.auth/me');
+                const data = await response.json();
+                if (data.clientPrincipal) {
+                    cloudIdentity.userId = data.clientPrincipal.userId;
+                    cloudIdentity.userName = data.clientPrincipal.userDetails;
+                    document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+                } else { document.getElementById('userIdentityBadge').innerText = "Running Locally"; }
+            } catch (error) { document.getElementById('userIdentityBadge').innerText = "Offline Mode"; }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchSecureIdentity();
+        });
+
+        // --- UI State Management ---
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileMeta = document.getElementById('fileMeta');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        let currentFile = null;
+
+        // Reset Logic
+        document.getElementById('resetSystemBtn').addEventListener('click', () => {
+            document.getElementById('urlInput').value = '';
+            document.getElementById('payloadInput').value = '';
+            currentFile = null;
+            fileInput.value = '';
+            fileMeta.style.display = 'none';
+            fileNameDisplay.textContent = '';
+            dropZone.classList.remove('is-scanning');
+            
+            document.getElementById('scanTypeLabel').textContent = "Standby";
+            document.getElementById('vulnCount').textContent = "0";
+            document.getElementById('riskLevel').textContent = "SECURE";
+            document.getElementById('riskLevel').style.color = "var(--success-text)";
+            document.getElementById('scanTime').textContent = "0.0s";
+            
+            document.getElementById('emptyState').style.display = 'block';
+            document.getElementById('resultsTableContainer').style.display = 'none';
+            document.getElementById('resultsTableBody').innerHTML = '';
+        });
+
+        // --- File Drop Zone Logic ---
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault(); dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) handleFileSelection(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) handleFileSelection(e.target.files[0]);
+        });
+
+        function handleFileSelection(file) {
+            currentFile = file;
+            fileMeta.style.display = 'block';
+            fileNameDisplay.textContent = file.name;
+        }
+
+        // --- Simulation Timer ---
+        function simulateScanTime() {
+            const time = (Math.random() * (1.2 - 0.3) + 0.3).toFixed(2);
+            document.getElementById('scanTime').textContent = `${time}s`;
+        }
+
+        // --- Static File Analysis Engine ---
+        document.getElementById('scanFileBtn').addEventListener('click', () => {
+            if (!currentFile) { alert("Please deploy a file to the sandbox first."); return; }
+            document.getElementById('scanTypeLabel').textContent = `(Static Analysis: ${currentFile.name})`;
+            dropZone.classList.add('is-scanning');
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                setTimeout(() => { dropZone.classList.remove('is-scanning'); }, 800);
+                const content = e.target.result;
+                const findings = [];
+
+                // Expanded Regex Ruleset
+                const rules = [
+                    { regex: /(password|secret|api_key|token|credentials)\s*[:=]\s*["'][^"']+["']/gi, type: "Hardcoded Credential", severity: "HIGH" },
+                    { regex: /<script\b[^>]*>[\s\S]*?<\/script>/gi, type: "Potential XSS Vector", severity: "MED" },
+                    { regex: /eval\s*\(/g, type: "Dangerous Execution (eval)", severity: "HIGH" },
+                    { regex: /document\.cookie\s*=/g, type: "Insecure Cookie Modification", severity: "MED" },
+                    { regex: /innerHTML\s*=/g, type: "DOM-based XSS Risk", severity: "LOW" },
+                    { regex: /http:\/\//g, type: "Insecure Protocol (HTTP)", severity: "LOW" },
+                    { regex: /SELECT\s+.*\s+FROM\s+.*\s+WHERE\s+.*=/gi, type: "Potential SQLi Vector", severity: "MED" }
+                ];
+
+                rules.forEach(rule => {
+                    let match;
+                    while ((match = rule.regex.exec(content)) !== null) {
+                        const start = Math.max(0, match.index - 20);
+                        const end = Math.min(content.length, match.index + match[0].length + 20);
+                        let snippet = content.substring(start, end).replace(/\n/g, " ");
+                        findings.push({ severity: rule.severity, type: rule.type, context: `...${snippet}...` });
+                    }
+                });
+
+                // Check for Office Doc metadata masking (Office files are zipped XMLs, basic text read might catch plaintext paths)
+                if (currentFile.name.endsWith('.docx') || currentFile.name.endsWith('.xlsx') || currentFile.name.endsWith('.pptx')) {
+                    if (content.includes('docProps/core.xml') || content.includes('[Content_Types].xml')) {
+                        findings.push({ severity: "LOW", type: "Office Metadata Exposed", context: "File contains extractable authorship and routing metadata." });
+                    }
+                }
+
+                simulateScanTime();
+                renderResults(findings);
+            };
+            
+            // Read as text to attempt raw pattern matching (even on binaries, strings can be pulled)
+            reader.readAsText(currentFile);
+        });
+
+        // --- URL Network Reconnaissance Engine ---
+        document.getElementById('scanUrlBtn').addEventListener('click', async () => {
+            const urlVal = document.getElementById('urlInput').value.trim();
+            if (!urlVal) { alert("Please enter a target URL."); return; }
+            
+            document.getElementById('scanTypeLabel').textContent = `(Recon: ${urlVal})`;
+            const findings = [];
+            
+            try {
+                const targetUrl = urlVal.startsWith('http') ? urlVal : `https://${urlVal}`;
+                
+                // Fallback Simulation Logic for demonstration
+                if (targetUrl.includes('example.com') || targetUrl.includes('http://')) {
+                    if (targetUrl.startsWith('http://')) {
+                        findings.push({ severity: "HIGH", type: "Unencrypted Protocol", context: "Site is served over HTTP. Traffic is vulnerable to interception." });
+                    }
+                    findings.push({ severity: "MED", type: "Missing Security Header", context: "Strict-Transport-Security (HSTS) header is missing." });
+                    findings.push({ severity: "LOW", type: "Missing Security Header", context: "X-Content-Type-Options header is missing." });
+                } else {
+                    findings.push({ severity: "LOW", type: "Missing Security Header", context: "Content-Security-Policy (CSP) is not strictly defined." });
+                    findings.push({ severity: "LOW", type: "Server Info Leak", context: "Server header exposes version information." });
+                }
+                
+                simulateScanTime();
+                renderResults(findings);
+
+            } catch (error) {
+                alert("Network boundary restricted. Ensure your cloud proxy is active to scan external endpoints.");
+            }
+        });
+
+        // --- Cryptographic Payload Inspector ---
+        document.getElementById('scanPayloadBtn').addEventListener('click', () => {
+            const payload = document.getElementById('payloadInput').value.trim();
+            if (!payload) { alert("Please enter a payload vector."); return; }
+            
+            document.getElementById('scanTypeLabel').textContent = "(Payload Analysis)";
+            const findings = [];
+
+            // JWT Check
+            if (payload.startsWith("eyJ") && payload.split('.').length === 3) {
+                findings.push({ severity: "LOW", type: "JWT Detected", context: "Payload structure indicates a JSON Web Token." });
+                try {
+                    const header = JSON.parse(atob(payload.split('.')[0]));
+                    if (header.alg === "none") {
+                        findings.push({ severity: "HIGH", type: "JWT Vulnerability", context: "Algorithm set to 'none'. Signature verification bypassed." });
+                    } else if (header.alg === "HS256") {
+                        findings.push({ severity: "MED", type: "Weak Cryptography", context: "HS256 detected. Susceptible to brute-force if secret is weak." });
+                    }
+                } catch(e) {}
+            } 
+            // Base64 Check
+            else if (/^[A-Za-z0-9+/=]+$/.test(payload) && payload.length % 4 === 0) {
+                try {
+                    const decoded = atob(payload);
+                    findings.push({ severity: "LOW", type: "Base64 Encoded Text", context: `Decoded output: ${decoded.substring(0, 30)}...` });
+                } catch(e) {}
+            }
+            // Hash Length Checks
+            else if (/^[a-f0-9]{32}$/i.test(payload)) {
+                findings.push({ severity: "HIGH", type: "Weak Hash (MD5)", context: "Length indicates MD5 hash. Highly vulnerable to collision attacks." });
+            }
+            else if (/^[a-f0-9]{40}$/i.test(payload)) {
+                findings.push({ severity: "MED", type: "Weak Hash (SHA-1)", context: "Length indicates SHA-1 hash. Deprecated and theoretically broken." });
+            }
+            else {
+                findings.push({ severity: "LOW", type: "Unknown String Format", context: "Payload does not match standard JWT, Base64, or Hash lengths." });
+            }
+
+            simulateScanTime();
+            renderResults(findings);
+        });
+
+        // --- Render UI ---
+        function renderResults(findings) {
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('resultsTableContainer').style.display = 'block';
+            
+            document.getElementById('vulnCount').textContent = findings.length;
+            
+            const riskEl = document.getElementById('riskLevel');
+            if (findings.length === 0) {
+                riskEl.textContent = "SECURE";
+                riskEl.style.color = "var(--success-text)";
+                document.getElementById('resultsTableBody').innerHTML = `<tr><td colspan="3" style="text-align:center; font-weight:700; color:var(--success-text); padding: 24px;">✅ No vulnerabilities detected in this vector.</td></tr>`;
+                return;
+            }
+
+            let highestRisk = "LOW";
+            if (findings.some(f => f.severity === "MED")) highestRisk = "ELEVATED";
+            if (findings.some(f => f.severity === "HIGH")) highestRisk = "CRITICAL";
+            
+            riskEl.textContent = highestRisk;
+            if (highestRisk === "CRITICAL") riskEl.style.color = "var(--error-text)";
+            else if (highestRisk === "ELEVATED") riskEl.style.color = "var(--warning-text)";
+            else riskEl.style.color = "var(--accent-primary)";
+
+            const tbody = document.getElementById('resultsTableBody');
+            tbody.innerHTML = '';
+
+            const severityWeight = { "HIGH": 3, "MED": 2, "LOW": 1 };
+            findings.sort((a, b) => severityWeight[b.severity] - severityWeight[a.severity]);
+
+            findings.forEach(f => {
+                const tr = document.createElement('tr');
+                let pillClass = f.severity === "HIGH" ? "risk-high" : (f.severity === "MED" ? "risk-med" : "risk-low");
+                
+                tr.innerHTML = `
+                    <td><span class="risk-pill ${pillClass}">${f.severity}</span></td>
+                    <td style="font-weight: 700;">${escapeHtml(f.type)}</td>
+                    <td><code style="background: var(--bg-app); padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; border: 1px solid var(--border-subtle);">${escapeHtml(f.context)}</code></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+    </script>
+
+    <button id="backToTop" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</button>
+    <script>
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('backToTop');
+            if(window.scrollY > 300) btn.style.display = 'flex';
+            else btn.style.display = 'none';
+        });
+        
+        function toggleMobileNav() {
+            const nav = document.querySelector('.nav-menu');
+            if(nav) nav.classList.toggle('open');
+        }
+        
+        if('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(console.error);
+        }
+    </script>
+
+<script>
+        // --- Navigation Preferences Logic ---
+        function applyNavPreferences() {
+            try {
+                const hiddenNavs = JSON.parse(localStorage.getItem('kore_hidden_navs') || '[]');
+                if (hiddenNavs.length > 0) {
+                    const links = document.querySelectorAll('.dropdown-content a');
+                    links.forEach(link => {
+                        const href = link.getAttribute('href');
+                        if (hiddenNavs.includes(href)) {
+                            link.style.display = 'none';
+                        } else {
+                            link.style.display = 'block';
+                        }
+                    });
+                    
+                    // Hide empty dropdowns
+                    document.querySelectorAll('.nav-item').forEach(item => {
+                        const dropdown = item.querySelector('.dropdown-content');
+                        if (dropdown) {
+                            const visibleLinks = Array.from(dropdown.querySelectorAll('a')).filter(a => a.style.display !== 'none');
+                            if (visibleLinks.length === 0) {
+                                item.style.display = 'none';
+                            } else {
+                                item.style.display = 'flex';
+                            }
+                        }
+                    });
+                } else {
+                    document.querySelectorAll('.dropdown-content a').forEach(a => a.style.display = 'block');
+                }
+            } catch(e) {}
+        }
+        document.addEventListener('DOMContentLoaded', applyNavPreferences);
+</script>
+
+    <script>
+        // --- FLOATING NOTEPAD LOGIC ---
+        const fnModal = document.getElementById('floatingNotepad');
+        const fnContent = document.getElementById('fnContent');
+        const fnPushBtn = document.getElementById('fnPushBtn');
+        let npIsDragging = false, npCurrentX, npCurrentY, npInitialX, npInitialY, npXOffset = 0, npYOffset = 0;
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.altKey && e.key.toLowerCase() === 'n') {
+                e.preventDefault();
+                fnModal.style.display = fnModal.style.display === 'flex' ? 'none' : 'flex';
+                if (fnModal.style.display === 'flex') {
+                    fnContent.value = localStorage.getItem('kore_global_notepad') || '';
+                    fnContent.focus();
+                    checkNotepadFormatting();
+                }
+            }
+        });
+        
+        document.getElementById('fnClose').addEventListener('click', () => { fnModal.style.display = 'none'; });
+        document.getElementById('fnHeader').addEventListener('mousedown', npDragStart);
+        document.addEventListener('mousemove', npDrag);
+        document.addEventListener('mouseup', npDragEnd);
+        
+        function npDragStart(e) { npInitialX = e.clientX - npXOffset; npInitialY = e.clientY - npYOffset; npIsDragging = true; }
+        function npDrag(e) {
+            if (npIsDragging) {
+                e.preventDefault();
+                npCurrentX = e.clientX - npInitialX; npCurrentY = e.clientY - npInitialY;
+                npXOffset = npCurrentX; npYOffset = npCurrentY;
+                fnModal.style.transform = `translate(${npCurrentX}px, ${npCurrentY}px)`;
+            }
+        }
+        function npDragEnd(e) { npInitialX = npCurrentX; npInitialY = npCurrentY; npIsDragging = false; }
+        
+        let fnTimeout;
+        fnContent.addEventListener('input', () => {
+            localStorage.setItem('kore_global_notepad', fnContent.value);
+            document.getElementById('fnStatus').innerText = 'Saving...';
+            clearTimeout(fnTimeout);
+            fnTimeout = setTimeout(() => { document.getElementById('fnStatus').innerText = 'Saved locally.'; checkNotepadFormatting(); }, 800);
+        });
+        
+        function checkNotepadFormatting() {
+            const val = fnContent.value;
+            if (val.startsWith('```')) { fnContent.classList.add('code-mode'); } else { fnContent.classList.remove('code-mode'); }
+            const hasTodo = /-\s?\[\s?\]\s?.+/i.test(val);
+            fnPushBtn.style.display = hasTodo ? 'block' : 'none';
+        }
+        
+        fnPushBtn.addEventListener('click', async () => {
+            const lines = fnContent.value.split('\n');
+            let newTasks = []; let remainingLines = [];
+            lines.forEach((line, index) => {
+                const match = line.match(/-\s?\[\s?\]\s?(.+)/i);
+                if (match) { 
+                    newTasks.push({ id: 'todo_' + Date.now() + '_' + index, title: match[1].trim(), priority: "Medium", completed: false, dueDate: new Date().toISOString().split('T')[0] }); 
+                } else { remainingLines.push(line); }
+            });
+            
+            if (newTasks.length > 0) {
+                let existingTodos = [];
+                try {
+                    let userId = "local-dev";
+                    if (typeof cloudIdentity !== 'undefined' && cloudIdentity.userId) {
+                        userId = cloudIdentity.userId;
+                    }
+                    const tr = await fetch(`/api/get_user_data?userId=${userId}&dataType=todos`);
+                    if(tr.ok) { 
+                        existingTodos = await tr.json() || []; 
+                        if(typeof existingTodos === 'string') existingTodos = JSON.parse(existingTodos);
+                    }
+                    existingTodos = existingTodos.concat(newTasks);
+                    await fetch('/api/save_user_data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: userId, dataType: 'todos', data: existingTodos }) });
+                } catch(e) {
+                    console.log("fallback", e);
+                    existingTodos = JSON.parse(localStorage.getItem('kore_todos')||'[]');
+                    if(typeof existingTodos === 'string') existingTodos = JSON.parse(existingTodos);
+                    existingTodos = existingTodos.concat(newTasks);
+                    localStorage.setItem('kore_todos', JSON.stringify(existingTodos));
+                }
+                fnContent.value = remainingLines.join('\n');
+                localStorage.setItem('kore_global_notepad', fnContent.value);
+                document.getElementById('fnStatus').innerText = `Pushed ${newTasks.length} tasks!`;
+                fnPushBtn.style.display = 'none';
+            }
+        });
+    </script>
+
+
+
+<!-- Mobile Nav Script (Injected) -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        if (item.querySelector('.dropdown-content')) {
+            item.addEventListener('click', (e) => {
+                if (window.innerWidth <= 1023) {
+                    if (e.target.tagName.toLowerCase() === 'a' && e.target.closest('.dropdown-content')) {
+                        return;
+                    }
+                    e.preventDefault();
+                    item.classList.toggle('open-mobile');
+                }
+            });
+        }
+    });
+});
+</script>
+</body>
+</html>

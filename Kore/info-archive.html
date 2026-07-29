@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kore | Info Hub Archive</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Premium Light Theme Variables */
+        :root {
+            --accent-primary: #0ea5e9; --accent-hover: #0284c7;
+            --bg-app: #f8fafc; --bg-surface: #ffffff;
+            --text-main: #0f172a; --text-secondary: #475569;
+            --border-subtle: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.05);
+            --radius-md: 12px; --radius-sm: 8px;
+        }
+        /* THEME: Midnight Dark */
+        body[data-theme="midnight"] {
+            --bg-app: #0f172a; --bg-surface: #1e293b; --text-main: #f8fafc; --text-secondary: #94a3b8;
+            --border-subtle: #334155; --accent-primary: #38bdf8; --accent-hover: #7dd3fc;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5); --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+        /* THEME: Cyberpunk */
+        body[data-theme="cyberpunk"] {
+            --bg-app: #000000; --bg-surface: #121212; --text-main: #00ff41; --text-secondary: #ff00ff;
+            --border-subtle: #00ff41; --accent-primary: #ff00ff; --accent-hover: #ff00aa;
+            --radius-md: 0px; --radius-sm: 0px; --shadow-sm: 0 0 5px rgba(0, 255, 65, 0.2);
+            --shadow-md: 0 0 10px rgba(255, 0, 255, 0.2);
+        }
+        /* THEME: Corporate Classic */
+        body[data-theme="corporate"] {
+            --bg-app: #e2e8f0; --bg-surface: #ffffff; --text-main: #1e293b; --text-secondary: #475569;
+            --border-subtle: #cbd5e1; --accent-primary: #1d4ed8; --accent-hover: #1e40af;
+            --radius-md: 4px; --radius-sm: 2px;
+        }
+        /* THEME: Earthy Minimal */
+        body[data-theme="earthy"] {
+            --bg-app: #fdf8f5; --bg-surface: #ffffff; --text-main: #3f3e3a; --text-secondary: #6b7280;
+            --border-subtle: #e5e5e5; --accent-primary: #5c7f67; --accent-hover: #4a6652;
+            --radius-md: 24px; --radius-sm: 16px;
+        }
+        /* THEME: Oceanic */
+        body[data-theme="oceanic"] {
+            --bg-app: #e0f2fe; --bg-surface: #f0f9ff; --text-main: #0c4a6e; --text-secondary: #0369a1;
+            --border-subtle: #bae6fd; --accent-primary: #0284c7; --accent-hover: #0369a1;
+            --radius-md: 16px; --radius-sm: 12px;
+        }
+
+        body {
+            margin: 0; font-family: 'Inter', system-ui, sans-serif; background-color: var(--bg-app); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh;  }
+
+        /* Global Header */
+        .global-header { background-color: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 64px; box-shadow: var(--shadow-sm); flex-shrink: 0; position: sticky; top: 0; z-index: 100;}
+        .header-left { display: flex; align-items: center; gap: 40px; height: 100%; }
+        .kore-logo { font-size: 1.5rem; font-weight: 800; color: var(--text-main); margin: 0; display: flex; align-items: center; gap: 8px; }
+        .kore-logo span { color: var(--accent-primary); }
+        .nav-menu { display: flex; gap: 8px; height: 100%; }
+        .nav-item { text-decoration: none; color: var(--text-secondary); padding: 0 16px; display: flex; align-items: center; height: 100%; font-weight: 500; font-size: 0.95rem; border-bottom: 3px solid transparent; cursor: pointer; position: relative; transition: all 0.2s ease; }
+        .nav-item:hover, .nav-item.active { color: var(--accent-primary); border-bottom-color: var(--accent-primary); background-color: rgba(14, 165, 233, 0.08); }
+        .dropdown-content { display: none; position: absolute; top: 64px; left: 0; background-color: var(--bg-surface); min-width: 200px; box-shadow: var(--shadow-md); border: 1px solid var(--border-subtle); border-radius: 0 0 var(--radius-sm) var(--radius-sm); overflow: hidden; z-index: 101; }
+        .nav-item:hover .dropdown-content { display: block; }
+        .dropdown-content a { white-space: nowrap; color: var(--text-secondary); padding: 14px 20px; text-decoration: none; display: block; border-bottom: 1px solid var(--bg-app); font-weight: 500; }
+        .dropdown-content a:hover { background-color: rgba(14, 165, 233, 0.08); color: var(--accent-primary); padding-left: 24px; transition: all 0.2s ease; }
+        .user-badge { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); background: var(--bg-app); padding: 6px 12px; border-radius: 99px; border: 1px solid var(--border-subtle); margin-left: auto; margin-right: 24px;}
+
+        /* Main Layout */
+        .main-container { padding: 40px 32px; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; flex-grow: 1; }
+        
+        .page-header { display: flex; flex-direction: column; gap: 8px; margin-bottom: 32px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 24px; }
+        .page-title { margin: 0; font-size: 2rem; font-weight: 800; color: var(--text-main); }
+        .page-subtitle { margin: 0; font-size: 1rem; color: var(--text-secondary); }
+
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; background: var(--bg-surface); padding: 16px 24px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm); }
+        
+        .btn { background-color: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-subtle); padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.9rem; text-decoration: none; }
+        .btn:hover { background-color: var(--bg-app); border-color: var(--text-secondary); }
+        .btn-primary { background-color: var(--accent-primary); color: white; border: none; }
+        .btn-primary:hover { background-color: var(--accent-hover); box-shadow: var(--shadow-sm); border: none; }
+        .btn-danger { color: #ef4444; border-color: #fca5a5; background: #fef2f2; }
+        .btn-danger:hover { background: #fee2e2; border-color: #ef4444; }
+
+        .archive-list { display: flex; flex-direction: column; gap: 12px; }
+        .archive-item { display: flex; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: 16px 24px; border-radius: var(--radius-sm); gap: 20px; transition: background 0.2s; }
+        .archive-item:hover { background: rgba(14, 165, 233, 0.08); border-color: #bae6fd; }
+        
+        .custom-checkbox { width: 20px; height: 20px; cursor: pointer; accent-color: var(--accent-primary); flex-shrink: 0; }
+        
+        .item-details { flex-grow: 1; min-width: 0; display: flex; align-items: center; gap: 12px;}
+        .item-title { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin: 0 0 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .item-meta { font-size: 0.85rem; color: var(--text-secondary); margin: 0; }
+        
+        .tag-global { background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5; padding: 2px 8px; border-radius: 99px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; display: inline-block;}
+
+        .empty-state { text-align: center; padding: 60px 20px; background: var(--bg-surface); border: 1px dashed var(--border-subtle); border-radius: var(--radius-md); color: var(--text-secondary); font-weight: 500; font-size: 1.1rem; }
+
+        
+        
+
+        .global-footer { background-color: var(--bg-surface); border-top: 1px solid var(--border-subtle); padding: 24px; text-align: center; color: var(--text-secondary); font-size: 0.9rem; flex-shrink: 0; font-weight: 500; margin-top: auto; }
+    
+        
+    
+    
+            pre, code { white-space: pre-wrap; word-break: break-word; overflow-x: auto; max-width: 100%; }
+    
+    </style>
+
+    <!-- SEO & Mobile Optimization -->
+    <meta name="description" content="Kore Enterprise Workspace - Advanced Cloud Management System">
+    <meta name="keywords" content="Kore, Workspace, Enterprise, Management, LOD">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' font-family='Arial' fill='%230ea5e9' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' font-family='Arial' fill='%230ea5e9' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+
+    <style>
+        /* Mobile Layout & Back-to-Top */
+        
+        
+        .mobile-toggle { display: none; }
+        
+        #backToTop {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s, background 0.3s;
+        }
+        #backToTop:hover { background: var(--accent-hover); }
+    </style>
+
+    <script>
+        window.uiConfirm = function(msg) {
+            return new Promise(resolve => {
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:99999;display:flex;align-items:center;justify-content:center;';
+                const box = document.createElement('div');
+                box.style.cssText = 'background:var(--bg-surface,#fff);padding:24px;border-radius:8px;max-width:400px;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,0.2);border:1px solid var(--border-subtle,#ccc);color:var(--text-main,#000);font-family:sans-serif;';
+                box.innerHTML = '<p style="margin-top:0;margin-bottom:24px;font-size:1.1rem;">' + msg + '</p>' +
+                                '<div style="display:flex;gap:12px;justify-content:center;">' +
+                                '<button id="uiConfirmCancel" style="padding:8px 16px;border:1px solid #ccc;background:transparent;cursor:pointer;border-radius:4px;color:var(--text-main,#000);">Cancel</button>' +
+                                '<button id="uiConfirmOk" style="padding:8px 16px;border:none;background:#ef4444;color:#fff;cursor:pointer;border-radius:4px;">Confirm</button>' +
+                                '</div>';
+                overlay.appendChild(box);
+                document.body.appendChild(overlay);
+                document.getElementById('uiConfirmCancel').onclick = () => { document.body.removeChild(overlay); resolve(false); };
+                document.getElementById('uiConfirmOk').onclick = () => { document.body.removeChild(overlay); resolve(true); };
+            });
+        };
+</script>
+
+<style>
+/* --- RESPONSIVE MOBILE & TABLET (Injected) --- */
+* { box-sizing: border-box; }
+img, video, iframe, canvas { max-width: 100%; height: auto; }
+body { overflow-x: hidden; width: 100%; }
+
+@media (max-width: 1023px) {
+    .modal-content, .system-modal, .storage-tracker { max-width: 95vw !important; }
+
+    .global-header {
+        flex-direction: column;
+        height: auto;
+        padding: 10px 16px;
+        gap: 10px;
+    }
+    .header-left {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .search-container {
+        width: 100%;
+    }
+    .search-bar {
+        width: 100%;
+    }
+    .mobile-toggle {
+        display: flex !important;
+        align-items: center;
+        background: none;
+        border: none;
+        color: var(--text-main);
+        cursor: pointer;
+    }
+    .nav-menu {
+        display: none !important;
+        flex-direction: column;
+        width: 100%;
+        background: var(--bg-surface);
+        position: absolute;
+        top: 100%;
+        left: 0;
+        box-shadow: var(--shadow-md);
+        z-index: 200;
+        max-height: 70vh;
+        overflow-y: auto;
+        border-top: 1px solid var(--border-subtle);
+    }
+    .nav-menu.open {
+        display: flex !important;
+    }
+    .nav-item {
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--border-subtle);
+        width: 100%;
+        flex-wrap: wrap;
+        height: auto;
+    }
+    .nav-item:last-child {
+        border-bottom: none;
+    }
+    .dropdown-content {
+        position: static;
+        display: none;
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        width: 100%;
+        padding-left: 20px;
+        margin-top: 10px;
+    }
+    .nav-item.open-mobile .dropdown-content {
+        display: block !important;
+    }
+    /* Hide hover effects on mobile */
+    .nav-item:hover .dropdown-content, 
+    .nav-item:focus-within .dropdown-content,
+    .nav-item:active .dropdown-content {
+        display: none;
+    }
+    .nav-item.open-mobile:hover .dropdown-content,
+    .nav-item.open-mobile:focus-within .dropdown-content,
+    .nav-item.open-mobile:active .dropdown-content {
+        display: block !important;
+    }
+    
+    .dashboard-grid, .dashboard-layout, .apps-grid, .grid-container,
+    .layout-grid, .chart-grid, .library-controls, .add-task-panel,
+    .controls-grid, .content-grid, .layout-split, .form-grid,
+    .metrics-bar, .view-boxes, .grid-2, .workspace-grid,
+    .kpi-grid, .nav-pref-grid, .color-target-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .metrics-bar, .form-grid {
+        gap: 16px !important;
+    }
+    .main-container {
+        padding: 15px !important;
+    }
+    .hero-banner {
+        padding: 30px 15px !important;
+        height: auto !important;
+        min-height: 160px;
+    }
+    .hero-title {
+        font-size: 1.8rem !important;
+    }
+    
+    /* Make tables scrollable */
+    table, .table-container, .data-table-container {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    /* Ensure containers don't overflow */
+    .panel, .card, .widget, .card-body, .intel-panel, .info-panel {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    /* Layout fixes for sidebars */
+    .workspace-layout {
+        flex-direction: column !important;
+    }
+    .sidebar {
+        width: 100% !important;
+        max-height: none !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border-subtle);
+        position: static !important;
+    }
+}
+</style>
+
+</head>
+
+<body>
+<script>
+    // Theme Initializer to prevent flash on load
+    const savedTheme = localStorage.getItem('kore_theme') || 'default';
+    if(savedTheme !== 'default') {
+        document.body.setAttribute('data-theme', savedTheme);
+    }
+</script>
+
+    <header class="global-header">
+        <div class="header-left">
+            <h1 class="kore-logo">Kore<span>.</span></h1>
+        <button class="mobile-toggle" aria-label="Toggle Menu" onclick="toggleMobileNav()"><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 12h18M3 6h18M3 18h18"></path></svg></button>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">Dashboard</a>
+                
+                <div class="nav-item">Operations ▼
+                    <div class="dropdown-content">
+                        <a href="apps.html">Apps</a>
+                        <a href="file-converter.html">File to LOAD Converter</a>
+                        <a href="lod.html">LOD Validation Tool</a>
+                        <a href="macros.html">Macro Library</a>
+                        <a href="nebula.html">Nebula HTML Forge</a>
+                        <a href="passwords.html">Password Generator</a>
+                    <a href="business-tools.html">Business & Sec Tools</a>
+                        <a href="todo.html">Personal To-Do</a>
+                        <a href="product-html.html">Product HTML Converter</a>
+                        <a href="scanner.html">Vulnerability Scanner</a>
+                        <a href="work.html">Work Tracker</a>
+                    </div>
+                </div>
+                
+                <div class="nav-item active">Resources ▼
+                    <div class="dropdown-content">
+                        <a href="info-archive.html">Archive</a>
+                        <a href="reports.html">Data/Reports</a>
+                        <a href="docs.html">Document Library</a>
+                        <a href="info-hub.html">Info Hub</a>
+                    </div>
+                </div>
+                
+                <a href="about.html" class="nav-item">About</a>
+                <a href="settings.html" class="nav-item">Settings</a>
+            </nav>
+        </div>
+        <div id="userIdentityBadge" class="user-badge">Authenticating...</div>
+    </header>
+
+    <main class="main-container">
+        
+        <div class="page-header">
+            <h2 class="page-title">Info Hub Archive</h2>
+            <p class="page-subtitle">Restore previously archived pages or delete them permanently to free up cloud storage space.</p>
+        </div>
+
+        <div class="toolbar">
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <input type="checkbox" id="selectAllCb" class="custom-checkbox" title="Select All">
+                <label for="selectAllCb" style="font-weight: 600; color: var(--text-main); font-size: 0.9rem; cursor: pointer;">Select All</label>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <button type="button" id="restoreBtn" class="btn btn-primary">Restore Selected</button>
+                <button type="button" id="deleteBtn" class="btn btn-danger">Permanently Delete</button>
+            </div>
+        </div>
+
+        <div id="archiveList" class="archive-list"></div>
+        <div id="emptyState" class="empty-state" style="display: none;">No archived pages found.</div>
+
+    </main>
+
+    
+
+    <footer class="global-footer">&copy; 2026 Kore | Enterprise Cloud Vault Connected.</footer>
+
+    <script>
+        let cloudIdentity = { userId: "local-dev", userName: "Local Developer" };
+        let profileName = "User";
+        let localTasks = [];
+        let localTickets = [];
+        let masterPages = [];
+
+        async function loadCloudData(dataType) {
+            try {
+                const res = await fetch(`/api/get_user_data?userId=${cloudIdentity.userId}&dataType=${dataType}&_t=${Date.now()}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && (Object.keys(data).length > 0 || data.length > 0)) return data;
+                }
+            } catch(e) {}
+            return null;
+        }
+        
+        async function saveCloudData(dataType, data) {
+            try {
+                await fetch('/api/save_user_data', {
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: cloudIdentity.userId, dataType: dataType, data: data })
+                });
+            } catch(e) {}
+        }
+
+        async function fetchSecureIdentity() {
+            try {
+                const response = await fetch('/.auth/me');
+                const data = await response.json();
+                if (data.clientPrincipal) {
+                    cloudIdentity.userId = data.clientPrincipal.userId;
+                    cloudIdentity.userName = data.clientPrincipal.userDetails;
+                    document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+                }
+            } catch (error) {}
+
+            const profile = await loadCloudData('profile') || {};
+            profileName = profile.name || cloudIdentity.userName.split('@')[0] || "User";
+            
+            const botWelcomeMsg = document.getElementById('botWelcomeMsg');
+            if (botWelcomeMsg) {
+                botWelcomeMsg.innerText = `Hello, ${profileName}. I am synced to the Archive matrix. Be careful when permanently deleting data.`;
+            }
+        }
+
+        
+
+        
+
+        // --- MERGED DATA ENGINE (To match Info Hub exactly) ---
+        async function fetchAllPages() {
+            let allPages = [];
+            
+            // 1. Specific Table Vault
+            try {
+                const res = await fetch(`/api/get_info_pages?userId=${cloudIdentity.userId}&_t=${Date.now()}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data)) allPages = [...data];
+                }
+            } catch(e) {}
+            
+            // 2. Fallback User Data Vault
+            try {
+                const fallback = await loadCloudData('infoPages');
+                if (fallback && Array.isArray(fallback)) {
+                    fallback.forEach(fbPage => {
+                        if (!allPages.find(p => p.id === fbPage.id)) {
+                            allPages.push(fbPage);
+                        }
+                    });
+                }
+            } catch(e) {}
+            
+            return allPages;
+        }
+
+        async function render() {
+            const allPages = await fetchAllPages();
+            
+            // Robust Boolean Check (Catches standard booleans and stringified "true")
+            masterPages = allPages.filter(p => p.archived === true || String(p.archived).toLowerCase() === 'true');
+            
+            const listEl = document.getElementById('archiveList');
+            const emptyEl = document.getElementById('emptyState');
+            listEl.innerHTML = '';
+            
+            if (!masterPages || masterPages.length === 0) {
+                listEl.style.display = 'none';
+                emptyEl.style.display = 'block';
+                return;
+            }
+            
+            listEl.style.display = 'flex';
+            emptyEl.style.display = 'none';
+            
+            masterPages.forEach(page => {
+                const titleText = String(page.titleHtml || page.title || 'Untitled Page').replace(/<[^>]+>/g, '').trim();
+                const globalTag = page.isGlobal ? `<span class="tag-global">Global Workspace</span>` : '';
+                
+                const item = document.createElement('div');
+                item.className = 'archive-item';
+                item.innerHTML = `
+                    <input type="checkbox" class="custom-checkbox item-cb" value="${page.id}">
+                    <div class="item-details">
+                        <div style="display: flex; flex-direction: column;">
+                            ${globalTag}
+                            <h4 class="item-title">${titleText}</h4>
+                            <p class="item-meta">Archived on: ${page.updatedAt ? new Date(page.updatedAt).toLocaleDateString() : 'Unknown'} • By: ${page.author || 'System'}</p>
+                        </div>
+                    </div>
+                `;
+                listEl.appendChild(item);
+            });
+        }
+
+        function getSelectedIds() {
+            const checkboxes = document.querySelectorAll(".item-cb:checked");
+            const ids = [];
+            checkboxes.forEach(cb => ids.push(cb.value));
+            return ids;
+        }
+
+        document.getElementById('selectAllCb').addEventListener('change', (e) => {
+            const isChecked = e.target.checked;
+            document.querySelectorAll('.item-cb').forEach(cb => cb.checked = isChecked);
+        });
+
+        // RESTORE LOGIC
+        document.getElementById('restoreBtn').addEventListener('click', async () => {
+            const ids = getSelectedIds();
+            if (!ids.length) return alert("Select at least one page to restore.");
+            
+            let allPages = await fetchAllPages();
+            const selectedPages = masterPages.filter(p => p && p.id && ids.includes(p.id));
+            const hasGlobal = selectedPages.some(p => p.isGlobal);
+
+            // Admin lock for restoring a Global page
+            if (hasGlobal) {
+                const adminData = await loadCloudData('admin_settings') || { admins: [] };
+                if (!adminData.admins) adminData.admins = [];
+                const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                const isAdmin = isLocal || adminData.admins.length === 0 || adminData.admins.includes(cloudIdentity.userName);
+                if (!isAdmin) {
+                    alert("Authorization Denied. Admin access required to restore Global pages.");
+                    return;
+                }
+            }
+
+            document.getElementById('restoreBtn').innerText = "Restoring...";
+            
+            const promises = [];
+            selectedPages.forEach(page => {
+                page.archived = false;
+                
+                // Update Fallback Array
+                const idx = allPages.findIndex(p => p.id === page.id);
+                if(idx > -1) allPages[idx].archived = false;
+
+                // Sync specific API
+                promises.push(fetch('/api/save_info_page', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(page)
+                }));
+            });
+            
+            try { await Promise.all(promises); } catch(e) {}
+            
+            // Sync Fallback Vault
+            try { await saveCloudData('infoPages', allPages); } catch(e) {}
+            
+            document.getElementById('restoreBtn').innerText = "Restore Selected";
+            await render();
+        });
+
+        // PERMANENT DELETE LOGIC
+        document.getElementById('deleteBtn').addEventListener('click', async () => {
+            const ids = getSelectedIds();
+            if (!ids.length) return alert("Select at least one page to delete.");
+            
+            let allPages = await fetchAllPages();
+            const selectedPages = masterPages.filter(p => p && p.id && ids.includes(p.id));
+            const hasGlobal = selectedPages.some(p => p.isGlobal);
+
+            // Admin lock for permanently deleting a Global page
+            if (hasGlobal) {
+                const adminData = await loadCloudData('admin_settings') || { admins: [] };
+                if (!adminData.admins) adminData.admins = [];
+                const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                const isAdmin = isLocal || adminData.admins.length === 0 || adminData.admins.includes(cloudIdentity.userName);
+                if (!isAdmin) {
+                    alert("Authorization Denied. Admin access required to wipe Global pages.");
+                    return;
+                }
+            } else if (!(await uiConfirm("Permanently delete the selected archived pages? This will wipe the data from the cloud vault and cannot be undone."))) {
+                return;
+            }
+            
+            document.getElementById('deleteBtn').innerText = "Deleting...";
+
+            const promises = [];
+            selectedPages.forEach(page => {
+                // Update Fallback Array
+                allPages = allPages.filter(p => p.id !== page.id);
+
+                promises.push(fetch('/api/delete_info_page', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id: page.id,
+                        authorId: page.authorId || cloudIdentity.userId,
+                        isGlobal: page.isGlobal || false
+                    })
+                }));
+            });
+
+            try { await Promise.all(promises); } catch(e) {}
+            
+            // Sync Fallback Vault
+            try { await saveCloudData('infoPages', allPages); } catch(e) {}
+
+            document.getElementById('deleteBtn').innerText = "Permanently Delete";
+            await render();
+        });
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchSecureIdentity();
+            await render();
+        });
+    </script>
+
+    <button id="backToTop" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</button>
+    <script>
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('backToTop');
+            if(window.scrollY > 300) btn.style.display = 'flex';
+            else btn.style.display = 'none';
+        });
+        
+        function toggleMobileNav() {
+            const nav = document.querySelector('.nav-menu');
+            if(nav) nav.classList.toggle('open');
+        }
+        
+        if('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(console.error);
+        }
+    </script>
+
+<script>
+        // --- Navigation Preferences Logic ---
+        function applyNavPreferences() {
+            try {
+                const hiddenNavs = JSON.parse(localStorage.getItem('kore_hidden_navs') || '[]');
+                if (hiddenNavs.length > 0) {
+                    const links = document.querySelectorAll('.dropdown-content a');
+                    links.forEach(link => {
+                        const href = link.getAttribute('href');
+                        if (hiddenNavs.includes(href)) {
+                            link.style.display = 'none';
+                        } else {
+                            link.style.display = 'block';
+                        }
+                    });
+                    
+                    // Hide empty dropdowns
+                    document.querySelectorAll('.nav-item').forEach(item => {
+                        const dropdown = item.querySelector('.dropdown-content');
+                        if (dropdown) {
+                            const visibleLinks = Array.from(dropdown.querySelectorAll('a')).filter(a => a.style.display !== 'none');
+                            if (visibleLinks.length === 0) {
+                                item.style.display = 'none';
+                            } else {
+                                item.style.display = 'flex';
+                            }
+                        }
+                    });
+                } else {
+                    document.querySelectorAll('.dropdown-content a').forEach(a => a.style.display = 'block');
+                }
+            } catch(e) {}
+        }
+        document.addEventListener('DOMContentLoaded', applyNavPreferences);
+</script>
+
+
+<!-- Mobile Nav Script (Injected) -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        if (item.querySelector('.dropdown-content')) {
+            item.addEventListener('click', (e) => {
+                if (window.innerWidth <= 1023) {
+                    if (e.target.tagName.toLowerCase() === 'a' && e.target.closest('.dropdown-content')) {
+                        return;
+                    }
+                    e.preventDefault();
+                    item.classList.toggle('open-mobile');
+                }
+            });
+        }
+    });
+});
+</script>
+</body>
+</html>

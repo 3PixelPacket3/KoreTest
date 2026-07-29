@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kore | Info Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Premium Light Theme Variables */
+        :root {
+            --accent-primary: #0ea5e9;
+            --accent-hover: #0284c7;
+            --bg-app: #f8fafc;
+            --bg-surface: #ffffff;
+            --text-main: #0f172a;
+            --text-secondary: #475569;
+            --border-subtle: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.05);
+            --shadow-hover: 0 10px 15px -3px rgba(15, 23, 42, 0.08);
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --success: #10b981;
+        }
+
+        /* --- GLOBAL WORKSPACE THEMES --- */
+        body[data-theme="midnight"] {
+            --bg-app: #0f172a; --bg-surface: #1e293b; --text-main: #f8fafc; --text-secondary: #94a3b8;
+            --border-subtle: #334155; --accent-primary: #38bdf8; --accent-hover: #7dd3fc;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5); --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+        body[data-theme="cyberpunk"] {
+            --bg-app: #000000; --bg-surface: #121212; --text-main: #00ff41; --text-secondary: #ff00ff;
+            --border-subtle: #00ff41; --accent-primary: #ff00ff; --accent-hover: #ff00aa;
+            --radius-md: 0px; --radius-sm: 0px; --shadow-sm: 0 0 5px rgba(0, 255, 65, 0.2);
+            --shadow-md: 0 0 10px rgba(255, 0, 255, 0.2);
+        }
+        body[data-theme="corporate"] {
+            --bg-app: #e2e8f0; --bg-surface: #ffffff; --text-main: #1e293b; --text-secondary: #475569;
+            --border-subtle: #cbd5e1; --accent-primary: #1d4ed8; --accent-hover: #1e40af;
+            --radius-md: 4px; --radius-sm: 2px;
+        }
+        body[data-theme="earthy"] {
+            --bg-app: #fdf8f5; --bg-surface: #ffffff; --text-main: #3f3e3a; --text-secondary: #6b7280;
+            --border-subtle: #e5e5e5; --accent-primary: #5c7f67; --accent-hover: #4a6652;
+            --radius-md: 24px; --radius-sm: 16px;
+        }
+        body[data-theme="oceanic"] {
+            --bg-app: #e0f2fe; --bg-surface: #f0f9ff; --text-main: #0c4a6e; --text-secondary: #0369a1;
+            --border-subtle: #bae6fd; --accent-primary: #0284c7; --accent-hover: #0369a1;
+            --radius-md: 16px; --radius-sm: 12px;
+        }
+        /* THEME: Midnight Dark */
+        body[data-theme="midnight"] {
+            --bg-app: #0f172a; --bg-surface: #1e293b; --text-main: #f8fafc; --text-secondary: #94a3b8;
+            --border-subtle: #334155; --accent-primary: #38bdf8; --accent-hover: #7dd3fc;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5); --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+        /* THEME: Cyberpunk */
+        body[data-theme="cyberpunk"] {
+            --bg-app: #000000; --bg-surface: #121212; --text-main: #00ff41; --text-secondary: #ff00ff;
+            --border-subtle: #00ff41; --accent-primary: #ff00ff; --accent-hover: #ff00aa;
+            --radius-md: 0px; --radius-sm: 0px; --shadow-sm: 0 0 5px rgba(0, 255, 65, 0.2);
+            --shadow-md: 0 0 10px rgba(255, 0, 255, 0.2);
+        }
+        /* THEME: Corporate Classic */
+        body[data-theme="corporate"] {
+            --bg-app: #e2e8f0; --bg-surface: #ffffff; --text-main: #1e293b; --text-secondary: #475569;
+            --border-subtle: #cbd5e1; --accent-primary: #1d4ed8; --accent-hover: #1e40af;
+            --radius-md: 4px; --radius-sm: 2px;
+        }
+        /* THEME: Earthy Minimal */
+        body[data-theme="earthy"] {
+            --bg-app: #fdf8f5; --bg-surface: #ffffff; --text-main: #3f3e3a; --text-secondary: #6b7280;
+            --border-subtle: #e5e5e5; --accent-primary: #5c7f67; --accent-hover: #4a6652;
+            --radius-md: 24px; --radius-sm: 16px;
+        }
+        /* THEME: Oceanic */
+        body[data-theme="oceanic"] {
+            --bg-app: #e0f2fe; --bg-surface: #f0f9ff; --text-main: #0c4a6e; --text-secondary: #0369a1;
+            --border-subtle: #bae6fd; --accent-primary: #0284c7; --accent-hover: #0369a1;
+            --radius-md: 16px; --radius-sm: 12px;
+        }
+
+        body {
+            margin: 0; 
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg-app); 
+            color: var(--text-main);
+            display: flex; 
+            flex-direction: column; 
+            min-height: 100vh; 
+            
+            -webkit-font-smoothing: antialiased;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* --- Global Header --- */
+        .global-header { 
+            background-color: var(--bg-surface); 
+            border-bottom: 1px solid var(--border-subtle); 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 0 32px; 
+            height: 64px; 
+            box-shadow: var(--shadow-sm); 
+            flex-shrink: 0; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100;
+        }
+        .header-left { 
+            display: flex; 
+            align-items: center; 
+            gap: 40px; 
+            height: 100%; 
+        }
+        .kore-logo { 
+            font-size: 1.5rem; 
+            font-weight: 800; 
+            color: var(--text-main); 
+            letter-spacing: -0.5px; 
+            margin: 0; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+        }
+        .kore-logo span { color: var(--accent-primary); }
+        .nav-menu { display: flex; gap: 8px; height: 100%; }
+        .nav-item { 
+            text-decoration: none; 
+            color: var(--text-secondary); 
+            padding: 0 16px; 
+            display: flex; 
+            align-items: center; 
+            height: 100%; 
+            font-weight: 500; 
+            font-size: 0.95rem; 
+            border-bottom: 3px solid transparent; 
+            cursor: pointer; 
+            position: relative; 
+            transition: all 0.2s ease; 
+        }
+        .nav-item:hover, .nav-item.active { 
+            color: var(--accent-primary); 
+            border-bottom-color: var(--accent-primary); 
+            background-color: rgba(14, 165, 233, 0.08); 
+        }
+        .dropdown-content { 
+            display: none; 
+            position: absolute; 
+            top: 64px; 
+            left: 0; 
+            background-color: var(--bg-surface); 
+            min-width: 200px; 
+            box-shadow: var(--shadow-md); 
+            border: 1px solid var(--border-subtle); 
+            border-radius: 0 0 var(--radius-sm) var(--radius-sm); 
+            overflow: hidden; 
+            z-index: 101; 
+        }
+        .nav-item:hover .dropdown-content { display: block; }
+        .dropdown-content a { white-space: nowrap; 
+            color: var(--text-secondary); 
+            padding: 14px 20px; 
+            text-decoration: none; 
+            display: block; 
+            border-bottom: 1px solid var(--bg-app); 
+            font-weight: 500; 
+        }
+        .dropdown-content a:hover { 
+            background-color: rgba(14, 165, 233, 0.08); 
+            color: var(--accent-primary); 
+            padding-left: 24px; 
+            transition: all 0.2s ease; 
+        }
+
+        .user-badge { 
+            font-size: 0.85rem; 
+            font-weight: 600; 
+            color: var(--text-secondary); 
+            background: var(--bg-app); 
+            padding: 6px 12px; 
+            border-radius: 99px; 
+            border: 1px solid var(--border-subtle); 
+            margin-left: auto; 
+            margin-right: 24px;
+        }
+
+        /* --- Main Content Layout --- */
+        .main-container { 
+            padding: 40px 32px; 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            width: 100%; 
+            box-sizing: border-box; 
+            flex-grow: 1; 
+        }
+        
+        .hero-banner { 
+            background: var(--bg-surface); 
+            border-radius: var(--radius-md); 
+            overflow: hidden; 
+            border: 1px solid var(--border-subtle); 
+            box-shadow: var(--shadow-sm); 
+            height: 160px; 
+            position: relative; 
+            margin-bottom: 32px; 
+        }
+        .hero-banner img { width: 100%; height: 100%; object-fit: cover; }
+        .hero-overlay { 
+            position: absolute; 
+            bottom: 0; left: 0; 
+            width: 100%; 
+            background: linear-gradient(to top, rgba(15,23,42,0.9), transparent); 
+            padding: 24px 30px; 
+            box-sizing: border-box; 
+            color: white; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-end; 
+        }
+        .hero-title { margin: 0; font-size: 1.8rem; font-weight: 700; }
+        .hero-subtitle { margin: 6px 0 0 0; font-size: 1rem; color: #cbd5e1; }
+
+        /* --- Buttons & Inputs --- */
+        .btn { 
+            background-color: var(--bg-surface); 
+            color: var(--text-main); 
+            border: 1px solid var(--border-subtle); 
+            padding: 10px 18px; 
+            border-radius: var(--radius-sm); 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+            font-size: 0.95rem; 
+            text-decoration: none; 
+        }
+        .btn:hover { background-color: var(--bg-app); border-color: var(--text-secondary); }
+        .btn-primary { background-color: var(--accent-primary); color: white; border: none; }
+        .btn-primary:hover { background-color: var(--accent-hover); border: none; box-shadow: var(--shadow-sm); }
+        
+        .input, .form-select { 
+            padding: 12px 16px; 
+            border: 1px solid var(--border-subtle); 
+            border-radius: var(--radius-sm); 
+            font-size: 0.95rem; 
+            outline: none; 
+            background: var(--bg-surface); 
+            color: var(--text-main); 
+            font-family: inherit; 
+            transition: border-color 0.2s; 
+        }
+        .input:focus, .form-select:focus { 
+            border-color: var(--accent-primary); 
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); 
+        }
+
+        /* --- Toolbar & Dynamic Categories --- */
+        .toolbar { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; 
+            background: var(--bg-surface); 
+            padding: 20px; 
+            border-radius: var(--radius-md); 
+            border: 1px solid var(--border-subtle); 
+            box-shadow: var(--shadow-sm); 
+            align-items: center; 
+        }
+        .search-wrapper { flex-grow: 1; display: flex; align-items: center; }
+        .search-wrapper .input { width: 100%; border-radius: 99px; padding-left: 20px; }
+
+        .category-filters { 
+            display: flex; 
+            gap: 10px; 
+            flex-wrap: wrap; 
+            margin-bottom: 24px; 
+        }
+        .cat-btn { 
+            background: var(--bg-surface); 
+            color: var(--text-secondary); 
+            border: 1px solid var(--border-subtle); 
+            padding: 6px 14px; 
+            border-radius: 99px; 
+            font-size: 0.85rem; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+        }
+        .cat-btn:hover { 
+            border-color: var(--accent-primary); 
+            color: var(--accent-primary); 
+        }
+        .cat-btn.active { 
+            background: var(--accent-primary); 
+            color: white; 
+            border-color: var(--accent-primary); 
+            box-shadow: var(--shadow-sm); 
+        }
+
+        /* --- Info Hub List --- */
+        .infohub-list { display: flex; flex-direction: column; gap: 16px; }
+        .infohub-card { 
+            display: flex; 
+            background: var(--bg-surface); 
+            border: 1px solid var(--border-subtle); 
+            border-radius: var(--radius-md); 
+            padding: 20px; 
+            box-shadow: var(--shadow-sm); 
+            transition: all 0.2s ease; 
+            align-items: center; 
+            gap: 20px; 
+            text-decoration: none; 
+            color: inherit; 
+        }
+        .infohub-card:hover { 
+            transform: translateY(-2px); 
+            box-shadow: var(--shadow-hover); 
+            border-color: var(--accent-primary); 
+        }
+        
+        .infohub-thumb { 
+            width: 80px; 
+            height: 80px; 
+            border-radius: var(--radius-sm); 
+            object-fit: cover; 
+            background: var(--bg-app); 
+            border: 1px solid var(--border-subtle); 
+            flex-shrink: 0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 24px; 
+            color: var(--text-secondary); 
+        }
+        
+        .infohub-content { flex-grow: 1; min-width: 0; }
+        .infohub-title { 
+            font-size: 1.2rem; 
+            font-weight: 700; 
+            color: var(--text-main); 
+            margin: 0 0 6px 0; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px;
+        }
+        .infohub-card:hover .infohub-title { color: var(--accent-primary); }
+        .infohub-summary { 
+            font-size: 0.95rem; 
+            color: var(--text-secondary); 
+            margin: 0 0 12px 0; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+        }
+        
+        .infohub-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tag { 
+            background: rgba(14, 165, 233, 0.08); 
+            color: var(--accent-primary); 
+            border: 1px solid #bae6fd; 
+            padding: 2px 10px; 
+            border-radius: 99px; 
+            font-size: 0.75rem; 
+            font-weight: 600; 
+            text-transform: uppercase; 
+        }
+        .tag-global { background: #fef2f2; color: #ef4444; border-color: #fca5a5; }
+        .tag-personal { background: #fdf4ff; color: #c026d3; border-color: #f5d0fe; }
+        
+        .infohub-meta { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: flex-end; 
+            gap: 8px; 
+            flex-shrink: 0; 
+            min-width: 140px; 
+        }
+        .status-badge { 
+            padding: 4px 10px; 
+            border-radius: 99px; 
+            font-size: 0.75rem; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+        }
+        .status-published { background: #ecfdf5; color: #10b981; border: 1px solid #a7f3d0; }
+        .status-draft { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+        .timestamp { font-size: 0.8rem; color: var(--text-secondary); font-weight: 500; }
+
+        #loadingState { text-align: center; padding: 40px; color: var(--text-secondary); font-weight: 600; display: none; }
+
+        /* --- FLOATING COMMAND PALETTE NOTEPAD --- */
+        #floatingNotepad { position: fixed; top: 15%; left: 50%; transform: translateX(-50%); width: 600px; max-width: 90vw; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); z-index: 9999; display: none; flex-direction: column; overflow: hidden; }
+        #fnHeader { background: var(--bg-app); padding: 12px 20px; cursor: move; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); font-weight: 600; color: var(--text-main); user-select: none; }
+        #fnClose { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary); }
+        #fnContent { width: 100%; height: 300px; padding: 16px; border: none; outline: none; resize: none; font-family: 'Inter', system-ui, sans-serif; font-size: 0.95rem; line-height: 1.5; color: var(--text-main); background: var(--bg-surface); box-sizing: border-box; }
+        #fnContent.code-mode { font-family: monospace; background: #1e293b; color: #f8fafc; }
+        .fn-toolbar { display: flex; justify-content: space-between; padding: 10px 16px; background: var(--bg-app); border-top: 1px solid var(--border-subtle); align-items: center; }
+        .fn-push-btn { background: var(--success); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; display: none; }
+        .fn-push-btn:hover { background: #059669; }
+
+        /* --- Global Footer --- */
+        .global-footer { 
+            background-color: var(--bg-surface); 
+            border-top: 1px solid var(--border-subtle); 
+            padding: 24px; 
+            text-align: center; 
+            color: var(--text-secondary); 
+            font-size: 0.9rem; 
+            flex-shrink: 0; 
+            font-weight: 500; 
+            margin-top: auto;
+        }
+    
+        
+    
+    
+            pre, code { white-space: pre-wrap; word-break: break-word; overflow-x: auto; max-width: 100%; }
+    
+    </style>
+
+    <!-- SEO & Mobile Optimization -->
+    <meta name="description" content="Kore Enterprise Workspace - Advanced Cloud Management System">
+    <meta name="keywords" content="Kore, Workspace, Enterprise, Management, LOD">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' font-family='Arial' fill='%230ea5e9' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' font-family='Arial' fill='%230ea5e9' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+
+    <style>
+        /* Mobile Layout & Back-to-Top */
+        
+        
+        .mobile-toggle { display: none; }
+        
+        #backToTop {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s, background 0.3s;
+        }
+        #backToTop:hover { background: var(--accent-hover); }
+    </style>
+
+
+<style>
+/* --- RESPONSIVE MOBILE & TABLET (Injected) --- */
+* { box-sizing: border-box; }
+img, video, iframe, canvas { max-width: 100%; height: auto; }
+body { overflow-x: hidden; width: 100%; }
+
+@media (max-width: 1023px) {
+    .toolbar select { width: 100% !important; }
+    .toolbar .search-wrapper { width: 100% !important; }
+
+    .modal-content, .system-modal, .storage-tracker { max-width: 95vw !important; }
+
+    .global-header {
+        flex-direction: column;
+        height: auto;
+        padding: 10px 16px;
+        gap: 10px;
+    }
+    .header-left {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .search-container {
+        width: 100%;
+    }
+    .search-bar {
+        width: 100%;
+    }
+    .mobile-toggle {
+        display: flex !important;
+        align-items: center;
+        background: none;
+        border: none;
+        color: var(--text-main);
+        cursor: pointer;
+    }
+    .nav-menu {
+        display: none !important;
+        flex-direction: column;
+        width: 100%;
+        background: var(--bg-surface);
+        position: absolute;
+        top: 100%;
+        left: 0;
+        box-shadow: var(--shadow-md);
+        z-index: 200;
+        max-height: 70vh;
+        overflow-y: auto;
+        border-top: 1px solid var(--border-subtle);
+    }
+    .nav-menu.open {
+        display: flex !important;
+    }
+    .nav-item {
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--border-subtle);
+        width: 100%;
+        flex-wrap: wrap;
+        height: auto;
+    }
+    .nav-item:last-child {
+        border-bottom: none;
+    }
+    .dropdown-content {
+        position: static;
+        display: none;
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        width: 100%;
+        padding-left: 20px;
+        margin-top: 10px;
+    }
+    .nav-item.open-mobile .dropdown-content {
+        display: block !important;
+    }
+    /* Hide hover effects on mobile */
+    .nav-item:hover .dropdown-content, 
+    .nav-item:focus-within .dropdown-content,
+    .nav-item:active .dropdown-content {
+        display: none;
+    }
+    .nav-item.open-mobile:hover .dropdown-content,
+    .nav-item.open-mobile:focus-within .dropdown-content,
+    .nav-item.open-mobile:active .dropdown-content {
+        display: block !important;
+    }
+    
+    .dashboard-grid, .dashboard-layout, .apps-grid, .grid-container,
+    .layout-grid, .chart-grid, .library-controls, .add-task-panel,
+    .controls-grid, .content-grid, .layout-split, .form-grid,
+    .metrics-bar, .view-boxes, .grid-2, .workspace-grid,
+    .kpi-grid, .nav-pref-grid, .color-target-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .metrics-bar, .form-grid {
+        gap: 16px !important;
+    }
+    .main-container {
+        padding: 15px !important;
+    }
+    .hero-banner {
+        padding: 30px 15px !important;
+        height: auto !important;
+        min-height: 160px;
+    }
+    .hero-title {
+        font-size: 1.8rem !important;
+    }
+    
+    /* Make tables scrollable */
+    table, .table-container, .data-table-container {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    /* Ensure containers don't overflow */
+    .panel, .card, .widget, .card-body, .intel-panel, .info-panel {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    /* Layout fixes for sidebars */
+    .workspace-layout {
+        flex-direction: column !important;
+    }
+    .sidebar {
+        width: 100% !important;
+        max-height: none !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border-subtle);
+        position: static !important;
+    }
+}
+</style>
+
+</head>
+<body>
+
+    <script>
+        // Theme Initializer to prevent flash on load
+        const savedTheme = localStorage.getItem('kore_theme') || 'default';
+        if(savedTheme !== 'default') {
+            document.body.setAttribute('data-theme', savedTheme);
+        }
+    </script>
+
+    <header class="global-header">
+        <div class="header-left">
+            <h1 class="kore-logo">Kore<span>.</span></h1>
+        <button class="mobile-toggle" aria-label="Toggle Menu" onclick="toggleMobileNav()"><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 12h18M3 6h18M3 18h18"></path></svg></button>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">Dashboard</a>
+                <div class="nav-item">Operations ▼
+                    <div class="dropdown-content">
+                        <a href="apps.html">Apps</a>
+                        <a href="file-converter.html">File to LOAD Converter</a>
+                        <a href="lod.html">LOD Validation Tool</a>
+                        <a href="macros.html">Macro Library</a>
+                        <a href="nebula.html">Nebula HTML Forge</a>
+                        <a href="passwords.html">Password Generator</a>
+                    <a href="business-tools.html">Business & Sec Tools</a>
+                        <a href="todo.html">Personal To-Do</a>
+                        <a href="product-html.html">Product HTML Converter</a>
+                        <a href="scanner.html">Vulnerability Scanner</a>
+                        <a href="work.html">Work Tracker</a>
+                    </div>
+                </div>
+                <div class="nav-item active">Resources ▼
+                    <div class="dropdown-content">
+                        <a href="info-archive.html">Archive</a>
+                        <a href="reports.html">Data/Reports</a>
+                        <a href="docs.html">Document Library</a>
+                        <a href="info-hub.html">Info Hub</a>
+                    </div>
+                </div>
+                <a href="about.html" class="nav-item">About</a>
+                <a href="settings.html" class="nav-item">Settings</a>
+            </nav>
+        </div>
+        <div id="userIdentityBadge" class="user-badge">Authenticating...</div>
+    </header>
+
+    <main class="main-container">
+        
+        <section class="hero-banner">
+            <img src="images/InfoHubBanner.jpg" alt="Info Hub" onerror="this.onerror=null; this.src='https://picsum.photos/1200/300?grayscale&blur=2';">
+            <div class="hero-overlay">
+                <div>
+                    <h2 class="hero-title">Enterprise Info Hub</h2>
+                    <p class="hero-subtitle">Centralized company documentation & personal guides.</p>
+                </div>
+                <a href="create-page.html" class="btn btn-primary" style="background: white; color: var(--accent-primary);">+ Create a Page</a>
+            </div>
+        </section>
+
+        <div class="toolbar">
+            <div class="search-wrapper">
+                <input type="search" id="infoSearch" class="input" placeholder="Search by title, summary, or tag..." oninput="updateFilters()" aria-label="Search Info Hub" autocomplete="off">
+            </div>
+            <select id="infoScopeFilter" class="form-select" style="width: 180px;" onchange="updateFilters()" aria-label="Filter by Scope">
+                <option value="all">All Scopes</option>
+                <option value="global">Global (Company)</option>
+                <option value="personal">Personal (Me)</option>
+            </select>
+            <select id="infoStatusFilter" class="form-select" style="width: 180px;" onchange="updateFilters()" aria-label="Filter by Status">
+                <option value="all">All Statuses</option>
+                <option value="published">Published</option>
+                <option value="draft">Draft</option>
+            </select>
+            <select id="infoSort" class="form-select" style="width: 220px;" onchange="updateFilters()" aria-label="Sort Order">
+                <option value="updatedDesc">Most recently updated</option>
+                <option value="updatedAsc">Least recently updated</option>
+                <option value="titleAsc">Title A–Z</option>
+                <option value="titleDesc">Title Z–A</option>
+            </select>
+        </div>
+
+        <div id="categoryFilters" class="category-filters">
+            </div>
+
+        <div id="loadingState">🔄 Establishing secure connection to Azure Cloud Vault...</div>
+        <div id="infoPageList" class="infohub-list"></div>
+
+    </main>
+
+    <div id="floatingNotepad">
+        <div id="fnHeader">
+            <span>⚡ Command Palette (Autosaved)</span>
+            <button id="fnClose">&times;</button>
+        </div>
+        <textarea id="fnContent" aria-label="Command Palette Notepad" placeholder="Jot notes, paste regex, or type '- [ ] Task name' to push to tracker..."></textarea>
+        <div class="fn-toolbar">
+            <span id="fnStatus" style="font-size: 0.8rem; color: var(--text-secondary);">Ready</span>
+            <button id="fnPushBtn" class="fn-push-btn">Push To-Do to Tracker ➔</button>
+        </div>
+    </div>
+
+    
+
+    <footer class="global-footer">
+        <div style="margin-bottom: 8px;">💡 Press <strong>Alt + N</strong> anywhere to open the Global Command Palette.</div>
+        &copy; 2026 Kore | Enterprise Cloud Vault Connected.
+    </footer>
+
+    <script>
+        let cloudIdentity = { userId: "local-dev", userName: "Local Developer" };
+        let masterPagesList = [];
+        
+        // Category State
+        let globalCategories = [];
+        let activeCategory = 'All';
+
+        
+        let profileName = "User";
+        let localTasks = [];
+        let localTickets = [];
+
+        // --- 1. Microsoft Entra ID Integration ---
+        async function fetchSecureIdentity() {
+            try {
+                const response = await fetch('/.auth/me');
+                const data = await response.json();
+                if (data.clientPrincipal) {
+                    cloudIdentity.userId = data.clientPrincipal.userId;
+                    cloudIdentity.userName = data.clientPrincipal.userDetails;
+                    document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+                } else {
+                    document.getElementById('userIdentityBadge').innerText = "Running Locally (Unauthenticated)";
+                }
+            } catch (error) {
+                console.log("Auth fetch bypassed - Local execution.");
+                document.getElementById('userIdentityBadge').innerText = "System Admin Offline Mode";
+            }
+        }
+
+        // --- Data Fetching Helper ---
+        async function loadCloudData(dataType) {
+            try {
+                const res = await fetch(`/api/get_user_data?userId=${cloudIdentity.userId}&dataType=${dataType}&_t=${Date.now()}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && (Object.keys(data).length > 0 || data.length > 0)) return data;
+                }
+            } catch(e) {}
+            return null;
+        }
+
+        // --- Dynamic Categories Logic ---
+        async function loadCategories() {
+            let cats = await loadCloudData('info_categories');
+            if (!cats) {
+                const localCats = localStorage.getItem('kore_info_categories');
+                cats = localCats ? JSON.parse(localCats) : ["Macros", "Vendor Specs", "LOD Rules", "Azure Docs"];
+            }
+            globalCategories = cats;
+            renderCategoryButtons();
+        }
+
+        function renderCategoryButtons() {
+            const container = document.getElementById('categoryFilters');
+            if (!container) return;
+            
+            let html = `<button class="cat-btn ${activeCategory === 'All' ? 'active' : ''}" onclick="setCategory('All')">All Categories</button>`;
+            
+            globalCategories.forEach(cat => {
+                html += `<button class="cat-btn ${activeCategory === cat ? 'active' : ''}" onclick="setCategory('${escapeHtml(cat)}')">${escapeHtml(cat)}</button>`;
+            });
+            
+            html += `<button class="cat-btn ${activeCategory === 'Uncategorized' ? 'active' : ''}" onclick="setCategory('Uncategorized')">Uncategorized</button>`;
+            
+            container.innerHTML = html;
+        }
+
+        function setCategory(cat) {
+            activeCategory = cat;
+            renderCategoryButtons();
+            updateFilters();
+        }
+
+        // --- Persistent Filters ---
+        function updateFilters() {
+            const params = new URLSearchParams(window.location.search);
+            params.set('search', document.getElementById('infoSearch').value);
+            params.set('scope', document.getElementById('infoScopeFilter').value);
+            params.set('status', document.getElementById('infoStatusFilter').value);
+            params.set('sort', document.getElementById('infoSort').value);
+            params.set('category', activeCategory);
+            
+            // Silently update URL
+            window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
+            
+            renderTable();
+        }
+
+        // --- 2. Data Fetching (MERGED VAULT LOGIC) ---
+        async function fetchAllPages() {
+            let allPages = [];
+            
+            // 1. Specific Table Vault
+            try {
+                const res = await fetch(`/api/get_info_pages?userId=${cloudIdentity.userId}&_t=${Date.now()}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data)) allPages = [...data];
+                }
+            } catch(e) {
+                console.warn("Primary info hub table offline.");
+            }
+            
+            // 2. Fallback User Data Vault (Prevents data loss)
+            try {
+                const fallback = await loadCloudData('infoPages');
+                if (fallback && Array.isArray(fallback)) {
+                    fallback.forEach(fbPage => {
+                        if (!allPages.find(p => p.id === fbPage.id)) {
+                            allPages.push(fbPage);
+                        }
+                    });
+                }
+            } catch(e) {}
+            
+            return allPages;
+        }
+
+        async function fetchPages() {
+            const allPages = await fetchAllPages();
+            masterPagesList = allPages.filter(p => !p.archived);
+            renderTable();
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        function stripTags(html) {
+            return String(html || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+        }
+
+        function formatDate(iso) {
+            if (!iso) return '';
+            try { return new Date(iso).toLocaleDateString(); } catch (e) { return iso; }
+        }
+
+        // --- 3. UI Rendering ---
+        function renderTable() {
+            const listEl = document.getElementById('infoPageList');
+            const searchEl = document.getElementById('infoSearch');
+            const statusEl = document.getElementById('infoStatusFilter');
+            const scopeEl = document.getElementById('infoScopeFilter');
+            const sortEl = document.getElementById('infoSort');
+
+            document.getElementById('loadingState').style.display = 'none';
+
+            const query = String(searchEl.value || '').toLowerCase();
+            const statusVal = statusEl.value;
+            const scopeVal = scopeEl.value;
+            const sortVal = sortEl.value;
+
+            let filtered = masterPagesList;
+
+            // Status Filter
+            if (statusVal !== 'all') {
+                filtered = filtered.filter(p => (p.status || 'draft').toLowerCase() === statusVal);
+            }
+
+            // Scope Filter (Global vs Personal)
+            if (scopeVal === 'global') {
+                filtered = filtered.filter(p => p.isGlobal === true);
+            } else if (scopeVal === 'personal') {
+                filtered = filtered.filter(p => p.isGlobal !== true);
+            }
+
+            // Search Filter
+            if (query) {
+                filtered = filtered.filter(p =>
+                    String(stripTags(p.titleHtml || p.title)).toLowerCase().includes(query) ||
+                    String(stripTags(p.summaryHtml || p.summary || '')).toLowerCase().includes(query) ||
+                    (p.tags || []).join(' ').toLowerCase().includes(query)
+                );
+            }
+
+            // Category Filter Logic
+            if (activeCategory !== 'All') {
+                filtered = filtered.filter(p => {
+                    const tags = p.tags || [];
+                    if (activeCategory === 'Uncategorized') {
+                        // If it has NO tags, or NONE of its tags match the global list
+                        if (tags.length === 0) return true;
+                        return !tags.some(t => globalCategories.includes(t));
+                    } else {
+                        return tags.includes(activeCategory);
+                    }
+                });
+            }
+
+            // Sorting
+            filtered.sort((a, b) => {
+                const aTitle = stripTags(a.titleHtml || a.title).toLowerCase();
+                const bTitle = stripTags(b.titleHtml || b.title).toLowerCase();
+                const aUpdated = new Date(a.updatedAt || a.createdAt || 0).getTime();
+                const bUpdated = new Date(b.updatedAt || b.createdAt || 0).getTime();
+
+                if (sortVal === 'titleAsc') return aTitle.localeCompare(bTitle);
+                if (sortVal === 'titleDesc') return bTitle.localeCompare(aTitle);
+                if (sortVal === 'updatedAsc') return aUpdated - bUpdated;
+                return bUpdated - aUpdated; 
+            });
+
+            listEl.innerHTML = '';
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--text-secondary); background: var(--bg-surface); border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">No pages found. Try adjusting your search or filters.</div>';
+                return;
+            }
+
+            filtered.forEach(page => {
+                const card = document.createElement('a');
+                card.href = `info-page.html?id=${encodeURIComponent(page.id)}`;
+                card.className = 'infohub-card';
+                
+                const thumb = (page.images && page.images.length > 0) ? page.images[0].dataUrl : '';
+                const thumbHtml = thumb ? `<img src="${thumb}" class="infohub-thumb" />` : `<div class="infohub-thumb">📄</div>`;
+
+                const titleText = stripTags(page.titleHtml || page.title || 'Untitled Page');
+                const summaryText = stripTags(page.summaryHtml || page.summary || 'No description provided.');
+                const statusClass = (page.status || 'draft').toLowerCase() === 'published' ? 'status-published' : 'status-draft';
+                const statusText = (page.status || 'draft').toUpperCase();
+
+                // Dynamic Global/Personal Scope Badge
+                const scopeBadge = page.isGlobal 
+                    ? `<span class="tag tag-global">🌐 GLOBAL</span>` 
+                    : `<span class="tag tag-personal">👤 PERSONAL</span>`;
+
+                card.innerHTML = `
+                    ${thumbHtml}
+                    <div class="infohub-content">
+                        <h3 class="infohub-title">${escapeHtml(titleText)} ${scopeBadge}</h3>
+                        <p class="infohub-summary">${escapeHtml(summaryText)}</p>
+                        ${(page.tags && page.tags.length) ? `<div class="infohub-tags">${page.tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+                    </div>
+                    <div class="infohub-meta">
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                        <span class="timestamp">${formatDate(page.updatedAt || page.createdAt)}</span>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">By: ${escapeHtml(page.author || 'Unknown')}</span>
+                    </div>
+                `;
+                listEl.appendChild(card);
+            });
+        }
+
+        
+        function isDateToday(dateStr) {
+            if (!dateStr) return false;
+            const d = new Date(dateStr + 'T00:00:00');
+            return d.toDateString() === new Date().toDateString();
+        }
+        function isDatePast(dateStr) {
+            if (!dateStr) return false;
+            const d = new Date(dateStr + 'T00:00:00');
+            const today = new Date(); today.setHours(0,0,0,0);
+            return d < today;
+        }
+
+
+        
+
+        
+        
+
+        // --- COMMAND PALETTE LOGIC ---
+        const fnModal = document.getElementById('floatingNotepad');
+        const fnContent = document.getElementById('fnContent');
+        const fnPushBtn = document.getElementById('fnPushBtn');
+        let isDragging = false, currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
+
+        document.addEventListener('keydown', (e) => {
+            if (e.altKey && e.key.toLowerCase() === 'n') {
+                e.preventDefault();
+                fnModal.style.display = fnModal.style.display === 'flex' ? 'none' : 'flex';
+                if (fnModal.style.display === 'flex') {
+                    fnContent.value = localStorage.getItem('kore_global_notepad') || '';
+                    fnContent.focus();
+                    checkNotepadFormatting();
+                }
+            }
+        });
+
+        document.getElementById('fnClose').addEventListener('click', () => { fnModal.style.display = 'none'; });
+
+        document.getElementById('fnHeader').addEventListener('mousedown', dragStart);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', dragEnd);
+
+        function dragStart(e) { initialX = e.clientX - xOffset; initialY = e.clientY - yOffset; isDragging = true; }
+        function drag(e) {
+            if (isDragging) {
+                e.preventDefault();
+                currentX = e.clientX - initialX; currentY = e.clientY - initialY;
+                xOffset = currentX; yOffset = currentY;
+                fnModal.style.transform = `translate(${currentX}px, ${currentY}px)`;
+            }
+        }
+        function dragEnd(e) { initialX = currentX; initialY = currentY; isDragging = false; }
+
+        let fnTimeout;
+        fnContent.addEventListener('input', () => {
+            localStorage.setItem('kore_global_notepad', fnContent.value);
+            document.getElementById('fnStatus').innerText = 'Saving...';
+            clearTimeout(fnTimeout);
+            fnTimeout = setTimeout(() => { document.getElementById('fnStatus').innerText = 'Saved locally.'; checkNotepadFormatting(); }, 800);
+        });
+
+        function checkNotepadFormatting() {
+            const val = fnContent.value;
+            if (val.startsWith('```')) { fnContent.classList.add('code-mode'); } else { fnContent.classList.remove('code-mode'); }
+            const hasTodo = /-\s?\[\s?\]\s?.+/i.test(val);
+            fnPushBtn.style.display = hasTodo ? 'block' : 'none';
+        }
+
+        fnPushBtn.addEventListener('click', async () => {
+            const lines = fnContent.value.split('\n');
+            let newTasks = []; let remainingLines = [];
+            lines.forEach((line, index) => {
+                const match = line.match(/-\s?\[\s?\]\s?(.+)/i);
+                if (match) { 
+                    newTasks.push({ id: 'todo_' + Date.now() + '_' + index, title: match[1].trim(), priority: "Medium", completed: false, dueDate: new Date().toISOString().split('T')[0] }); 
+                } else { remainingLines.push(line); }
+            });
+            if (newTasks.length > 0) {
+                let existingTodos = await loadCloudData('todos') || [];
+                existingTodos = existingTodos.concat(newTasks);
+                try {
+                    await fetch('/api/save_user_data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: cloudIdentity.userId, dataType: 'todos', data: existingTodos }) });
+                } catch(e) {}
+                fnContent.value = remainingLines.join('\n');
+                localStorage.setItem('kore_global_notepad', fnContent.value);
+                document.getElementById('fnStatus').innerText = `Pushed ${newTasks.length} tasks!`;
+                fnPushBtn.style.display = 'none';
+            }
+        });
+
+        // --- 5. Initialization ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('loadingState').style.display = 'block';
+            
+            // URL Params Override
+            const urlParams = new URLSearchParams(window.location.search);
+            if(urlParams.has('search')) document.getElementById('infoSearch').value = urlParams.get('search');
+            if(urlParams.has('scope')) document.getElementById('infoScopeFilter').value = urlParams.get('scope');
+            if(urlParams.has('status')) document.getElementById('infoStatusFilter').value = urlParams.get('status');
+            if(urlParams.has('sort')) document.getElementById('infoSort').value = urlParams.get('sort');
+            if(urlParams.has('category')) activeCategory = urlParams.get('category');
+
+            await fetchSecureIdentity();
+            await loadCategories();
+            await fetchPages();
+            
+        });
+    </script>
+
+    <button id="backToTop" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</button>
+    <script>
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('backToTop');
+            if(window.scrollY > 300) btn.style.display = 'flex';
+            else btn.style.display = 'none';
+        });
+        
+        function toggleMobileNav() {
+            const nav = document.querySelector('.nav-menu');
+            if(nav) nav.classList.toggle('open');
+        }
+        
+        if('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(console.error);
+        }
+    </script>
+
+<script>
+        // --- Navigation Preferences Logic ---
+        function applyNavPreferences() {
+            try {
+                const hiddenNavs = JSON.parse(localStorage.getItem('kore_hidden_navs') || '[]');
+                if (hiddenNavs.length > 0) {
+                    const links = document.querySelectorAll('.dropdown-content a');
+                    links.forEach(link => {
+                        const href = link.getAttribute('href');
+                        if (hiddenNavs.includes(href)) {
+                            link.style.display = 'none';
+                        } else {
+                            link.style.display = 'block';
+                        }
+                    });
+                    
+                    // Hide empty dropdowns
+                    document.querySelectorAll('.nav-item').forEach(item => {
+                        const dropdown = item.querySelector('.dropdown-content');
+                        if (dropdown) {
+                            const visibleLinks = Array.from(dropdown.querySelectorAll('a')).filter(a => a.style.display !== 'none');
+                            if (visibleLinks.length === 0) {
+                                item.style.display = 'none';
+                            } else {
+                                item.style.display = 'flex';
+                            }
+                        }
+                    });
+                } else {
+                    document.querySelectorAll('.dropdown-content a').forEach(a => a.style.display = 'block');
+                }
+            } catch(e) {}
+        }
+        document.addEventListener('DOMContentLoaded', applyNavPreferences);
+</script>
+
+
+<!-- Mobile Nav Script (Injected) -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        if (item.querySelector('.dropdown-content')) {
+            item.addEventListener('click', (e) => {
+                if (window.innerWidth <= 1023) {
+                    if (e.target.tagName.toLowerCase() === 'a' && e.target.closest('.dropdown-content')) {
+                        return;
+                    }
+                    e.preventDefault();
+                    item.classList.toggle('open-mobile');
+                }
+            });
+        }
+    });
+});
+</script>
+</body>
+</html>

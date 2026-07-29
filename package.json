@@ -1,0 +1,30 @@
+{
+  "name": "kore-workspace",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx server.ts",
+    "build": "echo 'Building...' && tsc --noEmit",
+    "lint": "tsc --noEmit",
+    "start": "tsx server.ts"
+  },
+  "dependencies": {
+    "@kenjiuno/msgreader": "^1.28.0",
+    "acorn": "^8.17.0",
+    "better-sqlite3": "^12.11.1",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "glob": "^13.0.6",
+    "jsdom": "^29.1.1",
+    "multer": "^2.2.0",
+    "puppeteer": "^25.4.0",
+    "quill": "^2.0.3"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4"
+  }
+}

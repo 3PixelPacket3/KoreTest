@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kore | File to LOAD Converter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        /* Tactical Light Theme Variables */
+        :root {
+            --accent-primary: #0ea5e9;
+            --accent-hover: #0284c7;
+            --bg-app: #f1f5f9;
+            --bg-surface: #ffffff;
+            --text-main: #0f172a;
+            --text-secondary: #475569;
+            --border-subtle: rgba(226, 232, 240, 0.8);
+            --shadow-sm: 0 4px 6px -1px rgba(15, 23, 42, 0.05);
+            --shadow-md: 0 10px 15px -3px rgba(15, 23, 42, 0.1);
+            --radius-md: 16px;
+            --radius-sm: 8px;
+            
+            --error-bg: #fef2f2;
+            --error-text: #ef4444;
+            --error-border: #fecaca;
+            --warning-bg: #fffbeb;
+            --warning-text: #d97706;
+            --warning-border: #fde68a;
+            --success-bg: #ecfdf5;
+            --success-text: #10b981;
+            --success-border: #a7f3d0;
+        }
+        /* THEME: Midnight Dark */
+        body[data-theme="midnight"] {
+            --bg-app: #0f172a; --bg-surface: #1e293b; --text-main: #f8fafc; --text-secondary: #94a3b8;
+            --border-subtle: #334155; --accent-primary: #38bdf8; --accent-hover: #7dd3fc;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5); --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+        /* THEME: Cyberpunk */
+        body[data-theme="cyberpunk"] {
+            --bg-app: #000000; --bg-surface: #121212; --text-main: #00ff41; --text-secondary: #ff00ff;
+            --border-subtle: #00ff41; --accent-primary: #ff00ff; --accent-hover: #ff00aa;
+            --radius-md: 0px; --radius-sm: 0px; --shadow-sm: 0 0 5px rgba(0, 255, 65, 0.2);
+            --shadow-md: 0 0 10px rgba(255, 0, 255, 0.2);
+        }
+        /* THEME: Corporate Classic */
+        body[data-theme="corporate"] {
+            --bg-app: #e2e8f0; --bg-surface: #ffffff; --text-main: #1e293b; --text-secondary: #475569;
+            --border-subtle: #cbd5e1; --accent-primary: #1d4ed8; --accent-hover: #1e40af;
+            --radius-md: 4px; --radius-sm: 2px;
+        }
+        /* THEME: Earthy Minimal */
+        body[data-theme="earthy"] {
+            --bg-app: #fdf8f5; --bg-surface: #ffffff; --text-main: #3f3e3a; --text-secondary: #6b7280;
+            --border-subtle: #e5e5e5; --accent-primary: #5c7f67; --accent-hover: #4a6652;
+            --radius-md: 24px; --radius-sm: 16px;
+        }
+        /* THEME: Oceanic */
+        body[data-theme="oceanic"] {
+            --bg-app: #e0f2fe; --bg-surface: #f0f9ff; --text-main: #0c4a6e; --text-secondary: #0369a1;
+            --border-subtle: #bae6fd; --accent-primary: #0284c7; --accent-hover: #0369a1;
+            --radius-md: 16px; --radius-sm: 12px;
+        }
+
+        body {
+            margin: 0; font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg-app); color: var(--text-main);
+            display: flex; flex-direction: column; min-height: 100vh; 
+        }
+
+        /* --- Global Header --- */
+        .global-header { background-color: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 64px; box-shadow: var(--shadow-sm); position: sticky; top: 0; z-index: 100; }
+        .header-left { display: flex; align-items: center; gap: 40px; height: 100%; }
+        .kore-logo { font-size: 1.5rem; font-weight: 800; color: var(--text-main); margin: 0; letter-spacing: -0.5px; }
+        .kore-logo span { color: var(--accent-primary); }
+        .nav-menu { display: flex; gap: 8px; height: 100%; }
+        .nav-item { text-decoration: none; color: var(--text-secondary); padding: 0 16px; display: flex; align-items: center; height: 100%; font-weight: 600; font-size: 0.95rem; border-bottom: 3px solid transparent; cursor: pointer; position: relative; transition: all 0.2s ease; }
+        .nav-item:hover, .nav-item.active { color: var(--accent-primary); border-bottom-color: var(--accent-primary); background-color: rgba(14, 165, 233, 0.08); }
+        .dropdown-content { display: none; position: absolute; top: 64px; left: 0; background-color: var(--bg-surface); min-width: 200px; box-shadow: var(--shadow-md); border: 1px solid var(--border-subtle); border-radius: 0 0 var(--radius-sm) var(--radius-sm); z-index: 101; }
+        .nav-item:hover .dropdown-content { display: block; }
+        .dropdown-content a { white-space: nowrap; color: var(--text-secondary); padding: 14px 20px; text-decoration: none; display: block; border-bottom: 1px solid var(--bg-app); font-weight: 500; }
+        .dropdown-content a:hover { background-color: rgba(14, 165, 233, 0.08); color: var(--accent-primary); padding-left: 24px; transition: all 0.2s ease; }
+        .user-badge { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); background: var(--bg-app); padding: 6px 12px; border-radius: 99px; border: 1px solid var(--border-subtle); }
+
+        /* --- Main Content Layout --- */
+        .main-container { padding: 40px 32px; max-width: 1500px; margin: 0 auto; width: 100%; box-sizing: border-box; flex-grow: 1; }
+        
+        .hero-banner { background: var(--bg-surface); border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm); height: 160px; position: relative; margin-bottom: 32px; }
+        .hero-banner img { width: 100%; height: 100%; object-fit: cover; }
+        .hero-overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(15,23,42,0.9), transparent); padding: 24px 30px; box-sizing: border-box; color: white; display: flex; justify-content: space-between; align-items: flex-end; }
+        .hero-title { margin: 0; font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; }
+        .hero-subtitle { margin: 6px 0 0 0; font-size: 1.05rem; color: #cbd5e1; }
+
+        .layout-grid { display: grid; grid-template-columns: 450px 1fr; gap: 32px; align-items: start; }
+
+        .section-card { background: var(--bg-surface); border-radius: var(--radius-md); padding: 32px; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-md); position: relative; }
+        .section-header { margin: 0 0 24px 0; font-size: 1.1rem; color: var(--text-main); font-weight: 800; border-bottom: 1px solid var(--border-subtle); padding-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* --- Drop Zone --- */
+        .file-drop-zone { border: 2px dashed var(--accent-primary); border-radius: var(--radius-md); padding: 50px 20px; text-align: center; background: rgba(14, 165, 233, 0.02); cursor: pointer; transition: all 0.2s; margin-bottom: 24px; }
+        .file-drop-zone:hover, .file-drop-zone.dragover { background: rgba(14, 165, 233, 0.08); border-color: var(--accent-hover); transform: scale(1.01); }
+        .file-drop-text { font-weight: 800; color: var(--accent-primary); margin-bottom: 8px; font-size: 1.2rem; }
+        .file-drop-subtext { font-size: 0.9rem; color: var(--text-secondary); font-weight: 500; }
+        #fileInput { display: none; }
+
+        .form-select { width: 100%; padding: 12px 16px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); font-size: 0.95rem; background: var(--bg-surface); color: var(--text-main); margin-bottom: 24px; outline: none; font-weight: 600; }
+        
+        .btn { padding: 12px 20px; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer; transition: all 0.2s; border: none; font-size: 0.95rem; width: 100%; margin-bottom: 12px; }
+        .btn-primary { background-color: var(--accent-primary); color: white; box-shadow: var(--shadow-sm); }
+        .btn-primary:hover { background-color: var(--accent-hover); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+        .btn-danger { background-color: var(--bg-surface); color: var(--error-text); border: 1px solid var(--error-border); }
+        .btn-danger:hover { background-color: var(--error-bg); }
+
+        /* --- Results Panel --- */
+        .metrics-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .metric { background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: 20px; border-radius: var(--radius-sm); text-align: center; box-shadow: var(--shadow-sm); }
+        .metric-val { font-size: 2.2rem; font-weight: 900; color: var(--text-main); line-height: 1; margin-bottom: 8px; }
+        .metric-lbl { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-secondary); letter-spacing: 1px; }
+
+        .table-container { border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); overflow-y: auto; max-height: 500px; background: var(--bg-surface); box-shadow: var(--shadow-sm); }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
+        th { background: var(--bg-app); padding: 12px 16px; font-weight: 700; color: var(--text-main); border-bottom: 2px solid var(--border-subtle); position: sticky; top: 0; z-index: 10; }
+        td { padding: 12px 16px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        tr:hover td { background: rgba(14, 165, 233, 0.08); }
+        
+        .status-pill { padding: 4px 10px; border-radius: 99px; font-size: 0.75rem; font-weight: 800; display: inline-block; text-transform: uppercase; }
+        .status-success { background: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-border); }
+        .status-error { background: var(--error-bg); color: var(--error-text); border: 1px solid var(--error-border); }
+
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-secondary); font-weight: 600; background: var(--bg-surface); border-radius: var(--radius-sm); border: 1px dashed var(--border-subtle); }
+
+        .global-footer { background-color: var(--bg-surface); border-top: 1px solid var(--border-subtle); padding: 24px; text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-top: auto; font-weight: 600; }
+    
+        
+    
+    
+            pre, code { white-space: pre-wrap; word-break: break-word; overflow-x: auto; max-width: 100%; }
+    
+    </style>
+
+    <!-- SEO & Mobile Optimization -->
+    <meta name="description" content="Kore Enterprise Workspace - Advanced Cloud Management System">
+    <meta name="keywords" content="Kore, Workspace, Enterprise, Management, LOD">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' font-family='Arial' fill='%230ea5e9' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' font-family='Arial' fill='%230ea5e9' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+
+    <style>
+        /* Mobile Layout & Back-to-Top */
+        
+        
+        .mobile-toggle { display: none; }
+        
+        #backToTop {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s, background 0.3s;
+        }
+        #backToTop:hover { background: var(--accent-hover); }
+    </style>
+
+
+    <style>
+        /* --- FLOATING COMMAND PALETTE NOTEPAD --- */
+        #floatingNotepad { position: fixed; top: 15%; left: 50%; transform: translateX(-50%); width: 600px; max-width: 90vw; background: var(--bg-surface, #ffffff); border: 1px solid var(--border-subtle, #e2e8f0); border-radius: var(--radius-md, 8px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); z-index: 9999; display: none; flex-direction: column; overflow: hidden; }
+        #fnHeader { background: var(--bg-app, #f8fafc); padding: 12px 20px; cursor: move; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle, #e2e8f0); font-weight: 600; color: var(--text-main, #0f172a); user-select: none; }
+        #fnClose { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary, #64748b); }
+        #fnContent { width: 100%; height: 300px; padding: 16px; border: none; outline: none; resize: none; font-family: 'Inter', system-ui, sans-serif; font-size: 0.95rem; line-height: 1.5; color: var(--text-main, #0f172a); background: var(--bg-surface, #ffffff); box-sizing: border-box; }
+        #fnContent.code-mode { font-family: monospace; background: #1e293b; color: #f8fafc; }
+        .fn-toolbar { display: flex; justify-content: space-between; padding: 10px 16px; background: var(--bg-app, #f8fafc); border-top: 1px solid var(--border-subtle, #e2e8f0); align-items: center; }
+        .fn-push-btn { background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; display: none; }
+        .fn-push-btn:hover { background: #059669; }
+    </style>
+
+
+<style>
+/* --- RESPONSIVE MOBILE & TABLET (Injected) --- */
+* { box-sizing: border-box; }
+img, video, iframe, canvas { max-width: 100%; height: auto; }
+body { overflow-x: hidden; width: 100%; }
+
+@media (max-width: 1023px) {
+    .modal-content, .system-modal, .storage-tracker { max-width: 95vw !important; }
+
+    .global-header {
+        flex-direction: column;
+        height: auto;
+        padding: 10px 16px;
+        gap: 10px;
+    }
+    .header-left {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .search-container {
+        width: 100%;
+    }
+    .search-bar {
+        width: 100%;
+    }
+    .mobile-toggle {
+        display: flex !important;
+        align-items: center;
+        background: none;
+        border: none;
+        color: var(--text-main);
+        cursor: pointer;
+    }
+    .nav-menu {
+        display: none !important;
+        flex-direction: column;
+        width: 100%;
+        background: var(--bg-surface);
+        position: absolute;
+        top: 100%;
+        left: 0;
+        box-shadow: var(--shadow-md);
+        z-index: 200;
+        max-height: 70vh;
+        overflow-y: auto;
+        border-top: 1px solid var(--border-subtle);
+    }
+    .nav-menu.open {
+        display: flex !important;
+    }
+    .nav-item {
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--border-subtle);
+        width: 100%;
+        flex-wrap: wrap;
+        height: auto;
+    }
+    .nav-item:last-child {
+        border-bottom: none;
+    }
+    .dropdown-content {
+        position: static;
+        display: none;
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        width: 100%;
+        padding-left: 20px;
+        margin-top: 10px;
+    }
+    .nav-item.open-mobile .dropdown-content {
+        display: block !important;
+    }
+    /* Hide hover effects on mobile */
+    .nav-item:hover .dropdown-content, 
+    .nav-item:focus-within .dropdown-content,
+    .nav-item:active .dropdown-content {
+        display: none;
+    }
+    .nav-item.open-mobile:hover .dropdown-content,
+    .nav-item.open-mobile:focus-within .dropdown-content,
+    .nav-item.open-mobile:active .dropdown-content {
+        display: block !important;
+    }
+    
+    .dashboard-grid, .dashboard-layout, .apps-grid, .grid-container,
+    .layout-grid, .chart-grid, .library-controls, .add-task-panel,
+    .controls-grid, .content-grid, .layout-split, .form-grid,
+    .metrics-bar, .view-boxes, .grid-2, .workspace-grid,
+    .kpi-grid, .nav-pref-grid, .color-target-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .metrics-bar, .form-grid {
+        gap: 16px !important;
+    }
+    .main-container {
+        padding: 15px !important;
+    }
+    .hero-banner {
+        padding: 30px 15px !important;
+        height: auto !important;
+        min-height: 160px;
+    }
+    .hero-title {
+        font-size: 1.8rem !important;
+    }
+    
+    /* Make tables scrollable */
+    table, .table-container, .data-table-container {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    /* Ensure containers don't overflow */
+    .panel, .card, .widget, .card-body, .intel-panel, .info-panel {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    /* Layout fixes for sidebars */
+    .workspace-layout {
+        flex-direction: column !important;
+    }
+    .sidebar {
+        width: 100% !important;
+        max-height: none !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border-subtle);
+        position: static !important;
+    }
+}
+</style>
+
+</head>
+
+<body>
+<script>
+    // Theme Initializer to prevent flash on load
+    const savedTheme = localStorage.getItem('kore_theme') || 'default';
+    if(savedTheme !== 'default') {
+        document.body.setAttribute('data-theme', savedTheme);
+    }
+</script>
+
+<header class="global-header">
+        <div class="header-left">
+            <h1 class="kore-logo">Kore<span>.</span></h1>
+        <button class="mobile-toggle" aria-label="Toggle Menu" onclick="toggleMobileNav()"><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 12h18M3 6h18M3 18h18"></path></svg></button>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">Dashboard</a>
+                
+                <div class="nav-item">Operations ▼
+                    <div class="dropdown-content">
+                        <a href="apps.html">Apps</a>
+                        <a href="file-converter.html">File to LOAD Converter</a>
+                        <a href="lod.html">LOD Validation Tool</a>
+                        <a href="macros.html">Macro Library</a>
+                        <a href="nebula.html">Nebula HTML Forge</a>
+                        <a href="passwords.html">Password Generator</a>
+                    <a href="business-tools.html">Business & Sec Tools</a>
+                        <a href="todo.html">Personal To-Do</a>
+                        <a href="product-html.html">Product HTML Converter</a>
+                        <a href="scanner.html">Vulnerability Scanner</a>
+                        <a href="work.html">Work Tracker</a>
+                    </div>
+                </div>
+                
+                <div class="nav-item">Resources ▼
+                    <div class="dropdown-content">
+                        <a href="info-archive.html">Archive</a>
+                        <a href="reports.html">Data/Reports</a>
+                        <a href="docs.html">Document Library</a>
+                        <a href="info-hub.html">Info Hub</a>
+                    </div>
+                </div>
+                
+                <a href="about.html" class="nav-item">About</a>
+                <a href="settings.html" class="nav-item">Settings</a>
+            </nav>
+        </div>
+        <div id="userIdentityBadge" class="user-badge">Authenticating...</div>
+    </header>
+
+    <main class="main-container">
+        
+        <section class="hero-banner">
+            <img src="images/FileConverterBanner.jpg" alt="File to LOAD Converter" onerror="this.onerror=null; this.src='https://picsum.photos/1200/300?grayscale&blur=2';">
+            <div class="hero-overlay">
+                <div>
+                    <h2 class="hero-title">File to LOAD Converter</h2>
+                    <p class="hero-subtitle">Batch process new user setups and massive data conversions effortlessly.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="layout-grid">
+            
+            <div style="display: flex; flex-direction: column;">
+                
+                <section class="section-card">
+                    <h2 class="section-header">Module Configuration</h2>
+                    
+                    <select class="form-select" id="converterType">
+                        <option value="cm10">New User Setup Iseries JHARD</option>
+                        <option value="web">New User Setup Web JHARD</option>
+                        <option value="longdesc">Long Description Mass Converter</option>
+                    </select>
+
+                    <div class="file-drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                        <div class="file-drop-text">Drag & Drop Target Files</div>
+                        <div class="file-drop-subtext">Select the appropriate module before deploying files.</div>
+                        <input type="file" id="fileInput" accept=".xlsx, .xls, .csv" multiple>
+                    </div>
+
+                    <button id="downloadBtn" class="btn btn-primary" style="opacity: 0.5; pointer-events: none;">Download Data Payload</button>
+                    <button id="clearBtn" class="btn btn-danger">Clear Session Data</button>
+                </section>
+
+            </div>
+
+            <section class="section-card">
+                <h2 class="section-header">Session Telemetry</h2>
+                
+                <div class="metrics-bar">
+                    <div class="metric">
+                        <div class="metric-val" id="valTotal">0</div>
+                        <div class="metric-lbl">Total Parsed</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-val" id="valSuccess" style="color: var(--success-text);">0</div>
+                        <div class="metric-lbl">Ready to Compile</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-val" id="valErrors" style="color: var(--error-text);">0</div>
+                        <div class="metric-lbl">Incomplete Data</div>
+                    </div>
+                </div>
+
+                <div id="resultsContainer">
+                    <div class="empty-state" id="emptyState">
+                        <div style="font-size: 2.5rem; margin-bottom: 16px;">📂</div>
+                        Deploy setup files to queue processing.
+                    </div>
+                    
+                    <div class="table-container" id="resultsTableContainer" style="display: none;">
+                        <table>
+                            <thead>
+                                <tr id="dynamicTableHeaders">
+                                    <th>Status</th>
+                                    <th>Target Identity</th>
+                                    <th>Cost Center</th>
+                                    <th>Source File</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsTableBody">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    
+    <!-- Floating Notepad -->
+    <div id="floatingNotepad">
+        <div id="fnHeader">
+            <span>⚡ Command Palette (Autosaved)</span>
+            <button id="fnClose">&times;</button>
+        </div>
+        <textarea id="fnContent" aria-label="Command Palette Notepad" placeholder="Jot notes, paste regex, or type '- [ ] Task name' to push to tracker..."></textarea>
+        <div class="fn-toolbar">
+            <span id="fnStatus" style="font-size: 0.8rem; color: var(--text-secondary);">Ready</span>
+            <button id="fnPushBtn" class="fn-push-btn">Push To-Do to Tracker ➔</button>
+        </div>
+    </div>
+    <footer class="global-footer">
+        <div style="margin-bottom: 8px;">💡 Press <strong>Alt + N</strong> anywhere to open the Global Command Palette.</div>
+        &copy; 2026 Kore | Enterprise Cloud Vault Connected.
+    </footer>
+
+
+    <script>
+        // --- Authentication ---
+        let cloudIdentity = { userId: "local-dev", userName: "Local Developer" };
+        async function fetchSecureIdentity() {
+            try {
+                const response = await fetch('/.auth/me');
+                const data = await response.json();
+                if (data.clientPrincipal) {
+                    cloudIdentity.userName = data.clientPrincipal.userDetails;
+                    document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+                } else { document.getElementById('userIdentityBadge').innerText = "Running Locally"; }
+            } catch (error) { document.getElementById('userIdentityBadge').innerText = "Offline Mode"; }
+        }
+        document.addEventListener('DOMContentLoaded', fetchSecureIdentity);
+
+        // --- Core Application State ---
+        let sessionData = [];
+        let totalFilesProcessed = 0;
+        let successCount = 0;
+        let errorCount = 0;
+
+        // Long Desc Tool Constants
+        const CAN_IMG_B64 = "data:image/png;base64,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";
+        const stopWordsArr = ["Original Item Number:", "Size:", "Material:", "Language:", "Product Line:", "Tagline:", "Supersedes:", "Replaces:", "Product Type:", "Region:", "Use:", "Market Segment:", "Focus Market:", "Product Information", "Download PDF", "\\.product-description"];
+
+        // UI Elements
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const converterType = document.getElementById('converterType');
+        
+        // --- Dynamic Table Headers ---
+        function updateTableHeaders() {
+            const thead = document.getElementById('dynamicTableHeaders');
+            if (converterType.value === 'longdesc') {
+                thead.innerHTML = `<th>Status</th><th>Item Number</th><th>Product Type</th><th>Source File</th>`;
+            } else {
+                thead.innerHTML = `<th>Status</th><th>Target Identity</th><th>Cost Center</th><th>Source File</th>`;
+            }
+        }
+
+        converterType.addEventListener('change', () => {
+            // Safety: Clear active data to prevent mismatched generation
+            if (sessionData.length > 0) { clearBtn.click(); }
+            updateTableHeaders();
+        });
+
+        // --- Drag & Drop Handlers ---
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault(); dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+        });
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) handleFiles(e.target.files);
+        });
+
+        clearBtn.addEventListener('click', () => {
+            sessionData = []; totalFilesProcessed = 0; successCount = 0; errorCount = 0;
+            fileInput.value = ''; updateUI();
+        });
+
+        // --- Master File Processing Switchboard ---
+        async function handleFiles(files) {
+            let limit = Math.min(files.length, 100);
+            for (let i = 0; i < limit; i++) {
+                await parseFile(files[i]);
+            }
+            updateUI();
+        }
+
+        function parseFile(file) {
+            return new Promise((resolve) => {
+                const mode = converterType.value;
+
+                if (mode === 'longdesc' && file.name.endsWith('.csv')) {
+                    // PapaParse Protocol for Mass Converter Encoding Requirements
+                    Papa.parse(file, {
+                        header: true, skipEmptyLines: 'greedy', encoding: "ISO-8859-1",
+                        transformHeader: function(h) { return h.replace(/^\uFEFF/, '').trim(); },
+                        complete: function(results) {
+                            results.data.forEach(row => {
+                                let extracted = extractLongDescData(row);
+                                extracted.sourceFile = file.name;
+                                if (extracted.status === "SUCCESS") { successCount++; } else { errorCount++; }
+                                sessionData.push(extracted);
+                                totalFilesProcessed++;
+                            });
+                            resolve();
+                        }
+                    });
+                } else {
+                    // XLSX Protocol for New User Setups
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, {type: 'array'});
+                        const firstSheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[firstSheetName];
+                        const jsonArr = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+                        
+                        let extracted = extractUserData(jsonArr);
+                        extracted.sourceFile = file.name;
+                        
+                        if((extracted.businessName || extracted.name) && extracted.cc) {
+                            extracted.status = "SUCCESS"; successCount++;
+                        } else {
+                            extracted.status = "ERROR"; errorCount++;
+                        }
+                        
+                        sessionData.push(extracted);
+                        totalFilesProcessed++;
+                        resolve();
+                    };
+                    reader.readAsArrayBuffer(file);
+                }
+            });
+        }
+
+        // --- Logic: New User Data Extraction ---
+        function extractUserData(sheetJson) {
+            let data = { name: '', businessName: '', loyaltyNum: '', userClass: '', email: '', addr: '', city: '', state: '', zip: '', phone: '', cc: '' };
+
+            for (let r = 0; r < Math.min(sheetJson.length, 5); r++) {
+                let row = sheetJson[r] || [];
+                for (let c = 0; c < row.length; c++) {
+                    let val = String(row[c] || '').trim().toLowerCase();
+                    if (sheetJson[r+1]) {
+                        if (val === 'address 1') data.addr = String(sheetJson[r+1][c] || '').trim();
+                        if (val === 'city') data.city = String(sheetJson[r+1][c] || '').trim();
+                        if (val === 'st') data.state = String(sheetJson[r+1][c] || '').trim();
+                        if (val === 'zip code') data.zip = String(sheetJson[r+1][c] || '').trim();
+                        if (val === 'telephone #') data.phone = String(sheetJson[r+1][c] || '').trim();
+                        if (val === 'cost center') data.cc = String(sheetJson[r+1][c] || '').trim();
+                        if (val === 'business name') data.businessName = String(sheetJson[r+1][c] || '').trim();
+                        if (val === 'loyalty member #') data.loyaltyNum = String(sheetJson[r+1][c] || '').trim();
+                        if (val === 'user class') data.userClass = String(sheetJson[r+1][c] || '').trim();
+                        if (val === 'email address') data.email = String(sheetJson[r+1][c] || '').trim();
+                    }
+                }
+            }
+
+            for(let r = 0; r < sheetJson.length; r++) {
+                let row = sheetJson[r] || [];
+                for(let c = 0; c < row.length; c++) {
+                    let val = String(row[c] || '').trim();
+                    if (!data.name && val.match(/^Name:\s*(.+)/i)) data.name = val.match(/^Name:\s*(.+)/i)[1].trim();
+                    if (!data.businessName && val.match(/^Business Name:\s*(.+)/i)) data.businessName = val.match(/^Business Name:\s*(.+)/i)[1].trim();
+                    if (!data.loyaltyNum && val.match(/^Loyalty Member(?:ship)?\s*#:\s*(.+)/i)) data.loyaltyNum = val.match(/^Loyalty Member(?:ship)?\s*#:\s*(.+)/i)[1].trim();
+                    if (!data.userClass && val.match(/^Type:\s*(.+)/i)) data.userClass = val.match(/^Type:\s*(.+)/i)[1].trim();
+                    if (!data.email && val.match(/^Email Address:\s*(.+)/i)) data.email = val.match(/^Email Address:\s*(.+)/i)[1].trim();
+                    
+                    if (!data.addr && val.match(/^Address:\s*(.+)/i)) {
+                        let fullAddr = val.match(/^Address:\s*(.+)/i)[1];
+                        let parts = fullAddr.split(',').map(s => s.trim());
+                        if (parts.length >= 4) { data.addr = parts[0]; data.city = parts[1]; data.state = parts[2]; data.zip = parts[3]; }
+                    }
+
+                    if (!data.phone && val.match(/^Phone:\s*(.+)/i)) data.phone = val.match(/^Phone:\s*(.+)/i)[1].trim();
+                    if (!data.cc && val.match(/^JH Cost Center:\s*(.+)/i)) data.cc = val.match(/^JH Cost Center:\s*(.+)/i)[1].trim();
+                }
+            }
+
+            data.phone = data.phone.replace(/\D/g, ''); 
+            
+            data.abbrev_generated = '';
+            if (data.name) {
+                let parts = data.name.trim().split(/\s+/);
+                if (parts.length > 1) { data.abbrev_generated = (parts[0].charAt(0) + parts[parts.length-1]).replace(/[^a-zA-Z0-9]/g, '').toUpperCase(); } 
+                else { data.abbrev_generated = parts[0].replace(/[^a-zA-Z0-9]/g, '').toUpperCase(); }
+                data.abbrev_generated = data.abbrev_generated.substring(0, 15);
+            }
+            return data;
+        }
+
+        // --- Logic: Long Desc Data Extraction ---
+        function cleanValue(val) {
+            return val.replace(/[\r\n]+\s*Product Information\s*$/i, "").replace(/[\r\n]+\s*Download PDF\s*$/i, "")
+                      .replace(/¿½|ï¿½/g, "'").replace(/®/g, "").trim();
+        }
+        function extractField(text, fieldName) {
+            const safeFieldName = fieldName.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+            const regex = new RegExp(safeFieldName + "\\s*([\\s\\S]*?)(?=(" + stopWordsArr.join("|") + "|$))", "i");
+            const match = text.match(regex);
+            return match ? cleanValue(match[1]) : "";
+        }
+        function extractSummary(text) {
+            const regex = new RegExp("^(.*?)(?=(" + stopWordsArr.join("|") + "|$))", "i");
+            const match = text.match(regex);
+            return match ? cleanValue(match[1]) : cleanValue(text);
+        }
+
+        function extractLongDescData(row) {
+            const nacItem = row["NAC Item Number"] || row["NAC Item Number "] || "";
+            const longDesc = row["Long Description"] || row["Long Description "] || "";
+            
+            if(!longDesc) return { status: "ERROR", itemNumber: nacItem, productType: "Missing Description" };
+
+            let summary = extractSummary(longDesc);
+            let originalItem = extractField(longDesc, "Original Item Number:");
+            let extractedSupersedes = extractField(longDesc, "Supersedes:") || extractField(longDesc, "Replaces:");
+            let finalSupersedes = [extractedSupersedes, originalItem].filter(Boolean).join(", ");
+            let productType = extractField(longDesc, "Product Type:");
+            let size = extractField(longDesc, "Size:");
+            let material = extractField(longDesc, "Material:");
+            let rawRegion = extractField(longDesc, "Region:");
+
+            let specsLines = [];
+            if (size) specsLines.push(`Size: ${size}`);
+            if (material) specsLines.push(`Material: ${material}`);
+
+            let ad_flagUrl = "", ae_flagAlt = "", af_flagSize = "";
+            const regLower = rawRegion.toLowerCase();
+            if ((regLower.includes('canada') || regLower.includes('canadian')) && !(regLower.includes('us') || regLower.includes('america'))) {
+                ad_flagUrl = CAN_IMG_B64; ae_flagAlt = "CAN"; af_flagSize = "34";
+            } 
+
+            const mappedRow = {
+                "Item Number": nacItem,
+                "Summary": summary,
+                "Supersedes": finalSupersedes,
+                "ProductType": productType,
+                "Region": rawRegion,
+                "Language": extractField(longDesc, "Language:"),
+                "ProductLine": extractField(longDesc, "Product Line:"),
+                "Use": extractField(longDesc, "Use:"),
+                "Segment": extractField(longDesc, "Market Segment:"),
+                "TemplateId": "", "Badges": "", "Highlights": extractField(longDesc, "Tagline:"),
+                "UseRedChecks": "", "Specs": specsLines.join("\n"), "WhatsIncluded": "", "Compatibility": "", 
+                "Certifications": "", "Warnings": "", "Care": "", "ShippingReturns": "", "Warranty": "", 
+                "CTA_Text": "", "CTA_Url": "", "ImageUrl": "", "ImagePlacement": "", "ImageAlt": "", 
+                "DownloadLabel": "", "DownloadUrl": "", "DownloadPlacement": "", 
+                "FlagUrl": ad_flagUrl, "FlagAlt": ae_flagAlt, "FlagSize": af_flagSize  
+            };
+
+            return { status: "SUCCESS", itemNumber: nacItem, productType: productType || "N/A", rowData: mappedRow };
+        }
+
+        // --- Export Generation ---
+        function triggerDownload(content, filename) {
+            let blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a'); a.href = url; a.download = filename;
+            a.click(); URL.revokeObjectURL(url);
+        }
+
+        downloadBtn.addEventListener('click', () => {
+            if (sessionData.length === 0) return;
+            const mode = converterType.value;
+
+            if (mode === 'cm10') {
+                const headers = ["Ship To", "Customer Name (35)", "Address Line 1 (35)", "Address Line 2 (35)", "Address Line 3 (35)", "City", "State", "Zip", "County", "Country", "Contact Name (20)", "Phone", "Ext", "Fax", "Abbrev(15)", "EDI", "G/L Code", "ARA Location #", "ARA Service Type", "Division Code", "Dept 1", "Dept 2", "Dept 3", "Territory Code", "Cost Center Code", "Field 100", "Cost Center Group", "ERROR CHECK"];
+                let csvContent = headers.join(",") + "\r\n";
+
+                sessionData.forEach((d, index) => {
+                    let rowNum = index + 2; 
+                    let userTypeLower = (d.userClass || '').toLowerCase();
+                    let isContractor = userTypeLower.includes('contractor');
+                    let isDistributor = userTypeLower.includes('distributor');
+
+                    let finalCustomerName = (isContractor || isDistributor) ? (d.businessName || d.name) : (d.name || d.businessName);
+                    
+                    let finalAbbrev = "";
+                    if (isContractor) finalAbbrev = d.loyaltyNum;
+                    else if (isDistributor) finalAbbrev = (d.businessName || "").replace(/[^a-zA-Z0-9]/g, '').toUpperCase().substring(0, 15);
+                    else finalAbbrev = d.abbrev_generated;
+
+                    let formula = `=IF(LEN(B${rowNum})>35, "NAME ERROR", IF(LEN(C${rowNum})>35, "ADDRESS 1 ERROR", IF(LEN(D${rowNum})>35, "ADDRESS 2 ERROR", IF(LEN(E${rowNum})>35, "ADDRESS 3 ERROR", IF(LEN(F${rowNum})>21, "CITY ERROR", IF(LEN(G${rowNum})>2, "STATE ERROR", IF(LEN(H${rowNum})>5, "ZIP ERROR", IF(LEN(I${rowNum})>5, "COUNTY ERROR", IF(LEN(J${rowNum})>5, "COUNTRY ERROR", (IF(LEN(K${rowNum})>20, "CONTACT NAME ERROR", IF(LEN(L${rowNum})>12, "PHONE ERROR", IF(LEN(M${rowNum})>4, "EXTENSION ERROR", IF(LEN(N${rowNum})>12, "FAX ERROR", IF(LEN(O${rowNum})>15, "ABBREV ERROR", IF(P${rowNum}<>A${rowNum}, "EDI ERROR", IF(LEN(Q${rowNum})>15, "G/L CODE ERROR", IF(LEN(R${rowNum})>9, "ARA LOCATION ERROR", IF(LEN(S${rowNum})>3, "ARA SERVICE ERROR", IF(LEN(T${rowNum})>3, "DIVISION CODE ERROR", IF(LEN(U${rowNum})>15, "DEPT 1 ERROR", IF(LEN(V${rowNum})>15, "DEPT 2 ERROR", IF(LEN(W${rowNum})>15, "DEPT 3 ERROR", IF(LEN(X${rowNum})>15, "TERRITORY CODE ERROR", IF(LEN(Y${rowNum})>15, "COST CENTER CODE ERROR", IF(LEN(Z${rowNum})>15, "FIELD 100 ERROR", IF(LEN(AA${rowNum})>5, "COST CENTER GROUP ERROR", IF(OR(A${rowNum}="",B${rowNum}= "", C${rowNum}="", D${rowNum}="", E${rowNum}="", F${rowNum}="", G${rowNum}="", H${rowNum}="", I${rowNum}="", J${rowNum}="", K${rowNum}="", L${rowNum}="", M${rowNum}="", N${rowNum}="", O${rowNum}="", P${rowNum}="", Q${rowNum}="", R${rowNum}="", S${rowNum}="", T${rowNum}="", U${rowNum}="", V${rowNum}="", W${rowNum}="",X${rowNum}="", Y${rowNum}="",Z${rowNum}="",AA${rowNum}=""), "EMPTY CELL(S)", "NO ERROR"))))))))))))))))))))))))))))`;
+
+                    let rowArray = ["", finalCustomerName, " ", d.addr, " ", d.city, d.state, d.zip, " ", "US", d.name, d.phone, " ", " ", finalAbbrev, "", " ", " ", " ", " ", " ", " ", " ", " ", d.cc, " ", " ", formula];
+
+                    let formattedRow = rowArray.map(cell => {
+                        let cellStr = String(cell);
+                        if (cellStr.includes(',') || cellStr.includes('"') || cellStr.startsWith('=')) { cellStr = `"${cellStr.replace(/"/g, '""')}"`; }
+                        return cellStr;
+                    });
+                    csvContent += formattedRow.join(",") + "\r\n";
+                });
+                triggerDownload(csvContent, "CM-10 New Customer Set Up.csv");
+
+            } else if (mode === 'web') {
+                const webHeaders = ["PWBLTO","PWCUST","PWUSERName","PSWORD","PWWEBLVL","ActiveAccount","PWTESTFLG","DaysInactive","PWEmergencyShipRight","PWGroupRight","PWUserDefinedField1","PWUserDefinedField2","PWUserDefinedField3","PWAlph","PWGroupReportRight","PWBillToReportRight","PWShipToReportRight","PWDefaultReportRight","PWCCPaymentRequired","PWBudgetRight","PWSaveCart","PWOrderSubmissionRight","PWAccountApprovalRight","PWStatus","PWScheduledOrders","PWProfileRights","PWItemQtyApprovals","PWMaxOrdQty","PWShippingRights","PWUserClass","PWMaxOrdDollars","PWAltPriceGroup","PWCustomerPickup","PWOrderingRights","PWGroupApprovalRight","PWMaxCartDollars","PWGroupBackShipments","PWCheckout","PWItemApprovalRight","PWBrandsite","PWShipSpeed","PWStoreProfileEditRight","PWKittingRights","PWUserLink1","PWUserLink2","PWUserLink3","PWUserLink4","PWUserLink5","PWHoldExpeditedOrders","PWPickupOnly","PWScheduledCartApprover","PWEmailApprovalRight","PWCostCenterGroup","PWNotes","PWScheduledCartGroupApprovalRight","PWScheduledCartEmailApprovalRight","PWAdminAccount","fname","lname","Email","Address","Address2","City","State","Zip","Country","Province_territory","Phone","VTuser","VTdefault","CWAltShpTo","CWPOCode","PWExpediteScheduledCart","PWPreOrderAccMgrRights","PWPreOrdrMgrGroupApprovalRight","PWPreOrdrMgrEmailApprovalRight","PWLockWndwApplies","PWTrackHistory","PWHideBudgets"];
+                let csvContent = webHeaders.join(",") + "\r\n";
+
+                sessionData.forEach((d) => {
+                    let userTypeLower = (d.userClass || '').toLowerCase();
+                    let isContractor = userTypeLower.includes('contractor');
+                    let rowArray = new Array(webHeaders.length).fill("");
+                    
+                    rowArray[webHeaders.indexOf("PWUSERName")] = isContractor ? (d.loyaltyNum || "") : (d.email || "");
+                    rowArray[webHeaders.indexOf("Email")] = isContractor ? "" : (d.email || "");
+                    rowArray[webHeaders.indexOf("PSWORD")] = "Hardie-1";
+                    rowArray[webHeaders.indexOf("PWUserClass")] = d.userClass || "";
+                    
+                    let nameParts = (d.name || d.businessName || "").trim().split(/\s+/);
+                    rowArray[webHeaders.indexOf("fname")] = nameParts[0] || "";
+                    rowArray[webHeaders.indexOf("lname")] = nameParts.slice(1).join(" ") || "";
+
+                    let formattedRow = rowArray.map(cell => {
+                        let cellStr = String(cell);
+                        if (cellStr.includes(',') || cellStr.includes('"')) { cellStr = `"${cellStr.replace(/"/g, '""')}"`; }
+                        return cellStr;
+                    });
+                    csvContent += formattedRow.join(",") + "\r\n";
+                });
+                triggerDownload(csvContent, "User Profiles Setup.csv");
+            } else if (mode === 'longdesc') {
+                const columns = ["Item Number","Summary","Supersedes","ProductType","Region","Language","ProductLine","Use","Segment","TemplateId","Badges","Highlights","UseRedChecks","Specs","WhatsIncluded","Compatibility","Certifications","Warnings","Care","ShippingReturns","Warranty","CTA_Text","CTA_Url","ImageUrl","ImagePlacement","ImageAlt","DownloadLabel","DownloadUrl","DownloadPlacement","FlagUrl","FlagAlt","FlagSize"];
+                const loadData = sessionData.map(d => d.rowData).filter(Boolean);
+                const finalCsv = Papa.unparse(loadData, { columns: columns });
+                triggerDownload("\uFEFF" + finalCsv, "Processed_LOAD_File.csv");
+            }
+        });
+
+        // --- UI Updates ---
+        function updateUI() {
+            document.getElementById('valTotal').textContent = totalFilesProcessed;
+            document.getElementById('valSuccess').textContent = successCount;
+            document.getElementById('valErrors').textContent = errorCount;
+
+            const emptyState = document.getElementById('emptyState');
+            const tableContainer = document.getElementById('resultsTableContainer');
+            const tbody = document.getElementById('resultsTableBody');
+            const mode = converterType.value;
+
+            if (sessionData.length === 0) {
+                emptyState.style.display = 'block';
+                tableContainer.style.display = 'none';
+                downloadBtn.style.opacity = '0.5';
+                downloadBtn.style.pointerEvents = 'none';
+                downloadBtn.innerText = 'Download Data Payload';
+                tbody.innerHTML = '';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            tableContainer.style.display = 'block';
+            downloadBtn.style.opacity = '1';
+            downloadBtn.style.pointerEvents = 'auto';
+            
+            if (mode === 'cm10') downloadBtn.innerText = 'Download CM-10 Load File';
+            else if (mode === 'web') downloadBtn.innerText = 'Download Web Profile Load File';
+            else if (mode === 'longdesc') downloadBtn.innerText = 'Download Long Desc Load File';
+
+            tbody.innerHTML = '';
+            sessionData.forEach(d => {
+                const tr = document.createElement('tr');
+                const pillClass = d.status === "SUCCESS" ? "status-success" : "status-error";
+                
+                let errContext = '';
+                if (d.status === "ERROR") {
+                    errContext = mode === 'longdesc' ? `<br><span style="font-size:0.75rem;color:var(--error-text);">Missing Description</span>` : `<br><span style="font-size:0.75rem;color:var(--error-text);">Missing Bus. Name or CC</span>`;
+                }
+                
+                let idCol = mode === 'longdesc' ? (d.itemNumber || '—') : (d.businessName || d.name || '—');
+                let subIdCol = mode === 'longdesc' ? 'Item' : (d.userClass || 'Unknown Type');
+                let ccCol = mode === 'longdesc' ? (d.productType || '—') : (d.cc || '—');
+                
+                tr.innerHTML = `
+                    <td><span class="status-pill ${pillClass}">${d.status}</span>${errContext}</td>
+                    <td style="font-weight: 600;">
+                        ${escapeHtml(idCol)}
+                        <br><span style="font-size:0.75rem; color:var(--text-secondary); font-weight:500;">${escapeHtml(subIdCol)}</span>
+                    </td>
+                    <td><code style="background: var(--bg-app); padding: 2px 6px; border-radius: 4px;">${escapeHtml(ccCol)}</code></td>
+                    <td style="font-size: 0.8rem;">${escapeHtml(d.sourceFile)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+    </script>
+
+    <button id="backToTop" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</button>
+    <script>
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('backToTop');
+            if(window.scrollY > 300) btn.style.display = 'flex';
+            else btn.style.display = 'none';
+        });
+        
+        function toggleMobileNav() {
+            const nav = document.querySelector('.nav-menu');
+            if(nav) nav.classList.toggle('open');
+        }
+        
+        if('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(console.error);
+        }
+    </script>
+
+<script>
+        // --- Navigation Preferences Logic ---
+        function applyNavPreferences() {
+            try {
+                const hiddenNavs = JSON.parse(localStorage.getItem('kore_hidden_navs') || '[]');
+                if (hiddenNavs.length > 0) {
+                    const links = document.querySelectorAll('.dropdown-content a');
+                    links.forEach(link => {
+                        const href = link.getAttribute('href');
+                        if (hiddenNavs.includes(href)) {
+                            link.style.display = 'none';
+                        } else {
+                            link.style.display = 'block';
+                        }
+                    });
+                    
+                    // Hide empty dropdowns
+                    document.querySelectorAll('.nav-item').forEach(item => {
+                        const dropdown = item.querySelector('.dropdown-content');
+                        if (dropdown) {
+                            const visibleLinks = Array.from(dropdown.querySelectorAll('a')).filter(a => a.style.display !== 'none');
+                            if (visibleLinks.length === 0) {
+                                item.style.display = 'none';
+                            } else {
+                                item.style.display = 'flex';
+                            }
+                        }
+                    });
+                } else {
+                    document.querySelectorAll('.dropdown-content a').forEach(a => a.style.display = 'block');
+                }
+            } catch(e) {}
+        }
+        document.addEventListener('DOMContentLoaded', applyNavPreferences);
+</script>
+
+    <script>
+        // --- FLOATING NOTEPAD LOGIC ---
+        const fnModal = document.getElementById('floatingNotepad');
+        const fnContent = document.getElementById('fnContent');
+        const fnPushBtn = document.getElementById('fnPushBtn');
+        let npIsDragging = false, npCurrentX, npCurrentY, npInitialX, npInitialY, npXOffset = 0, npYOffset = 0;
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.altKey && e.key.toLowerCase() === 'n') {
+                e.preventDefault();
+                fnModal.style.display = fnModal.style.display === 'flex' ? 'none' : 'flex';
+                if (fnModal.style.display === 'flex') {
+                    fnContent.value = localStorage.getItem('kore_global_notepad') || '';
+                    fnContent.focus();
+                    checkNotepadFormatting();
+                }
+            }
+        });
+        
+        document.getElementById('fnClose').addEventListener('click', () => { fnModal.style.display = 'none'; });
+        document.getElementById('fnHeader').addEventListener('mousedown', npDragStart);
+        document.addEventListener('mousemove', npDrag);
+        document.addEventListener('mouseup', npDragEnd);
+        
+        function npDragStart(e) { npInitialX = e.clientX - npXOffset; npInitialY = e.clientY - npYOffset; npIsDragging = true; }
+        function npDrag(e) {
+            if (npIsDragging) {
+                e.preventDefault();
+                npCurrentX = e.clientX - npInitialX; npCurrentY = e.clientY - npInitialY;
+                npXOffset = npCurrentX; npYOffset = npCurrentY;
+                fnModal.style.transform = `translate(${npCurrentX}px, ${npCurrentY}px)`;
+            }
+        }
+        function npDragEnd(e) { npInitialX = npCurrentX; npInitialY = npCurrentY; npIsDragging = false; }
+        
+        let fnTimeout;
+        fnContent.addEventListener('input', () => {
+            localStorage.setItem('kore_global_notepad', fnContent.value);
+            document.getElementById('fnStatus').innerText = 'Saving...';
+            clearTimeout(fnTimeout);
+            fnTimeout = setTimeout(() => { document.getElementById('fnStatus').innerText = 'Saved locally.'; checkNotepadFormatting(); }, 800);
+        });
+        
+        function checkNotepadFormatting() {
+            const val = fnContent.value;
+            if (val.startsWith('```')) { fnContent.classList.add('code-mode'); } else { fnContent.classList.remove('code-mode'); }
+            const hasTodo = /-\s?\[\s?\]\s?.+/i.test(val);
+            fnPushBtn.style.display = hasTodo ? 'block' : 'none';
+        }
+        
+        fnPushBtn.addEventListener('click', async () => {
+            const lines = fnContent.value.split('\n');
+            let newTasks = []; let remainingLines = [];
+            lines.forEach((line, index) => {
+                const match = line.match(/-\s?\[\s?\]\s?(.+)/i);
+                if (match) { 
+                    newTasks.push({ id: 'todo_' + Date.now() + '_' + index, title: match[1].trim(), priority: "Medium", completed: false, dueDate: new Date().toISOString().split('T')[0] }); 
+                } else { remainingLines.push(line); }
+            });
+            
+            if (newTasks.length > 0) {
+                let existingTodos = [];
+                try {
+                    let userId = "local-dev";
+                    if (typeof cloudIdentity !== 'undefined' && cloudIdentity.userId) {
+                        userId = cloudIdentity.userId;
+                    }
+                    const tr = await fetch(`/api/get_user_data?userId=${userId}&dataType=todos`);
+                    if(tr.ok) { 
+                        existingTodos = await tr.json() || []; 
+                        if(typeof existingTodos === 'string') existingTodos = JSON.parse(existingTodos);
+                    }
+                    existingTodos = existingTodos.concat(newTasks);
+                    await fetch('/api/save_user_data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: userId, dataType: 'todos', data: existingTodos }) });
+                } catch(e) {
+                    console.log("fallback", e);
+                    existingTodos = JSON.parse(localStorage.getItem('kore_todos')||'[]');
+                    if(typeof existingTodos === 'string') existingTodos = JSON.parse(existingTodos);
+                    existingTodos = existingTodos.concat(newTasks);
+                    localStorage.setItem('kore_todos', JSON.stringify(existingTodos));
+                }
+                fnContent.value = remainingLines.join('\n');
+                localStorage.setItem('kore_global_notepad', fnContent.value);
+                document.getElementById('fnStatus').innerText = `Pushed ${newTasks.length} tasks!`;
+                fnPushBtn.style.display = 'none';
+            }
+        });
+    </script>
+
+
+
+<!-- Mobile Nav Script (Injected) -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        if (item.querySelector('.dropdown-content')) {
+            item.addEventListener('click', (e) => {
+                if (window.innerWidth <= 1023) {
+                    if (e.target.tagName.toLowerCase() === 'a' && e.target.closest('.dropdown-content')) {
+                        return;
+                    }
+                    e.preventDefault();
+                    item.classList.toggle('open-mobile');
+                }
+            });
+        }
+    });
+});
+</script>
+</body>
+</html>

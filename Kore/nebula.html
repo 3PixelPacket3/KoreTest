@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kore | Nebula HTML Forge</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        /* Premium Light Theme Variables */
+        :root {
+            --accent-primary: #0ea5e9;
+            --accent-hover: #0284c7;
+            --bg-app: #f8fafc;
+            --bg-surface: #ffffff;
+            --text-main: #0f172a;
+            --text-secondary: #475569;
+            --border-subtle: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.05);
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --success-color: #10b981;
+            --font-editor: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        }
+        /* THEME: Midnight Dark */
+        body[data-theme="midnight"] {
+            --bg-app: #0f172a; --bg-surface: #1e293b; --text-main: #f8fafc; --text-secondary: #94a3b8;
+            --border-subtle: #334155; --accent-primary: #38bdf8; --accent-hover: #7dd3fc;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5); --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+        /* THEME: Cyberpunk */
+        body[data-theme="cyberpunk"] {
+            --bg-app: #000000; --bg-surface: #121212; --text-main: #00ff41; --text-secondary: #ff00ff;
+            --border-subtle: #00ff41; --accent-primary: #ff00ff; --accent-hover: #ff00aa;
+            --radius-md: 0px; --radius-sm: 0px; --shadow-sm: 0 0 5px rgba(0, 255, 65, 0.2);
+            --shadow-md: 0 0 10px rgba(255, 0, 255, 0.2);
+        }
+        /* THEME: Corporate Classic */
+        body[data-theme="corporate"] {
+            --bg-app: #e2e8f0; --bg-surface: #ffffff; --text-main: #1e293b; --text-secondary: #475569;
+            --border-subtle: #cbd5e1; --accent-primary: #1d4ed8; --accent-hover: #1e40af;
+            --radius-md: 4px; --radius-sm: 2px;
+        }
+        /* THEME: Earthy Minimal */
+        body[data-theme="earthy"] {
+            --bg-app: #fdf8f5; --bg-surface: #ffffff; --text-main: #3f3e3a; --text-secondary: #6b7280;
+            --border-subtle: #e5e5e5; --accent-primary: #5c7f67; --accent-hover: #4a6652;
+            --radius-md: 24px; --radius-sm: 16px;
+        }
+        /* THEME: Oceanic */
+        body[data-theme="oceanic"] {
+            --bg-app: #e0f2fe; --bg-surface: #f0f9ff; --text-main: #0c4a6e; --text-secondary: #0369a1;
+            --border-subtle: #bae6fd; --accent-primary: #0284c7; --accent-hover: #0369a1;
+            --radius-md: 16px; --radius-sm: 12px;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-editor);
+            background-color: var(--bg-app);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            
+        }
+
+        /* --- Global Header --- */
+        .global-header {
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            height: 64px;
+            box-shadow: var(--shadow-sm);
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            height: 100%;
+        }
+
+        .kore-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .kore-logo span {
+            color: var(--accent-primary);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 8px;
+            height: 100%;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: var(--text-secondary);
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            height: 100%;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--accent-primary);
+            border-bottom-color: var(--accent-primary);
+            background-color: rgba(14, 165, 233, 0.08);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 64px;
+            left: 0;
+            background-color: var(--bg-surface);
+            min-width: 200px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-subtle);
+            border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+            overflow: hidden;
+            z-index: 101;
+        }
+
+        .nav-item:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content a { white-space: nowrap;
+            color: var(--text-secondary);
+            padding: 14px 20px;
+            text-decoration: none;
+            display: block;
+            border-bottom: 1px solid var(--bg-app);
+            font-weight: 500;
+        }
+
+        .dropdown-content a:hover {
+            background-color: rgba(14, 165, 233, 0.08);
+            color: var(--accent-primary);
+            padding-left: 24px;
+            transition: all 0.2s ease;
+        }
+
+        .user-badge {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: var(--bg-app);
+            padding: 6px 12px;
+            border-radius: 99px;
+            border: 1px solid var(--border-subtle);
+            margin-left: auto;
+        }
+
+        /* --- Main Content Layout --- */
+        .main-container {
+            padding: 40px 32px;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+            flex-grow: 1;
+        }
+
+        .hero-banner {
+            background: var(--bg-surface);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
+            box-shadow: var(--shadow-sm);
+            height: 140px;
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .hero-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to top, rgba(15,23,42,0.9), transparent);
+            padding: 24px 30px;
+            box-sizing: border-box;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .hero-title {
+            margin: 0;
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .hero-subtitle {
+            margin: 4px 0 0 0;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            background-color: var(--bg-surface);
+            color: var(--text-main);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            background-color: var(--bg-app);
+            border-color: var(--text-secondary);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-primary);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .input {
+            padding: 10px 12px;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            outline: none;
+            background: var(--bg-surface);
+            color: var(--text-main);
+            font-family: inherit;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        /* --- Nav Tabs (Inner) --- */
+        .tabs-nav {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid var(--border-subtle);
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: var(--accent-primary);
+        }
+
+        .tab-btn.active {
+            color: var(--accent-primary);
+            border-bottom-color: var(--accent-primary);
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Workspace Grid --- */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .panel-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .panel-title {
+            margin: 0 0 16px 0;
+            font-size: 1.1rem;
+            color: var(--text-main);
+            font-weight: 700;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Left Rail (Snippets) */
+        .rail-section {
+            margin-bottom: 24px;
+        }
+
+        .rail-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 0 0 12px 0;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .snippet-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .rail-snippet {
+            background: var(--bg-app);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .rail-snippet:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            background: rgba(14, 165, 233, 0.08);
+        }
+
+        .rail-preset-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .rail-preset-item {
+            font-size: 0.85rem;
+            padding: 8px 12px;
+            background: var(--bg-app);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .rail-preset-item:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        /* Editor Toolbar */
+        .toolbar {
+            background: var(--bg-app);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .toolbar-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .tool-btn {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            padding: 6px 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-main);
+            transition: all 0.2s;
+            min-width: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .tool-btn:hover {
+            background: rgba(14, 165, 233, 0.08);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .tool-select {
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-subtle);
+            font-size: 0.8rem;
+            outline: none;
+            background: var(--bg-surface);
+            font-family: inherit;
+            color: var(--text-main);
+        }
+
+        .tool-color {
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            cursor: pointer;
+            background: var(--bg-surface);
+        }
+
+        .toolbar-divider {
+            width: 1px;
+            height: 24px;
+            background-color: var(--border-subtle);
+            margin: 0 4px;
+        }
+
+        .editor-container {
+            min-height: 500px;
+            max-height: 700px;
+            overflow-y: auto;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 32px;
+            outline: none;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .editor-container:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+
+        /* Preview Area */
+        .preview-container {
+            min-height: 500px;
+            max-height: 700px;
+            overflow-y: auto;
+            background: #f1f5f9;
+            border: 1px dashed var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 32px;
+        }
+        
+        /* Templates Tab */
+        .item-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .item-row-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .item-row-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .item-row-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* HTML Tab */
+        .code-output {
+            width: 100%;
+            min-height: 500px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.85rem;
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-subtle);
+            background: #1e293b;
+            color: #e2e8f0;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            resize: vertical;
+            box-sizing: border-box;
+            margin-top: 16px;
+        }
+
+        /* Global Footer */
+        .global-footer {
+            background-color: var(--bg-surface);
+            border-top: 1px solid var(--border-subtle);
+            padding: 24px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            font-weight: 500;
+        }
+        
+        
+        
+
+        /* --- FLOATING COMMAND PALETTE NOTEPAD --- */
+        #floatingNotepad { position: fixed; top: 15%; left: 50%; transform: translateX(-50%); width: 600px; max-width: 90vw; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); z-index: 9999; display: none; flex-direction: column; overflow: hidden; }
+        #fnHeader { background: var(--bg-app); padding: 12px 20px; cursor: move; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); font-weight: 600; color: var(--text-main); user-select: none; }
+        #fnClose { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary); }
+        #fnContent { width: 100%; height: 300px; padding: 16px; border: none; outline: none; resize: none; font-family: 'Inter', system-ui, sans-serif; font-size: 0.95rem; line-height: 1.5; color: var(--text-main); background: var(--bg-surface); box-sizing: border-box; }
+        #fnContent.code-mode { font-family: monospace; background: #1e293b; color: #f8fafc; }
+        .fn-toolbar { display: flex; justify-content: space-between; padding: 10px 16px; background: var(--bg-app); border-top: 1px solid var(--border-subtle); align-items: center; }
+        .fn-push-btn { background: var(--success-color); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; display: none; }
+        .fn-push-btn:hover { background: #059669; }
+    
+        
+    
+    
+            pre, code { white-space: pre-wrap; word-break: break-word; overflow-x: auto; max-width: 100%; }
+    
+    </style>
+
+    <!-- SEO & Mobile Optimization -->
+    <meta name="description" content="Kore Enterprise Workspace - Advanced Cloud Management System">
+    <meta name="keywords" content="Kore, Workspace, Enterprise, Management, LOD">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' font-family='Arial' fill='%230ea5e9' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' font-family='Arial' fill='%230ea5e9' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+
+    <style>
+        /* Mobile Layout & Back-to-Top */
+        
+        
+        .mobile-toggle { display: none; }
+        
+        #backToTop {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s, background 0.3s;
+        }
+        #backToTop:hover { background: var(--accent-hover); }
+    </style>
+
+    <script>
+        window.uiConfirm = function(msg) {
+            return new Promise(resolve => {
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:99999;display:flex;align-items:center;justify-content:center;';
+                const box = document.createElement('div');
+                box.style.cssText = 'background:var(--bg-surface,#fff);padding:24px;border-radius:8px;max-width:400px;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,0.2);border:1px solid var(--border-subtle,#ccc);color:var(--text-main,#000);font-family:sans-serif;';
+                box.innerHTML = '<p style="margin-top:0;margin-bottom:24px;font-size:1.1rem;">' + msg + '</p>' +
+                                '<div style="display:flex;gap:12px;justify-content:center;">' +
+                                '<button id="uiConfirmCancel" style="padding:8px 16px;border:1px solid #ccc;background:transparent;cursor:pointer;border-radius:4px;color:var(--text-main,#000);">Cancel</button>' +
+                                '<button id="uiConfirmOk" style="padding:8px 16px;border:none;background:#ef4444;color:#fff;cursor:pointer;border-radius:4px;">Confirm</button>' +
+                                '</div>';
+                overlay.appendChild(box);
+                document.body.appendChild(overlay);
+                document.getElementById('uiConfirmCancel').onclick = () => { document.body.removeChild(overlay); resolve(false); };
+                document.getElementById('uiConfirmOk').onclick = () => { document.body.removeChild(overlay); resolve(true); };
+            });
+        };
+</script>
+
+<style>
+/* --- RESPONSIVE MOBILE & TABLET (Injected) --- */
+* { box-sizing: border-box; }
+img, video, iframe, canvas { max-width: 100%; height: auto; }
+body { overflow-x: hidden; width: 100%; }
+
+@media (max-width: 1023px) {
+    .modal-content, .system-modal, .storage-tracker { max-width: 95vw !important; }
+
+    .global-header {
+        flex-direction: column;
+        height: auto;
+        padding: 10px 16px;
+        gap: 10px;
+    }
+    .header-left {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .search-container {
+        width: 100%;
+    }
+    .search-bar {
+        width: 100%;
+    }
+    .mobile-toggle {
+        display: flex !important;
+        align-items: center;
+        background: none;
+        border: none;
+        color: var(--text-main);
+        cursor: pointer;
+    }
+    .nav-menu {
+        display: none !important;
+        flex-direction: column;
+        width: 100%;
+        background: var(--bg-surface);
+        position: absolute;
+        top: 100%;
+        left: 0;
+        box-shadow: var(--shadow-md);
+        z-index: 200;
+        max-height: 70vh;
+        overflow-y: auto;
+        border-top: 1px solid var(--border-subtle);
+    }
+    .nav-menu.open {
+        display: flex !important;
+    }
+    .nav-item {
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--border-subtle);
+        width: 100%;
+        flex-wrap: wrap;
+        height: auto;
+    }
+    .nav-item:last-child {
+        border-bottom: none;
+    }
+    .dropdown-content {
+        position: static;
+        display: none;
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        width: 100%;
+        padding-left: 20px;
+        margin-top: 10px;
+    }
+    .nav-item.open-mobile .dropdown-content {
+        display: block !important;
+    }
+    /* Hide hover effects on mobile */
+    .nav-item:hover .dropdown-content, 
+    .nav-item:focus-within .dropdown-content,
+    .nav-item:active .dropdown-content {
+        display: none;
+    }
+    .nav-item.open-mobile:hover .dropdown-content,
+    .nav-item.open-mobile:focus-within .dropdown-content,
+    .nav-item.open-mobile:active .dropdown-content {
+        display: block !important;
+    }
+    
+    .dashboard-grid, .dashboard-layout, .apps-grid, .grid-container,
+    .layout-grid, .chart-grid, .library-controls, .add-task-panel,
+    .controls-grid, .content-grid, .layout-split, .form-grid,
+    .metrics-bar, .view-boxes, .grid-2, .workspace-grid,
+    .kpi-grid, .nav-pref-grid, .color-target-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .metrics-bar, .form-grid {
+        gap: 16px !important;
+    }
+    .main-container {
+        padding: 15px !important;
+    }
+    .hero-banner {
+        padding: 30px 15px !important;
+        height: auto !important;
+        min-height: 160px;
+    }
+    .hero-title {
+        font-size: 1.8rem !important;
+    }
+    
+    /* Make tables scrollable */
+    table, .table-container, .data-table-container {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    /* Ensure containers don't overflow */
+    .panel, .card, .widget, .card-body, .intel-panel, .info-panel {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    /* Layout fixes for sidebars */
+    .workspace-layout {
+        flex-direction: column !important;
+    }
+    .sidebar {
+        width: 100% !important;
+        max-height: none !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border-subtle);
+        position: static !important;
+    }
+}
+</style>
+
+</head>
+
+<body>
+<script>
+    // Theme Initializer to prevent flash on load
+    const savedTheme = localStorage.getItem('kore_theme') || 'default';
+    if(savedTheme !== 'default') {
+        document.body.setAttribute('data-theme', savedTheme);
+    }
+</script>
+
+<header class="global-header">
+        <div class="header-left">
+            <h1 class="kore-logo">Kore<span>.</span></h1>
+        <button class="mobile-toggle" aria-label="Toggle Menu" onclick="toggleMobileNav()"><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 12h18M3 6h18M3 18h18"></path></svg></button>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">Dashboard</a>
+                
+                <div class="nav-item">Operations ▼
+                    <div class="dropdown-content">
+                        <a href="apps.html">Apps</a>
+                        <a href="file-converter.html">File to LOAD Converter</a>
+                        <a href="lod.html">LOD Validation Tool</a>
+                        <a href="macros.html">Macro Library</a>
+                        <a href="nebula.html">Nebula HTML Forge</a>
+                        <a href="passwords.html">Password Generator</a>
+                    <a href="business-tools.html">Business & Sec Tools</a>
+                        <a href="todo.html">Personal To-Do</a>
+                        <a href="product-html.html">Product HTML Converter</a>
+                        <a href="scanner.html">Vulnerability Scanner</a>
+                        <a href="work.html">Work Tracker</a>
+                    </div>
+                </div>
+                
+                <div class="nav-item">Resources ▼
+                    <div class="dropdown-content">
+                        <a href="info-archive.html">Archive</a>
+                        <a href="reports.html">Data/Reports</a>
+                        <a href="docs.html">Document Library</a>
+                        <a href="info-hub.html">Info Hub</a>
+                    </div>
+                </div>
+                
+                <a href="about.html" class="nav-item">About</a>
+                <a href="settings.html" class="nav-item">Settings</a>
+            </nav>
+        </div>
+        <div id="userIdentityBadge" class="user-badge">Authenticating...</div>
+    </header>
+
+    <main class="main-container">
+        
+        <section class="hero-banner">
+            <img src="images/NebulaBanner.jpg" alt="Nebula Layout Forge" onerror="this.onerror=null; this.src='https://picsum.photos/1200/300?grayscale&blur=2';">
+            <div class="hero-overlay">
+                <div>
+                    <h2 class="hero-title">Nebula HTML Forge</h2>
+                    <p class="hero-subtitle">Visual plain-text to Enterprise HTML layout builder.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="tabs-nav">
+            <button class="tab-btn active" data-tab="editor">Editor & Preview</button>
+            <button class="tab-btn" data-tab="templates">Templates (15)</button>
+            <button class="tab-btn" data-tab="html">HTML Output</button>
+        </div>
+
+        <div id="editorTab" class="tab-panel active">
+            <div class="workspace-grid">
+                
+                <aside class="panel-card">
+                    <div class="rail-section">
+                        <h3 class="rail-subtitle">Layout Snippets</h3>
+                        <div class="snippet-grid">
+                            <button class="rail-snippet" data-snippet="two-column">2-Column</button>
+                            <button class="rail-snippet" data-snippet="three-column">3-Column</button>
+                            <button class="rail-snippet" data-snippet="feature-grid">Data Grid</button>
+                            <button class="rail-snippet" data-snippet="profile-card">User Card</button>
+                            <button class="rail-snippet" data-snippet="pricing-table">Data Table</button>
+                            <button class="rail-snippet" data-snippet="mock-chart">Mock Chart</button>
+                            <button class="rail-snippet" data-snippet="timeline">Timeline</button>
+                            <button class="rail-snippet" data-snippet="cta-strip">CTA Strip</button>
+                            <button class="rail-snippet" data-snippet="hero-banner">Hero Banner</button>
+                            <button class="rail-snippet" data-snippet="testimonial">Testimonial</button>
+                            <button class="rail-snippet" data-snippet="faq-section">FAQ List</button>
+                            <button class="rail-snippet" data-snippet="steps-list">Steps List</button>
+                        </div>
+                    </div>
+                    <div class="rail-section">
+                        <h3 class="rail-subtitle">Quick Presets</h3>
+                        <ul class="rail-preset-list" id="railPresetList"></ul>
+                    </div>
+                </aside>
+
+                <div class="panel-card">
+                    <div class="panel-title">
+                        <span>Workspace</span>
+                        <button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.8rem;" onclick="document.querySelector('[data-tab=&quot;html&quot;]').click()">Export HTML</button>
+                    </div>
+                    
+                    <div class="toolbar" id="toolbar">
+                        <div class="toolbar-row">
+                            <select class="tool-select" id="fontNameSelect" title="Font Family" aria-label="Font Family">
+                                <option value="Arial">Arial</option>
+                                <option value="'Segoe UI', sans-serif">Segoe UI</option>
+                                <option value="'Times New Roman', serif">Times New</option>
+                                <option value="Georgia, serif">Georgia</option>
+                                <option value="'Courier New', monospace">Courier</option>
+                                <option value="Verdana, sans-serif">Verdana</option>
+                                <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                            </select>
+                            <select class="tool-select" id="fontSizeSelect" title="Font Size" aria-label="Font Size">
+                                <option value="1">Small</option>
+                                <option value="3" selected>Normal</option>
+                                <option value="5">Large</option>
+                                <option value="7">Huge</option>
+                            </select>
+                            <div class="toolbar-divider"></div>
+                            <input type="color" class="tool-color" id="textColorSelect" title="Text Color" value="#0f172a" aria-label="Text Color">
+                            <input type="color" class="tool-color" id="bgColorSelect" title="Highlight Color" value="#ffffff" aria-label="Highlight Color">
+                            <div class="toolbar-divider"></div>
+                            <button class="tool-btn" data-cmd="bold" title="Bold"><b>B</b></button>
+                            <button class="tool-btn" data-cmd="italic" title="Italic"><i>I</i></button>
+                            <button class="tool-btn" data-cmd="underline" title="Underline"><u>U</u></button>
+                            <button class="tool-btn" data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>
+                            <div class="toolbar-divider"></div>
+                            <button class="tool-btn" data-cmd="subscript" title="Subscript">x₂</button>
+                            <button class="tool-btn" data-cmd="superscript" title="Superscript">x²</button>
+                            <button class="tool-btn" data-cmd="removeFormat" title="Clear Formatting">Tx</button>
+                        </div>
+
+                        <div class="toolbar-row">
+                            <button class="tool-btn" data-cmd="justifyLeft" title="Align Left">⫷</button>
+                            <button class="tool-btn" data-cmd="justifyCenter" title="Align Center">≣</button>
+                            <button class="tool-btn" data-cmd="justifyRight" title="Align Right">⫸</button>
+                            <button class="tool-btn" data-cmd="justifyFull" title="Justify">≡</button>
+                            <div class="toolbar-divider"></div>
+                            <button class="tool-btn" data-cmd="outdent" title="Outdent">⇤</button>
+                            <button class="tool-btn" data-cmd="indent" title="Indent">⇥</button>
+                            <div class="toolbar-divider"></div>
+                            <button class="tool-btn" data-block="h1" title="Heading 1">H1</button>
+                            <button class="tool-btn" data-block="h2" title="Heading 2">H2</button>
+                            <button class="tool-btn" data-block="h3" title="Heading 3">H3</button>
+                            <button class="tool-btn" data-block="p" title="Paragraph">P</button>
+                            <button class="tool-btn" data-block="blockquote" title="Quote">❝</button>
+                            <button class="tool-btn" data-custom="inlineCode" title="Inline code">&lt;/&gt;</button>
+                            <div class="toolbar-divider"></div>
+                            <button class="tool-btn" data-cmd="insertUnorderedList" title="Bullet list">• List</button>
+                            <button class="tool-btn" data-cmd="insertOrderedList" title="Numbered list">1. List</button>
+                            <div class="toolbar-divider"></div>
+                            <button class="tool-btn" data-action="link" title="Add Link">🔗</button>
+                            <button class="tool-btn" data-action="image" title="Add Image">🖼️</button>
+                            <div class="toolbar-divider"></div>
+                            <button class="tool-btn" id="toggleSourceBtn" title="Toggle HTML Source" style="color: #6366f1; border-color: #6366f1;">&lt;HTML&gt;</button>
+                            <button class="tool-btn" id="toggleFullscreenBtn" title="Toggle Fullscreen" style="color: #10b981; border-color: #10b981;">⛶</button>
+                        </div>
+
+                        <div class="toolbar-row">
+                            <button class="tool-btn" data-snippet="box-info" title="Info box">Info Box</button>
+                            <button class="tool-btn" data-snippet="box-warn" title="Warning box">Warning</button>
+                            <button class="tool-btn" data-snippet="box-success" title="Success box">Success</button>
+                            <button class="tool-btn" data-snippet="box-callout" title="Callout panel">Callout</button>
+                            <div class="toolbar-divider"></div>
+                            <button class="tool-btn" data-snippet="badge" title="Inline badge">Badge</button>
+                            <button class="tool-btn" data-snippet="tag" title="Monospace tag">Tag</button>
+                            <button class="tool-btn" data-snippet="note" title="Highlighted note">Note</button>
+                            <div class="toolbar-divider"></div>
+                            <button class="tool-btn" data-snippet="table-standard" title="Table">Table</button>
+                            <button class="tool-btn" data-snippet="table-kpi" title="KPI Board">KPI Board</button>
+                        </div>
+
+                        <div class="toolbar-row" id="emojiRow">
+                            <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Emoji:</span>
+                            <button class="tool-btn emoji-btn" data-emoji="✅">✅</button>
+                            <button class="tool-btn emoji-btn" data-emoji="❌">❌</button>
+                            <button class="tool-btn emoji-btn" data-emoji="⚠️">⚠️</button>
+                            <button class="tool-btn emoji-btn" data-emoji="ℹ️">ℹ️</button>
+                            <button class="tool-btn emoji-btn" data-emoji="⭐">⭐</button>
+                            <button class="tool-btn emoji-btn" data-emoji="🔥">🔥</button>
+                            <button class="tool-btn emoji-btn" data-emoji="🚀">🚀</button>
+                            <button class="tool-btn emoji-btn" data-emoji="💡">💡</button>
+                            <button class="tool-btn emoji-btn" data-emoji="📌">📌</button>
+                            <button class="tool-btn emoji-btn" data-emoji="📊">📊</button>
+                            <button class="tool-btn emoji-btn" data-emoji="📈">📈</button>
+                            <button class="tool-btn emoji-btn" data-emoji="📉">📉</button>
+                            <button class="tool-btn emoji-btn" data-emoji="💼">💼</button>
+                            <button class="tool-btn emoji-btn" data-emoji="📅">📅</button>
+                            <button class="tool-btn emoji-btn" data-emoji="🔒">🔒</button>
+                            <div class="toolbar-divider" style="margin-left: auto;"></div>
+                            <button class="tool-btn" id="clearEditorBtn" title="Clear Editor" style="color: #ef4444; border-color: #ef4444;">🗑️ Clear</button>
+                        </div>
+                    </div>
+
+                    <div id="editor" class="editor-container" contenteditable="true">
+                        <h1>Welcome to Nebula HTML Forge</h1>
+                        <p>Start typing here, use the advanced formatting tools, or select a template from the left rail to begin.</p>
+                    </div>
+                    <div id="editorStatusBar" style="display: flex; justify-content: space-between; padding: 8px 16px; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-top: none; border-bottom-left-radius: var(--radius-md); border-bottom-right-radius: var(--radius-md); font-size: 0.8rem; color: var(--text-secondary);">
+                        <span id="wordCount">Words: 19</span>
+                        <span id="charCount">Characters: 111</span>
+                    </div>
+                </div>
+
+                <div class="panel-card">
+                    <h3 class="panel-title">Live Preview</h3>
+                    <div id="preview" class="preview-container"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="templatesTab" class="tab-panel">
+            <div class="workspace-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="panel-card">
+                    <h3 class="panel-title">15 Global Enterprise Presets</h3>
+                    <ul id="presetList" class="item-list" style="max-height: 600px; overflow-y: auto; padding-right: 12px;"></ul>
+                </div>
+                <div class="panel-card">
+                    <h3 class="panel-title">My Personal Custom Templates</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: -10px;">Saved securely to your Entra ID profile.</p>
+                    <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+                        <input type="text" id="templateNameInput" class="input" placeholder="e.g. Weekly Division Update" aria-label="Template Name" />
+                        <button id="saveTemplateBtn" class="btn btn-primary" style="white-space: nowrap;">Save Current HTML</button>
+                    </div>
+                    <ul id="customTemplateList" class="item-list"></ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="htmlTab" class="tab-panel">
+            <div class="panel-card" style="max-width: 1000px; margin: 0 auto;">
+                <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <span>Raw HTML Code</span>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button class="btn" id="applyHtmlBtn" style="border-color: var(--accent-primary); color: var(--accent-primary);">🔄 Sync to Editor</button>
+                        <button class="btn" id="downloadHtmlBtn">💾 Download .html</button>
+                        <button class="btn btn-primary" id="copyHtmlBtn">📋 Copy to Clipboard</button>
+                    </div>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0;">This output uses inline CSS logic to ensure layouts render perfectly in restrictive environments like SharePoint, email clients, and corporate CMSs. You can edit this directly and click <strong>Sync to Editor</strong> to update the visual view.</p>
+                <textarea id="htmlOutput" class="code-output" aria-label="Generated HTML Output"></textarea>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="floatingNotepad">
+        <div id="fnHeader">
+            <span>⚡ Command Palette (Autosaved)</span>
+            <button id="fnClose">&times;</button>
+        </div>
+        <textarea id="fnContent" aria-label="Command Palette Notepad" placeholder="Jot notes, paste regex, or type '- [ ] Task name' to push to tracker..."></textarea>
+        <div class="fn-toolbar">
+            <span id="fnStatus" style="font-size: 0.8rem; color: var(--text-secondary);">Ready</span>
+            <button id="fnPushBtn" class="fn-push-btn">Push To-Do to Tracker ➔</button>
+        </div>
+    </div>
+
+    
+
+    <footer class="global-footer">
+        <div style="margin-bottom: 8px;">💡 Press <strong>Alt + N</strong> anywhere to open the Global Command Palette.</div>
+        &copy; 2026 Kore | Enterprise Cloud Vault Connected.
+    </footer>
+
+    <script>
+        // --- Microsoft Entra ID Security Bridge & Cloud Sync ---
+        let cloudIdentity = { userId: "local-dev", userName: "Local Developer" };
+        let profileName = "User";
+        let localTasks = [];
+        let localTickets = [];
+
+        async function fetchSecureIdentity() {
+            try {
+                const response = await fetch('/.auth/me');
+                const data = await response.json();
+                if (data.clientPrincipal) {
+                    cloudIdentity.userId = data.clientPrincipal.userId;
+                    cloudIdentity.userName = data.clientPrincipal.userDetails;
+                    document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+                }
+            } catch (error) {
+                console.log("Auth bypass - Local execution.");
+            }
+
+            const profile = await loadCloudData('profile') || {};
+            profileName = profile.name || cloudIdentity.userName.split('@')[0] || "User";
+            
+            const welcomeMessages = [
+                `Hello ${profileName}.`,
+                `Welcome back, ${profileName}. I'm synced to your cloud data.`,
+                `Good to see you, ${profileName}. I can check your tasks or look up tickets for you.`
+            ];
+            const botWelcomeMsg = document.getElementById('botWelcomeMsg');
+            if (botWelcomeMsg) {
+                botWelcomeMsg.innerText = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+            }
+
+            localTasks = await loadCloudData('todos') || [];
+            try {
+                // Fixed Bad Request 400 issue by appending userId query parameter to API call
+                const res = await fetch(`/api/get_work_items?userId=${cloudIdentity.userId}`); 
+                if (res.ok) { localTickets = await res.json(); } 
+                else { localTickets = await loadCloudData('work_items') || []; }
+            } catch(e) { localTickets = await loadCloudData('work_items') || []; }
+        }
+
+        async function loadCloudData(dataType) {
+            try {
+                const res = await fetch(`/api/get_user_data?userId=${cloudIdentity.userId}&dataType=${dataType}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data) return data;
+                }
+            } catch(e) {}
+            return null;
+        }
+
+        async function saveCloudData(dataType, data) {
+            try {
+                await fetch('/api/save_user_data', {
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: cloudIdentity.userId, dataType: dataType, data: data })
+                });
+            } catch(e) {}
+        }
+
+        
+
+        function isDateToday(dateStr) {
+            if (!dateStr) return false;
+            const d = new Date(dateStr + 'T00:00:00');
+            return d.toDateString() === new Date().toDateString();
+        }
+        function isDatePast(dateStr) {
+            if (!dateStr) return false;
+            const d = new Date(dateStr + 'T00:00:00');
+            const today = new Date(); today.setHours(0,0,0,0);
+            return d < today;
+        }
+
+        function escapeHtml(str) { return String(str||'').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+        
+
+        const editorEl = document.getElementById("editor");
+        const previewEl = document.getElementById("preview");
+        const htmlOutputEl = document.getElementById("htmlOutput");
+        let customTemplates = [];
+        let autosaveTimeout = null;
+
+        // --- 15 Robust Enterprise Presets Restored Fully ---
+        const presets = [
+            {
+                id: "p1-meeting", name: "1. Team Meeting Notes", description: "Structured agenda, attendees, and action items.",
+                html: `<h1>📅 Team Sync: Weekly Alignment</h1><p><strong>Date:</strong> [Date] | <strong>Lead:</strong> [Name]</p><hr><h2>👥 Attendees</h2><ul><li>[Name] - Present</li><li>[Name] - Absent</li></ul><h2>📋 Agenda Topics</h2><ol><li><strong>Q3 Metrics Review:</strong> Discussed variance in regional sales.</li><li><strong>Project Alpha:</strong> Blocked by IT provisioning.</li></ol><h2>✅ Action Items</h2><ul><li>[ ] John: Follow up with networking team.</li><li>[ ] Sarah: Distribute revised deck by EOD.</li></ul>`
+            },
+            {
+                id: "p2-exec", name: "2. Executive Summary", description: "High-level overview for leadership.",
+                html: `<h1>Executive Summary: Initiative Beta</h1><div class="box box-callout"><strong>BLUF (Bottom Line Up Front):</strong> The initiative is 2 weeks ahead of schedule and under budget by 4%.</div><div class="layout-two-column"><div><h3>Key Achievements</h3><ul><li>Finalized vendor contracts.</li><li>Completed UAT phase.</li></ul></div><div><h3>Current Risks</h3><ul><li>Supply chain delays for Q4.</li></ul></div></div><h2>Financial Overview</h2><table class="kpi-table"><thead><tr><th>Metric</th><th>Target</th><th>Actual</th><th>Status</th></tr></thead><tbody><tr><td>Budget Spent</td><td>$50k</td><td>$48k</td><td>✅ Good</td></tr></tbody></table>`
+            },
+            {
+                id: "p3-incident", name: "3. Incident Report (SEV)", description: "Post-mortem and incident tracking.",
+                html: `<h1>🚨 Incident Report: System Outage</h1><p><span class="badge">SEV-1</span> <span class="tag">Status: RESOLVED</span></p><hr><h2>Incident Details</h2><p><strong>Start Time:</strong> 10:00 AM EST<br><strong>Duration:</strong> 45 minutes<br><strong>Impact:</strong> Core payment gateway offline for NA region.</p><h2>Root Cause Analysis</h2><div class="box box-warn">A misconfigured firewall rule blocked port 443 on the primary load balancer.</div><h2>Mitigation & Next Steps</h2><ul><li>Rolled back configuration to previous stable state.</li><li>Adding automated validation checks to CI/CD pipeline.</li></ul>`
+            },
+            {
+                id: "p4-newsletter", name: "4. Department Newsletter", description: "Visual update with image placeholders.",
+                html: `<h1>📰 The Monthly Pulse - Logistics Dept</h1><div style="background:#e2e8f0; height:150px; display:flex; align-items:center; justify-content:center; border-radius:8px; margin-bottom:20px; color:#475569;">[ Hero Image Placeholder ]</div><div class="layout-two-column"><div><h2>Message from the VP</h2><p>Team, what an incredible month. We processed over 10k units...</p></div><div><h2>Employee Spotlight</h2><div class="profile-card"><h3>Jane Doe</h3><p><em>Logistics Coordinator</em></p><p>Jane broke the record for fewest routing errors this month!</p></div></div></div><div class="box box-info"><strong>Upcoming Event:</strong> Townhall on Friday at 2PM.</div>`
+            },
+            {
+                id: "p5-launch", name: "5. Product Launch Communication", description: "Feature highlights and call to action.",
+                html: `<h1>🚀 Announcing: Kore Enterprise v2.0</h1><p>We are thrilled to announce the rollout of the new cloud infrastructure.</p><div class="spacer-md"></div><h2>What's New?</h2><div class="feature-grid"><div class="feature-card"><h3>Cloud Sync</h3><p>Data now saves directly to Azure Table Storage.</p></div><div class="feature-card"><h3>Entra ID</h3><p>Seamless Microsoft 365 single sign-on.</p></div><div class="feature-card"><h3>Global Hub</h3><p>Centralized documentation pushing.</p></div></div><div class="spacer-md"></div><div class="box box-success" style="text-align:center;"><strong>Ready to try it?</strong> <a href="#">Login to the new Dashboard</a></div>`
+            },
+            {
+                id: "p6-onboarding", name: "6. New Hire Onboarding", description: "Welcome checklist and key resources.",
+                html: `<h1>👋 Welcome to the Team!</h1><p>We are excited to have you on board. Please follow this guide for your first week.</p><h2>Day 1 Checklist</h2><ul><li>[ ] Log into Entra ID portal.</li><li>[ ] Set up your email signature.</li><li>[ ] Review the Employee Handbook.</li></ul><h2>Key Systems</h2><table><thead><tr><th>System</th><th>Purpose</th><th>Access Link</th></tr></thead><tbody><tr><td>Workday</td><td>HR & Payroll</td><td>[Link]</td></tr><tr><td>Kore Hub</td><td>Internal Tools</td><td>[Link]</td></tr></tbody></table>`
+            },
+            {
+                id: "p7-kpi", name: "7. KPI & Metric Dashboard", description: "Data dense tables and mock charts.",
+                html: `<h1>📊 Q2 Performance Metrics</h1><p>Data compiled as of End of Quarter.</p><div class="spacer-sm"></div><div class="layout-two-column"><div><table class="kpi-table"><thead><tr><th>Region</th><th>Revenue</th><th>Growth</th></tr></thead><tbody><tr><td>North America</td><td>$1.2M</td><td>+12%</td></tr><tr><td>EMEA</td><td>$800k</td><td>+5%</td></tr></tbody></table></div><div><h3>Target Attainment</h3><div class="mock-chart"><div class="bar" style="width: 85%; background: var(--success-color);">NA: 85%</div><div class="bar" style="width: 60%; background: #f59e0b;">EMEA: 60%</div></div></div></div>`
+            },
+            {
+                id: "p8-charter", name: "8. Project Charter", description: "Formal project initiation document.",
+                html: `<h1>📄 Project Charter: Database Migration</h1><hr><h2>1. Objective</h2><p>Migrate all legacy SQL databases to Azure Cloud to reduce latency.</p><h2>2. Scope</h2><ul><li><strong>In Scope:</strong> User tables, transaction logs.</li><li><strong>Out of Scope:</strong> Archival cold storage.</li></ul><h2>3. Timeline</h2><ul class="timeline-list"><li><strong>Phase 1:</strong> Architecture Review (Oct 1)</li><li><strong>Phase 2:</strong> Data Transfer (Nov 15)</li><li><strong>Phase 3:</strong> Cutover (Dec 1)</li></ul>`
+            },
+            {
+                id: "p9-handover", name: "9. Shift Handover Log", description: "Critical info for 24/7 operations.",
+                html: `<h1>🔄 Shift Handover Log</h1><p><strong>Shift:</strong> Night (22:00 - 06:00) | <strong>Operator:</strong> D. Smith</p><div class="box box-warn"><strong>Critical Alert:</strong> Server Rack B3 is reporting elevated temperatures. Facilities notified.</div><h2>Pending Tasks for Day Shift</h2><ol><li>Verify backup completion for Database 4.</li><li>Follow up on Ticket #8829 (VIP User Lockout).</li></ol><h2>Completed Tasks</h2><ul><li>Routine patching cycle finished.</li><li>System rebooted successfully at 03:00.</li></ul>`
+            },
+            {
+                id: "p10-proposal", name: "10. Client Proposal", description: "Objective, solution, and pricing.",
+                html: `<h1>💼 Solution Proposal for Acme Corp</h1><p>Prepared by: BradyPLUS Enterprise Solutions</p><div class="spacer-md"></div><h2>Our Understanding</h2><p>Acme Corp requires a streamlined distribution tracking system...</p><h2>The Solution</h2><p>We propose deploying the Kore module tailored for warehouse logistics.</p><h2>Pricing Estimate</h2><table class="pricing-table"><thead><tr><th>Service</th><th>Duration</th><th>Cost</th></tr></thead><tbody><tr><td>Implementation</td><td>One-time</td><td>$5,000</td></tr><tr><td>Licensing</td><td>Annual</td><td>$12,000</td></tr></tbody></table>`
+            },
+            {
+                id: "p11-training", name: "11. SOP / Training Guide", description: "Step-by-step instructions with code blocks.",
+                html: `<h1>📖 SOP: Resetting User Passwords</h1><p>Follow these exact steps when a user is locked out.</p><h2>Prerequisites</h2><ul><li>Active Directory Admin Access.</li><li>Identity Verification (PIN).</li></ul><h2>Procedure</h2><ol><li>Open the Admin Portal.</li><li>Search for the user's Employee ID.</li><li>Run the following script to flush tokens:</li></ol><div class="code-block">Reset-EntraUserToken -ObjectId $UserID<br>Set-EntraUserPassword -ForceChange $true</div>`
+            },
+            {
+                id: "p12-marketing", name: "12. Campaign Plan", description: "Marketing campaign overview.",
+                html: `<h1>🎯 Campaign: Summer Blowout</h1><h2>Overview</h2><p>Targeting B2B clients for end-of-summer surplus.</p><div class="layout-three-column"><div><h3>Channels</h3><ul><li>Email</li><li>LinkedIn</li></ul></div><div><h3>Budget</h3><p>$15,000</p></div><div><h3>Launch</h3><p>Aug 15th</p></div></div><h2>Creative Direction</h2><div class="box box-info">Use the new branding guidelines (Blue/Gold theme).</div>`
+            },
+            {
+                id: "p13-press", name: "13. Press Release", description: "Standard PR format.",
+                html: `<h1>FOR IMMEDIATE RELEASE</h1><p><strong>NEW YORK, NY – March 6, 2026</strong></p><h2>BradyPLUS Announces Revolutionary AI Integration</h2><p>Today, BradyPLUS unveiled Kore, a localized enterprise system...</p><p>"This completely changes how our workforce interacts with data," said the CEO.</p><div class="spacer-md"></div><hr><h3>About the Company</h3><p><span style="font-size:0.85rem; color:#475569;">BradyPLUS is a leading distributor of...</span></p>`
+            },
+            {
+                id: "p14-weekly", name: "14. Weekly Status Update", description: "Brief Friday update format.",
+                html: `<h1>📆 Weekly Status: Web Dev Team</h1><p><strong>Week Ending:</strong> March 6, 2026</p><div class="layout-two-column"><div><h2>✅ Accomplished</h2><ul><li>Deployed Azure Functions backend.</li><li>Migrated Work Tracker to Cloud.</li></ul></div><div><h2>⏭️ Next Week</h2><ul><li>Refactor CSS variables.</li><li>Conduct load testing.</li></ul></div></div><div class="box box-warn"><strong>Blockers:</strong> Still waiting on API keys from vendor for the Maps integration.</div>`
+            },
+            {
+                id: "p15-outage", name: "15. Planned Maintenance Notice", description: "Communication for system downtime.",
+                html: `<h1>⚠️ Notice: Planned System Maintenance</h1><p>Please be advised of an upcoming service window.</p><table class="kpi-table" style="max-width: 500px;"><thead><tr><th>System</th><th>Downtime Window</th></tr></thead><tbody><tr><td>Kore Work Tracker</td><td>Sat 2AM - 4AM EST</td></tr></tbody></table><div class="spacer-sm"></div><h2>What to expect</h2><ul><li>The system will be completely inaccessible.</li><li>Active sessions will be disconnected.</li></ul><p>If you require emergency access to data during this time, please contact the on-call engineer.</p>`
+            }
+        ];
+
+        // --- Core Builder & Inline CSS Engine ---
+        function normalizeHtml(html) { 
+            return (!html) ? "" : html.replace(/<script[\s\S]*?<\/script>/gi, ""); 
+        }
+
+        function buildInlineStyledHtml(html) {
+            if (!html) return "";
+            const wrapper = document.createElement("div");
+            wrapper.innerHTML = html;
+
+            function applyInline(selector, style) {
+                wrapper.querySelectorAll(selector).forEach((el) => {
+                    const existing = el.getAttribute("style") || "";
+                    const sep = existing && !existing.trim().endsWith(";") ? "; " : "";
+                    el.setAttribute("style", existing + sep + style);
+                });
+            }
+
+            // Typography & Formatting
+            applyInline("h1", "font-weight:700; font-size:1.8rem; margin:0 0 0.5rem; color:#0f172a; font-family:Arial, sans-serif;");
+            applyInline("h2", "font-weight:700; font-size:1.4rem; margin:1.2rem 0 0.5rem; color:#0f172a; border-bottom:1px solid #e2e8f0; padding-bottom:5px; font-family:Arial, sans-serif;");
+            applyInline("h3", "font-weight:600; font-size:1.15rem; margin:1rem 0 0.4rem; color:#0f172a; font-family:Arial, sans-serif;");
+            applyInline("p", "margin:0.5rem 0 0.75rem; line-height:1.6; color:#334155; font-family:Arial, sans-serif;");
+            applyInline("ul, ol", "margin:0.5rem 0 0.75rem 1.5rem; padding-left:0; color:#334155; font-family:Arial, sans-serif;");
+            applyInline("li", "margin-bottom:0.3rem;");
+            applyInline("blockquote", "margin:1rem 0; padding:10px 16px; border-left:4px solid #0ea5e9; background: rgba(14, 165, 233, 0.08); color:#334155; font-style:italic; font-family:Arial, sans-serif;");
+            applyInline("hr", "border:0; border-top:1px solid #e2e8f0; margin:1.5rem 0;");
+
+            // Code
+            applyInline("code", "font-family:Consolas, monospace; font-size:0.9em; background:#f1f5f9; color:#0f172a; padding:2px 6px; border-radius:4px; border:1px solid #cbd5e1;");
+            applyInline(".code-block", "margin:1rem 0; padding:12px; border-radius:8px; border:1px solid #cbd5e1; background:#f8fafc; font-family:Consolas, monospace; font-size:0.9rem; overflow-x:auto; color:#0f172a;");
+
+            // Boxes
+            applyInline(".box", "border-radius:8px; padding:12px 16px; margin:1rem 0; border:1px solid #e2e8f0; background-color:#f8fafc; color:#334155; font-family:Arial, sans-serif;");
+            applyInline(".box-info", "border-color:#0ea5e9; background-color: rgba(14, 165, 233, 0.08);");
+            applyInline(".box-warn", "border-color:#f59e0b; background-color:#fffbeb;");
+            applyInline(".box-success", "border-color:#10b981; background-color:#ecfdf5;");
+            applyInline(".box-callout", "border-color:#8b5cf6; background-color:#faf5ff;");
+
+            // Tags & Badges
+            applyInline(".badge", "display:inline-block; border-radius:999px; padding:2px 10px; font-size:0.75rem; font-weight:700; background:#e0f2fe; border:1px solid #bae6fd; color:#0369a1; text-transform:uppercase; font-family:Arial, sans-serif;");
+            applyInline(".tag", "display:inline-block; border-radius:6px; padding:2px 8px; font-size:0.75rem; background:#f1f5f9; border:1px solid #cbd5e1; color:#475569; font-family:Consolas, monospace;");
+            applyInline(".note", "display:inline-block; border-radius:6px; padding:4px 10px; margin:0.5rem 0; background:#fef3c7; border:1px solid #fde68a; color:#92400e; font-family:Arial, sans-serif; font-size:0.85rem; font-weight:600;");
+
+            // Spacers
+            applyInline(".spacer-sm", "height:10px;");
+            applyInline(".spacer-md", "height:20px;");
+
+            // Tables
+            applyInline("table", "width:100%; border-collapse:collapse; margin:1rem 0; font-size:0.9rem; font-family:Arial, sans-serif;");
+            applyInline("th, td", "border:1px solid #cbd5e1; padding:8px 12px; color:#334155;");
+            applyInline("th", "background:#f1f5f9; color:#0f172a; text-align:left; font-weight:700;");
+            applyInline(".kpi-table th", "background:#0ea5e9; color:#ffffff; border-color:#0284c7;");
+            applyInline(".kpi-table td:first-child", "font-weight:700; color:#0f172a; background:#f8fafc;");
+            applyInline(".pricing-table th", "background:#0f172a; color:#ffffff; border-color:#1e293b;");
+
+            // Grids & Advanced Layouts
+            applyInline(".layout-two-column", "display:table; width:100%; margin:1rem 0; table-layout: fixed;");
+            applyInline(".layout-two-column > div", "display:table-cell; width:50%; padding-right:16px; vertical-align:top;");
+            applyInline(".layout-three-column", "display:table; width:100%; margin:1rem 0; table-layout: fixed;");
+            applyInline(".layout-three-column > div", "display:table-cell; width:33.3%; padding-right:16px; vertical-align:top;");
+            
+            applyInline(".feature-grid", "display:table; width:100%; border-spacing:10px; border-collapse:separate; margin:1rem 0;");
+            applyInline(".feature-card", "display:table-cell; padding:16px; border:1px solid #e2e8f0; background:#f8fafc; border-radius:8px; vertical-align:top;");
+            
+            applyInline(".profile-card", "border:1px solid #e2e8f0; border-radius:8px; padding:16px; background: var(--bg-surface); text-align:center; box-shadow:0 1px 3px rgba(0,0,0,0.1); margin:1rem 0;");
+            applyInline(".mock-chart", "background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:16px; margin:1rem 0;");
+            applyInline(".mock-chart .bar", "height:24px; margin-bottom:8px; color:white; font-size:0.75rem; font-weight:bold; padding-left:8px; display:flex; align-items:center; border-radius:4px;");
+            applyInline(".timeline-list", "list-style:none; padding-left:16px; border-left:3px solid #0ea5e9; margin:1rem 0;");
+            applyInline(".timeline-list li", "position:relative; margin-bottom:12px;");
+            
+            return wrapper.innerHTML;
+        }
+
+        function updatePreviewAndHtml() {
+            const normalized = normalizeHtml(editorEl.innerHTML);
+            previewEl.innerHTML = buildInlineStyledHtml(normalized);
+            htmlOutputEl.value = buildInlineStyledHtml(normalized);
+            
+            // Update counts
+            const textContent = editorEl.innerText || editorEl.textContent;
+            const charCount = textContent.length;
+            const wordCount = textContent.trim().split(/\s+/).filter(w => w.length > 0).length;
+            document.getElementById('charCount').innerText = `Characters: ${charCount}`;
+            document.getElementById('wordCount').innerText = `Words: ${wordCount}`;
+            
+            if (autosaveTimeout) clearTimeout(autosaveTimeout);
+            autosaveTimeout = setTimeout(() => {
+                saveCloudData('nebula_state', { html: normalized });
+            }, 1000);
+        }
+
+        // --- Interaction Logic ---
+        function execCommand(cmd, value = null) {
+            editorEl.focus();
+            document.execCommand(cmd, false, value);
+            updatePreviewAndHtml();
+        }
+
+        function insertHtmlAtCursor(html) {
+            editorEl.focus();
+            document.execCommand("insertHTML", false, html);
+            updatePreviewAndHtml();
+        }
+
+        function insertSnippet(kind) {
+            const snippets = {
+                "box-info": '<div class="box box-info"><strong>Info:</strong> Replace this with your information.</div><p><br></p>',
+                "box-warn": '<div class="box box-warn"><strong>Warning:</strong> Replace this with your warning text.</div><p><br></p>',
+                "box-success": '<div class="box box-success"><strong>Success:</strong> Task completed.</div><p><br></p>',
+                "box-callout": '<div class="box box-callout"><strong>Callout:</strong> Highlight your key message here.</div><p><br></p>',
+                "badge": '<span class="badge">NEW</span>',
+                "tag": '<span class="tag">ID-1234</span>',
+                "note": '<span class="note">Note: Important tip here.</span>',
+                "table-standard": `<table><thead><tr><th>Col A</th><th>Col B</th></tr></thead><tbody><tr><td>Data 1</td><td>Data 2</td></tr></tbody></table><p><br></p>`,
+                "table-kpi": `<table class="kpi-table"><thead><tr><th>Metric</th><th>Target</th><th>Status</th></tr></thead><tbody><tr><td>Uptime</td><td>99%</td><td>✅ Good</td></tr></tbody></table><p><br></p>`,
+                "two-column": `<div class="layout-two-column"><div><h3>Col A</h3><p>Content</p></div><div><h3>Col B</h3><p>Content</p></div></div><p><br></p>`,
+                "three-column": `<div class="layout-three-column"><div><h3>Col 1</h3><p>Content</p></div><div><h3>Col 2</h3><p>Content</p></div><div><h3>Col 3</h3><p>Content</p></div></div><p><br></p>`,
+                "feature-grid": `<div class="feature-grid"><div class="feature-card"><h3>Item 1</h3><p>Detail</p></div><div class="feature-card"><h3>Item 2</h3><p>Detail</p></div></div><p><br></p>`,
+                "cta-strip": `<div class="box box-success" style="text-align:center;"><strong>Action Needed:</strong> <a href="#">Click Here</a></div><p><br></p>`,
+                "timeline": `<ul class="timeline-list"><li><strong>Step 1:</strong> Detail</li><li><strong>Step 2:</strong> Detail</li></ul><p><br></p>`,
+                "profile-card": `<div class="profile-card"><h3>Name</h3><p><em>Title</em></p><p>Bio or description here.</p></div><p><br></p>`,
+                "pricing-table": `<table class="pricing-table"><thead><tr><th>Tier</th><th>Price</th></tr></thead><tbody><tr><td>Standard</td><td>$100</td></tr></tbody></table><p><br></p>`,
+                "mock-chart": `<div class="mock-chart"><div class="bar" style="width: 80%; background: #0ea5e9;">Metric A: 80</div><div class="bar" style="width: 45%; background: #f59e0b;">Metric B: 45</div></div><p><br></p>`,
+                "hero-banner": `<div style="background:var(--accent-primary);color:white;padding:32px;text-align:center;border-radius:8px;margin-bottom:16px;"><h2>Hero Title</h2><p style="color:white;">Subtitle text here.</p></div><p><br></p>`,
+                "testimonial": `<blockquote style="border-left:4px solid #0ea5e9;padding:12px;background: rgba(14, 165, 233, 0.08);font-style:italic;margin:16px 0;">"This is a fantastic product!"<br><strong>- Customer Name</strong></blockquote><p><br></p>`,
+                "faq-section": `<h3>Frequently Asked Questions</h3><ul><li><strong>Q: Question 1?</strong><br>A: Answer 1.</li><li><strong>Q: Question 2?</strong><br>A: Answer 2.</li></ul><p><br></p>`,
+                "steps-list": `<ol style="margin-left:20px;"><li><strong>Step 1:</strong> First action</li><li><strong>Step 2:</strong> Second action</li><li><strong>Step 3:</strong> Final action</li></ol><p><br></p>`
+            };
+            if (snippets[kind]) insertHtmlAtCursor(snippets[kind]);
+        }
+
+        // --- Fixing the Snippet Left Rail Click Target ---
+        document.querySelectorAll('.rail-snippet').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const snippetType = e.target.dataset.snippet;
+                if (snippetType) insertSnippet(snippetType);
+            });
+        });
+
+        // --- Toolbar Handlers ---
+        document.getElementById('fontNameSelect').addEventListener('change', (e) => { execCommand('fontName', e.target.value); });
+        document.getElementById('fontSizeSelect').addEventListener('change', (e) => { execCommand('fontSize', e.target.value); });
+        document.getElementById('textColorSelect').addEventListener('input', (e) => { execCommand('foreColor', e.target.value); });
+        document.getElementById('bgColorSelect').addEventListener('input', (e) => { execCommand('hiliteColor', e.target.value); });
+
+        document.getElementById('toolbar').addEventListener('click', e => {
+            const btn = e.target.closest('.tool-btn');
+            if (!btn) return;
+            if (btn.dataset.cmd) execCommand(btn.dataset.cmd);
+            if (btn.dataset.block) { editorEl.focus(); document.execCommand("formatBlock", false, btn.dataset.block); updatePreviewAndHtml(); }
+            if (btn.dataset.custom === 'inlineCode') { document.execCommand("insertHTML", false, `<code>${window.getSelection().toString()}</code>`); updatePreviewAndHtml(); }
+            if (btn.dataset.snippet) insertSnippet(btn.dataset.snippet);
+            if (btn.dataset.emoji) insertHtmlAtCursor(btn.dataset.emoji);
+            
+            if (btn.dataset.action === 'link') {
+                const url = prompt("Enter full URL (including https://):");
+                if (url) execCommand("createLink", url);
+            }
+            if (btn.dataset.action === 'image') {
+                const url = prompt("Enter direct image URL:");
+                if (url) execCommand("insertImage", url);
+            }
+        });
+
+        // --- Tabs ---
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                e.target.classList.add('active');
+                document.getElementById(e.target.getAttribute('data-tab') + 'Tab').classList.add('active');
+                if(e.target.getAttribute('data-tab') === 'html') updatePreviewAndHtml();
+            });
+        });
+
+        editorEl.addEventListener('input', () => {
+            if (!isSourceMode) {
+                updatePreviewAndHtml();
+            } else {
+                // In source mode, just update counts based on textContent (which is the raw HTML)
+                const textContent = editorEl.innerText || editorEl.textContent;
+                const charCount = textContent.length;
+                const wordCount = textContent.trim().split(/\s+/).filter(w => w.length > 0).length;
+                document.getElementById('charCount').innerText = `Characters: ${charCount}`;
+                document.getElementById('wordCount').innerText = `Words: ${wordCount}`;
+            }
+        });
+
+        document.getElementById('copyHtmlBtn').addEventListener('click', (e) => {
+            htmlOutputEl.select(); document.execCommand('copy');
+            e.target.innerHTML = "✅ Copied!";
+            setTimeout(() => e.target.innerHTML = "📋 Copy to Clipboard", 2000);
+        });
+
+        document.getElementById('clearEditorBtn').addEventListener('click', async () => {
+            if (await uiConfirm("Are you sure you want to clear the editor?")) {
+                editorEl.innerHTML = "<p><br></p>";
+                updatePreviewAndHtml();
+            }
+        });
+
+        let isSourceMode = false;
+        document.getElementById('toggleSourceBtn').addEventListener('click', (e) => {
+            isSourceMode = !isSourceMode;
+            if (isSourceMode) {
+                editorEl.textContent = editorEl.innerHTML;
+                editorEl.style.fontFamily = "Consolas, monospace";
+                editorEl.style.whiteSpace = "pre-wrap";
+                e.target.style.backgroundColor = "#e0e7ff";
+            } else {
+                editorEl.innerHTML = editorEl.textContent;
+                editorEl.style.fontFamily = "var(--font-editor)";
+                editorEl.style.whiteSpace = "normal";
+                e.target.style.backgroundColor = "";
+                updatePreviewAndHtml();
+            }
+        });
+
+        let isFullscreen = false;
+        document.getElementById('toggleFullscreenBtn').addEventListener('click', (e) => {
+            isFullscreen = !isFullscreen;
+            const editorTab = document.getElementById('editorTab');
+            if (isFullscreen) {
+                editorTab.style.position = 'fixed';
+                editorTab.style.top = '0';
+                editorTab.style.left = '0';
+                editorTab.style.width = '100vw';
+                editorTab.style.height = '100vh';
+                editorTab.style.zIndex = '9999';
+                editorTab.style.background = 'var(--bg-app)';
+                editorTab.style.padding = '20px';
+                editorTab.style.overflow = 'auto';
+                e.target.innerHTML = "🗗";
+                e.target.title = "Exit Fullscreen";
+            } else {
+                editorTab.style.position = '';
+                editorTab.style.top = '';
+                editorTab.style.left = '';
+                editorTab.style.width = '';
+                editorTab.style.height = '';
+                editorTab.style.zIndex = '';
+                editorTab.style.background = '';
+                editorTab.style.padding = '';
+                editorTab.style.overflow = '';
+                e.target.innerHTML = "⛶";
+                e.target.title = "Toggle Fullscreen";
+            }
+        });
+
+        document.getElementById('applyHtmlBtn').addEventListener('click', (e) => {
+            editorEl.innerHTML = htmlOutputEl.value;
+            updatePreviewAndHtml();
+            e.target.innerHTML = "✅ Synced!";
+            setTimeout(() => e.target.innerHTML = "🔄 Sync to Editor", 2000);
+        });
+
+        document.getElementById('downloadHtmlBtn').addEventListener('click', () => {
+            const element = document.createElement('a');
+            const file = new Blob([htmlOutputEl.value], {type: 'text/html'});
+            element.href = URL.createObjectURL(file);
+            element.download = "layout_" + Date.now() + ".html";
+            document.body.appendChild(element); // Required for this to work in FireFox
+            element.click();
+            document.body.removeChild(element);
+        });
+
+        // --- Templates Logic (Partitioned by Identity) ---
+        function renderTemplates() {
+            // Render 15 Presets
+            const presetHtml = presets.map(p => `
+                <li class="item-row">
+                    <div><div class="item-row-title">${p.name}</div><div class="item-row-desc">${p.description}</div></div>
+                    <button class="btn btn-primary btn-sm" onclick="loadPreset('${p.id}')">Load</button>
+                </li>
+            `).join('');
+            document.getElementById('presetList').innerHTML = presetHtml;
+
+            const railHtml = presets.map(p => `<li class="rail-preset-item" onclick="loadPreset('${p.id}')">${p.name}</li>`).join('');
+            document.getElementById('railPresetList').innerHTML = railHtml;
+
+            // Render Personal Custom Templates
+            document.getElementById('customTemplateList').innerHTML = customTemplates.map((t, i) => `
+                <li class="item-row">
+                    <div><div class="item-row-title">${escapeHtml(t.name)}</div></div>
+                    <div class="item-row-actions">
+                        <button class="btn btn-primary" onclick="loadCustom(${i})">Load</button>
+                        <button class="btn" onclick="deleteCustom(${i})">Delete</button>
+                    </div>
+                </li>
+            `).join('') || '<p style="color: var(--text-secondary); font-size: 0.9rem;">No custom templates saved to your profile.</p>';
+        }
+
+        window.loadPreset = function(id) {
+            const p = presets.find(x => x.id === id);
+            if (p) { editorEl.innerHTML = p.html; updatePreviewAndHtml(); document.querySelector('[data-tab="editor"]').click(); }
+        }
+        window.loadCustom = function(idx) {
+            const t = customTemplates[idx];
+            if (t) { editorEl.innerHTML = t.html; updatePreviewAndHtml(); document.querySelector('[data-tab="editor"]').click(); }
+        }
+        window.deleteCustom = async function(idx) {
+            customTemplates.splice(idx, 1); 
+            renderTemplates();
+            await saveCloudData('nebula_templates', customTemplates);
+        }
+
+        document.getElementById('saveTemplateBtn').addEventListener('click', async () => {
+            const name = document.getElementById('templateNameInput').value.trim() || 'My Layout ' + Date.now();
+            customTemplates.push({ name, html: editorEl.innerHTML });
+            document.getElementById('templateNameInput').value = '';
+            document.getElementById('saveTemplateBtn').innerText = "Saving...";
+            await saveCloudData('nebula_templates', customTemplates);
+            document.getElementById('saveTemplateBtn').innerText = "Save HTML";
+            renderTemplates();
+        });
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchSecureIdentity(); 
+            
+            const savedState = await loadCloudData('nebula_state');
+            if (savedState && savedState.html) {
+                editorEl.innerHTML = savedState.html;
+            }
+            
+            const savedTemplates = await loadCloudData('nebula_templates');
+            if (savedTemplates && savedTemplates.length > 0) {
+                customTemplates = savedTemplates;
+            }
+            
+            renderTemplates();
+            updatePreviewAndHtml();
+        });
+        
+        // --- COMMAND PALETTE LOGIC ---
+        const fnModal = document.getElementById('floatingNotepad');
+        const fnContent = document.getElementById('fnContent');
+        const fnPushBtn = document.getElementById('fnPushBtn');
+        let isDragging = false, currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
+
+        document.addEventListener('keydown', (e) => {
+            if (e.altKey && e.key.toLowerCase() === 'n') {
+                e.preventDefault();
+                fnModal.style.display = fnModal.style.display === 'flex' ? 'none' : 'flex';
+                if (fnModal.style.display === 'flex') {
+                    fnContent.value = localStorage.getItem('kore_global_notepad') || '';
+                    fnContent.focus();
+                    checkNotepadFormatting();
+                }
+            }
+        });
+
+        document.getElementById('fnClose').addEventListener('click', () => { fnModal.style.display = 'none'; });
+
+        document.getElementById('fnHeader').addEventListener('mousedown', dragStart);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', dragEnd);
+
+        function dragStart(e) { initialX = e.clientX - xOffset; initialY = e.clientY - yOffset; isDragging = true; }
+        function drag(e) {
+            if (isDragging) {
+                e.preventDefault();
+                currentX = e.clientX - initialX; currentY = e.clientY - initialY;
+                xOffset = currentX; yOffset = currentY;
+                fnModal.style.transform = `translate(${currentX}px, ${currentY}px)`;
+            }
+        }
+        function dragEnd(e) { initialX = currentX; initialY = currentY; isDragging = false; }
+
+        let fnTimeout;
+        fnContent.addEventListener('input', () => {
+            localStorage.setItem('kore_global_notepad', fnContent.value);
+            document.getElementById('fnStatus').innerText = 'Saving...';
+            clearTimeout(fnTimeout);
+            fnTimeout = setTimeout(() => { document.getElementById('fnStatus').innerText = 'Saved locally.'; checkNotepadFormatting(); }, 800);
+        });
+
+        function checkNotepadFormatting() {
+            const val = fnContent.value;
+            if (val.startsWith('```')) { fnContent.classList.add('code-mode'); } else { fnContent.classList.remove('code-mode'); }
+            const hasTodo = /-\s?\[\s?\]\s?.+/i.test(val);
+            fnPushBtn.style.display = hasTodo ? 'block' : 'none';
+        }
+
+        fnPushBtn.addEventListener('click', async () => {
+            const lines = fnContent.value.split('\n');
+            let newTasks = []; let remainingLines = [];
+            lines.forEach((line, index) => {
+                const match = line.match(/-\s?\[\s?\]\s?(.+)/i);
+                if (match) { 
+                    newTasks.push({ id: 'todo_' + Date.now() + '_' + index, title: match[1].trim(), priority: "Medium", completed: false, dueDate: new Date().toISOString().split('T')[0] }); 
+                } else { remainingLines.push(line); }
+            });
+            if (newTasks.length > 0) {
+                let existingTodos = await loadCloudData('todos') || [];
+                existingTodos = existingTodos.concat(newTasks);
+                try {
+                    await fetch('/api/save_user_data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: cloudIdentity.userId, dataType: 'todos', data: existingTodos }) });
+                } catch(e) {}
+                fnContent.value = remainingLines.join('\n');
+                localStorage.setItem('kore_global_notepad', fnContent.value);
+                document.getElementById('fnStatus').innerText = `Pushed ${newTasks.length} tasks!`;
+                fnPushBtn.style.display = 'none';
+            }
+        });
+
+    </script>
+
+    <button id="backToTop" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</button>
+    <script>
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('backToTop');
+            if(window.scrollY > 300) btn.style.display = 'flex';
+            else btn.style.display = 'none';
+        });
+        
+        function toggleMobileNav() {
+            const nav = document.querySelector('.nav-menu');
+            if(nav) nav.classList.toggle('open');
+        }
+        
+        if('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(console.error);
+        }
+    </script>
+
+<script>
+        // --- Navigation Preferences Logic ---
+        function applyNavPreferences() {
+            try {
+                const hiddenNavs = JSON.parse(localStorage.getItem('kore_hidden_navs') || '[]');
+                if (hiddenNavs.length > 0) {
+                    const links = document.querySelectorAll('.dropdown-content a');
+                    links.forEach(link => {
+                        const href = link.getAttribute('href');
+                        if (hiddenNavs.includes(href)) {
+                            link.style.display = 'none';
+                        } else {
+                            link.style.display = 'block';
+                        }
+                    });
+                    
+                    // Hide empty dropdowns
+                    document.querySelectorAll('.nav-item').forEach(item => {
+                        const dropdown = item.querySelector('.dropdown-content');
+                        if (dropdown) {
+                            const visibleLinks = Array.from(dropdown.querySelectorAll('a')).filter(a => a.style.display !== 'none');
+                            if (visibleLinks.length === 0) {
+                                item.style.display = 'none';
+                            } else {
+                                item.style.display = 'flex';
+                            }
+                        }
+                    });
+                } else {
+                    document.querySelectorAll('.dropdown-content a').forEach(a => a.style.display = 'block');
+                }
+            } catch(e) {}
+        }
+        document.addEventListener('DOMContentLoaded', applyNavPreferences);
+</script>
+
+
+<!-- Mobile Nav Script (Injected) -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        if (item.querySelector('.dropdown-content')) {
+            item.addEventListener('click', (e) => {
+                if (window.innerWidth <= 1023) {
+                    if (e.target.tagName.toLowerCase() === 'a' && e.target.closest('.dropdown-content')) {
+                        return;
+                    }
+                    e.preventDefault();
+                    item.classList.toggle('open-mobile');
+                }
+            });
+        }
+    });
+});
+</script>
+</body>
+</html>

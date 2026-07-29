@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kore | Macro Library</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --accent-primary: #0ea5e9; --accent-hover: #0284c7;
+            --bg-app: #f8fafc; --bg-surface: #ffffff;
+            --text-main: #0f172a; --text-secondary: #475569;
+            --border-subtle: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.05);
+            --shadow-hover: 0 10px 15px -3px rgba(15, 23, 42, 0.08);
+            --radius-md: 12px; --radius-sm: 8px;
+            --success: #10b981; --danger: #ef4444;
+            --global-badge: #8b5cf6;
+        }
+
+        /* --- GLOBAL WORKSPACE THEMES --- */
+        body[data-theme="midnight"] {
+            --bg-app: #0f172a; --bg-surface: #1e293b; --text-main: #f8fafc; --text-secondary: #94a3b8;
+            --border-subtle: #334155; --accent-primary: #38bdf8; --accent-hover: #7dd3fc;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5); --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+        body[data-theme="cyberpunk"] {
+            --bg-app: #000000; --bg-surface: #121212; --text-main: #00ff41; --text-secondary: #ff00ff;
+            --border-subtle: #00ff41; --accent-primary: #ff00ff; --accent-hover: #ff00aa;
+            --radius-md: 0px; --radius-sm: 0px; --shadow-sm: 0 0 5px rgba(0, 255, 65, 0.2);
+            --shadow-md: 0 0 10px rgba(255, 0, 255, 0.2);
+        }
+        body[data-theme="corporate"] {
+            --bg-app: #e2e8f0; --bg-surface: #ffffff; --text-main: #1e293b; --text-secondary: #475569;
+            --border-subtle: #cbd5e1; --accent-primary: #1d4ed8; --accent-hover: #1e40af;
+            --radius-md: 4px; --radius-sm: 2px;
+        }
+        body[data-theme="earthy"] {
+            --bg-app: #fdf8f5; --bg-surface: #ffffff; --text-main: #3f3e3a; --text-secondary: #6b7280;
+            --border-subtle: #e5e5e5; --accent-primary: #5c7f67; --accent-hover: #4a6652;
+            --radius-md: 24px; --radius-sm: 16px;
+        }
+        body[data-theme="oceanic"] {
+            --bg-app: #e0f2fe; --bg-surface: #f0f9ff; --text-main: #0c4a6e; --text-secondary: #0369a1;
+            --border-subtle: #bae6fd; --accent-primary: #0284c7; --accent-hover: #0369a1;
+            --radius-md: 16px; --radius-sm: 12px;
+        }
+        /* THEME: Midnight Dark */
+        body[data-theme="midnight"] {
+            --bg-app: #0f172a; --bg-surface: #1e293b; --text-main: #f8fafc; --text-secondary: #94a3b8;
+            --border-subtle: #334155; --accent-primary: #38bdf8; --accent-hover: #7dd3fc;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5); --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+        /* THEME: Cyberpunk */
+        body[data-theme="cyberpunk"] {
+            --bg-app: #000000; --bg-surface: #121212; --text-main: #00ff41; --text-secondary: #ff00ff;
+            --border-subtle: #00ff41; --accent-primary: #ff00ff; --accent-hover: #ff00aa;
+            --radius-md: 0px; --radius-sm: 0px; --shadow-sm: 0 0 5px rgba(0, 255, 65, 0.2);
+            --shadow-md: 0 0 10px rgba(255, 0, 255, 0.2);
+        }
+        /* THEME: Corporate Classic */
+        body[data-theme="corporate"] {
+            --bg-app: #e2e8f0; --bg-surface: #ffffff; --text-main: #1e293b; --text-secondary: #475569;
+            --border-subtle: #cbd5e1; --accent-primary: #1d4ed8; --accent-hover: #1e40af;
+            --radius-md: 4px; --radius-sm: 2px;
+        }
+        /* THEME: Earthy Minimal */
+        body[data-theme="earthy"] {
+            --bg-app: #fdf8f5; --bg-surface: #ffffff; --text-main: #3f3e3a; --text-secondary: #6b7280;
+            --border-subtle: #e5e5e5; --accent-primary: #5c7f67; --accent-hover: #4a6652;
+            --radius-md: 24px; --radius-sm: 16px;
+        }
+        /* THEME: Oceanic */
+        body[data-theme="oceanic"] {
+            --bg-app: #e0f2fe; --bg-surface: #f0f9ff; --text-main: #0c4a6e; --text-secondary: #0369a1;
+            --border-subtle: #bae6fd; --accent-primary: #0284c7; --accent-hover: #0369a1;
+            --radius-md: 16px; --radius-sm: 12px;
+        }
+
+        body {
+            margin: 0; font-family: 'Inter', system-ui, sans-serif; background-color: var(--bg-app); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh;  transition: background-color 0.3s, color 0.3s; }
+
+        /* --- Global Header --- */
+        .global-header { background-color: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 64px; box-shadow: var(--shadow-sm); flex-shrink: 0; position: sticky; top: 0; z-index: 100;}
+        .header-left { display: flex; align-items: center; gap: 40px; height: 100%; }
+        .kore-logo { font-size: 1.5rem; font-weight: 800; color: var(--text-main); margin: 0; display: flex; gap: 8px; }
+        .kore-logo span { color: var(--accent-primary); }
+        .nav-menu { display: flex; gap: 8px; height: 100%; }
+        .nav-item { text-decoration: none; color: var(--text-secondary); padding: 0 16px; display: flex; align-items: center; height: 100%; font-weight: 500; font-size: 0.95rem; border-bottom: 3px solid transparent; cursor: pointer; position: relative; transition: all 0.2s ease;}
+        .nav-item:hover, .nav-item.active { color: var(--accent-primary); border-bottom-color: var(--accent-primary); background-color: rgba(14, 165, 233, 0.08); }
+        .dropdown-content { display: none; position: absolute; top: 64px; left: 0; background-color: var(--bg-surface); min-width: 200px; box-shadow: var(--shadow-md); border: 1px solid var(--border-subtle); border-radius: 0 0 var(--radius-sm) var(--radius-sm); overflow: hidden; z-index: 101; }
+        .nav-item:hover .dropdown-content { display: block; }
+        .dropdown-content a { white-space: nowrap; color: var(--text-secondary); padding: 14px 20px; text-decoration: none; display: block; border-bottom: 1px solid var(--bg-app); font-weight: 500; }
+        .dropdown-content a:hover { background-color: rgba(14, 165, 233, 0.08); color: var(--accent-primary); padding-left: 24px; transition: all 0.2s ease; }
+        .user-badge { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); background: var(--bg-app); padding: 6px 12px; border-radius: 99px; border: 1px solid var(--border-subtle); margin-left: auto; margin-right: 24px;}
+
+        /* --- Main Content --- */
+        .main-container { padding: 40px 32px; max-width: 1400px; margin: 0 auto; width: 100%; box-sizing: border-box; flex-grow: 1; }
+
+        .hero-banner { background: var(--bg-surface); border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm); height: 160px; position: relative; margin-bottom: 32px; display: flex; align-items: stretch; }
+        .hero-banner img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;}
+        .hero-overlay { position: relative; z-index: 2; width: 100%; background: linear-gradient(to right, rgba(15,23,42,0.95), rgba(15,23,42,0.6)); padding: 24px 30px; box-sizing: border-box; color: white; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; }
+        .hero-title { margin: 0; font-size: 1.8rem; font-weight: 700; }
+
+        .layout-grid { display: grid; grid-template-columns: 320px 1fr; gap: 32px; align-items: start; }
+
+        .btn { background-color: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-subtle); padding: 10px 18px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem; }
+        .btn:hover { background-color: var(--bg-app); border-color: var(--text-secondary); }
+        .btn-primary { background-color: var(--accent-primary); color: white; border: none; }
+        .btn-primary:hover { background-color: var(--accent-hover); box-shadow: var(--shadow-sm); }
+        
+        .input, .select, .textarea { padding: 12px 16px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); font-size: 0.95rem; outline: none; background: var(--bg-surface); color: var(--text-main); font-family: inherit; width: 100%; box-sizing: border-box; transition: all 0.2s;}
+        .input:focus, .select:focus, .textarea:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); }
+        .textarea { min-height: 150px; font-family: Consolas, monospace; font-size: 0.85rem; resize: vertical; background: #1e293b; color: #e2e8f0;}
+        .search-bar { background-color: var(--bg-app); border-radius: 99px; padding-left: 36px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%2394a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>'); background-repeat: no-repeat; background-position: 12px center; margin-bottom: 16px;}
+
+        /* --- Sidebar --- */
+        .sidebar { background: var(--bg-surface); border-radius: var(--radius-md); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm); padding: 20px; position: sticky; top: 88px; display: flex; flex-direction: column;}
+        .macro-nav-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; max-height: 60vh; overflow-y: auto;}
+        .macro-nav-item { padding: 14px 16px; border-radius: var(--radius-sm); cursor: pointer; border: 1px solid var(--border-subtle); transition: all 0.2s; display: flex; flex-direction: column; gap: 6px; background: var(--bg-surface); position: relative;}
+        .macro-nav-item:hover { border-color: var(--accent-primary); box-shadow: var(--shadow-sm); transform: translateY(-2px);}
+        .macro-nav-item.active { background: rgba(14, 165, 233, 0.08); border-color: var(--accent-primary); box-shadow: 0 0 0 1px var(--accent-primary); }
+        .macro-nav-title { font-weight: 700; color: var(--text-main); font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .macro-nav-meta { font-size: 0.75rem; color: var(--text-secondary); display: flex; gap: 8px; align-items: center;}
+        .tag-global { flex-shrink: 0; font-size: 0.65rem; background: var(--global-badge); color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; }
+
+        /* --- Content Area --- */
+        .content-area { display: flex; flex-direction: column; gap: 24px; min-height: 60vh; }
+        
+        .macro-card { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden; display: none; animation: fadeIn 0.3s ease;}
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .macro-header { padding: 24px 32px; border-bottom: 1px solid var(--border-subtle); background: var(--bg-app); display: flex; justify-content: space-between; align-items: flex-start;}
+        .macro-title { margin: 0; font-size: 1.6rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 12px; }
+        .macro-tag { font-size: 0.8rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: 4px 10px; border-radius: 99px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;}
+        .macro-desc { margin: 12px 0 0 0; font-size: 1.05rem; color: var(--text-secondary); line-height: 1.6; }
+        
+        .code-block-container { padding: 32px; border-bottom: 1px solid var(--border-subtle); position: relative; }
+        .code-block-container:last-child { border-bottom: none; }
+        .code-title { font-weight: 800; color: var(--text-main); margin: 0 0 16px 0; font-size: 1rem; display: flex; align-items: center; gap: 8px;}
+        .code-title::before { content: '</>'; color: var(--accent-primary); font-family: monospace; font-size: 1.2rem;}
+        
+        .macro-code-wrapper { position: relative; background: #0f172a; border-radius: var(--radius-sm); border: 1px solid #334155; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);}
+        .macro-code-header { background: #1e293b; padding: 10px 16px; border-bottom: 1px solid #334155; display: flex; align-items: center; justify-content: space-between;}
+        .mac-dots { display: flex; gap: 6px; }
+        .mac-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .mac-dot.red { background: #ef4444; } .mac-dot.yellow { background: #f59e0b; } .mac-dot.green { background: #10b981; }
+        .copy-btn { background: transparent; border: 1px solid #475569; color: #cbd5e1; padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 700; transition: all 0.2s; }
+        .copy-btn:hover { background: #334155; color: white; }
+        .copy-btn.copied { background: var(--success); border-color: var(--success); color: white;}
+        .macro-code { padding: 20px; color: #e2e8f0; font-family: Consolas, 'Courier New', monospace; font-size: 0.9rem; margin: 0; line-height: 1.6; white-space: pre-wrap; overflow-x: auto; tab-size: 4;}
+
+        /* --- Editor --- */
+        .editor-card { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 40px; box-shadow: var(--shadow-sm); display: none; animation: fadeIn 0.3s ease;}
+        .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+        .form-label { font-size: 0.95rem; font-weight: 700; color: var(--text-main); }
+        
+        .admin-box { border: 1px solid #c4b5fd; background: #f5f3ff; padding: 16px 20px; border-radius: var(--radius-sm); margin-bottom: 32px; display: flex; align-items: center; gap: 12px; box-shadow: inset 0 2px 4px rgba(139, 92, 246, 0.05); }
+        .admin-box label { font-weight: 700; color: #5b21b6; cursor: pointer; font-size: 0.95rem;}
+        
+        .code-editor-repeater { display: flex; flex-direction: column; gap: 24px; border-top: 2px dashed var(--border-subtle); padding-top: 32px; margin-top: 16px;}
+        .code-editor-block { background: var(--bg-app); border: 1px solid var(--border-subtle); padding: 24px; border-radius: var(--radius-md); position: relative; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);}
+        .remove-block-btn { position: absolute; top: 24px; right: 24px; color: var(--danger); background: #fee2e2; border: none; font-weight: 800; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s;}
+        .remove-block-btn:hover { background: var(--danger); color: white; transform: rotate(90deg);}
+
+        /* --- FLOATING COMMAND PALETTE NOTEPAD --- */
+        #floatingNotepad { position: fixed; top: 15%; left: 50%; transform: translateX(-50%); width: 600px; max-width: 90vw; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); z-index: 9999; display: none; flex-direction: column; overflow: hidden; }
+        #fnHeader { background: var(--bg-app); padding: 12px 20px; cursor: move; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); font-weight: 600; color: var(--text-main); user-select: none; }
+        #fnClose { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary); }
+        #fnContent { width: 100%; height: 300px; padding: 16px; border: none; outline: none; resize: none; font-family: 'Inter', system-ui, sans-serif; font-size: 0.95rem; line-height: 1.5; color: var(--text-main); background: var(--bg-surface); box-sizing: border-box; }
+        #fnContent.code-mode { font-family: monospace; background: #1e293b; color: #f8fafc; }
+        .fn-toolbar { display: flex; justify-content: space-between; padding: 10px 16px; background: var(--bg-app); border-top: 1px solid var(--border-subtle); align-items: center; }
+        .fn-push-btn { background: var(--success); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; display: none; }
+        .fn-push-btn:hover { background: #059669; }
+
+        .global-footer { background-color: var(--bg-surface); border-top: 1px solid var(--border-subtle); padding: 24px; text-align: center; color: var(--text-secondary); font-size: 0.9rem; flex-shrink: 0; font-weight: 500; margin-top: auto;}
+    
+        
+    
+    
+            pre, code { white-space: pre-wrap; word-break: break-word; overflow-x: auto; max-width: 100%; }
+    
+    </style>
+
+    <!-- SEO & Mobile Optimization -->
+    <meta name="description" content="Kore Enterprise Workspace - Advanced Cloud Management System">
+    <meta name="keywords" content="Kore, Workspace, Enterprise, Management, LOD">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' font-family='Arial' fill='%230ea5e9' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' font-family='Arial' fill='%230ea5e9' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+
+    <style>
+        /* Mobile Layout & Back-to-Top */
+        
+        
+        .mobile-toggle { display: none; }
+        
+        #backToTop {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s, background 0.3s;
+        }
+        #backToTop:hover { background: var(--accent-hover); }
+    </style>
+
+    <script>
+        window.uiConfirm = function(msg) {
+            return new Promise(resolve => {
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:99999;display:flex;align-items:center;justify-content:center;';
+                const box = document.createElement('div');
+                box.style.cssText = 'background:var(--bg-surface,#fff);padding:24px;border-radius:8px;max-width:400px;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,0.2);border:1px solid var(--border-subtle,#ccc);color:var(--text-main,#000);font-family:sans-serif;';
+                box.innerHTML = '<p style="margin-top:0;margin-bottom:24px;font-size:1.1rem;">' + msg + '</p>' +
+                                '<div style="display:flex;gap:12px;justify-content:center;">' +
+                                '<button id="uiConfirmCancel" style="padding:8px 16px;border:1px solid #ccc;background:transparent;cursor:pointer;border-radius:4px;color:var(--text-main,#000);">Cancel</button>' +
+                                '<button id="uiConfirmOk" style="padding:8px 16px;border:none;background:#ef4444;color:#fff;cursor:pointer;border-radius:4px;">Confirm</button>' +
+                                '</div>';
+                overlay.appendChild(box);
+                document.body.appendChild(overlay);
+                document.getElementById('uiConfirmCancel').onclick = () => { document.body.removeChild(overlay); resolve(false); };
+                document.getElementById('uiConfirmOk').onclick = () => { document.body.removeChild(overlay); resolve(true); };
+            });
+        };
+</script>
+
+<style>
+/* --- RESPONSIVE MOBILE & TABLET (Injected) --- */
+* { box-sizing: border-box; }
+img, video, iframe, canvas { max-width: 100%; height: auto; }
+body { overflow-x: hidden; width: 100%; }
+
+@media (max-width: 1023px) {
+    .hero-overlay .btn-primary { width: 100%; justify-content: center; }
+
+    .modal-content, .system-modal, .storage-tracker { max-width: 95vw !important; }
+
+    .global-header {
+        flex-direction: column;
+        height: auto;
+        padding: 10px 16px;
+        gap: 10px;
+    }
+    .header-left {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .search-container {
+        width: 100%;
+    }
+    .search-bar {
+        width: 100%;
+    }
+    .mobile-toggle {
+        display: flex !important;
+        align-items: center;
+        background: none;
+        border: none;
+        color: var(--text-main);
+        cursor: pointer;
+    }
+    .nav-menu {
+        display: none !important;
+        flex-direction: column;
+        width: 100%;
+        background: var(--bg-surface);
+        position: absolute;
+        top: 100%;
+        left: 0;
+        box-shadow: var(--shadow-md);
+        z-index: 200;
+        max-height: 70vh;
+        overflow-y: auto;
+        border-top: 1px solid var(--border-subtle);
+    }
+    .nav-menu.open {
+        display: flex !important;
+    }
+    .nav-item {
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--border-subtle);
+        width: 100%;
+        flex-wrap: wrap;
+        height: auto;
+    }
+    .nav-item:last-child {
+        border-bottom: none;
+    }
+    .dropdown-content {
+        position: static;
+        display: none;
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        width: 100%;
+        padding-left: 20px;
+        margin-top: 10px;
+    }
+    .nav-item.open-mobile .dropdown-content {
+        display: block !important;
+    }
+    /* Hide hover effects on mobile */
+    .nav-item:hover .dropdown-content, 
+    .nav-item:focus-within .dropdown-content,
+    .nav-item:active .dropdown-content {
+        display: none;
+    }
+    .nav-item.open-mobile:hover .dropdown-content,
+    .nav-item.open-mobile:focus-within .dropdown-content,
+    .nav-item.open-mobile:active .dropdown-content {
+        display: block !important;
+    }
+    
+    .dashboard-grid, .dashboard-layout, .apps-grid, .grid-container,
+    .layout-grid, .chart-grid, .library-controls, .add-task-panel,
+    .controls-grid, .content-grid, .layout-split, .form-grid,
+    .metrics-bar, .view-boxes, .grid-2, .workspace-grid,
+    .kpi-grid, .nav-pref-grid, .color-target-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .metrics-bar, .form-grid {
+        gap: 16px !important;
+    }
+    .main-container {
+        padding: 15px !important;
+    }
+    .hero-banner {
+        padding: 30px 15px !important;
+        height: auto !important;
+        min-height: 160px;
+    }
+    .hero-title {
+        font-size: 1.8rem !important;
+    }
+    
+    /* Make tables scrollable */
+    table, .table-container, .data-table-container {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    /* Ensure containers don't overflow */
+    .panel, .card, .widget, .card-body, .intel-panel, .info-panel {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    /* Layout fixes for sidebars */
+    .workspace-layout {
+        flex-direction: column !important;
+    }
+    .sidebar {
+        width: 100% !important;
+        max-height: none !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border-subtle);
+        position: static !important;
+    }
+}
+</style>
+
+</head>
+<body>
+    <script>
+        // Theme Initializer to prevent flash on load
+        const savedTheme = localStorage.getItem('kore_theme') || 'default';
+        if(savedTheme !== 'default') {
+            document.body.setAttribute('data-theme', savedTheme);
+        }
+    </script>
+
+    <header class="global-header">
+        <div class="header-left">
+            <h1 class="kore-logo">Kore<span>.</span></h1>
+        <button class="mobile-toggle" aria-label="Toggle Menu" onclick="toggleMobileNav()"><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 12h18M3 6h18M3 18h18"></path></svg></button>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">Dashboard</a>
+                <div class="nav-item active">Operations ▼
+                    <div class="dropdown-content">
+                        <a href="apps.html">Apps</a>
+                        <a href="file-converter.html">File to LOAD Converter</a>
+                        <a href="lod.html">LOD Validation Tool</a>
+                        <a href="macros.html">Macro Library</a>
+                        <a href="nebula.html">Nebula HTML Forge</a>
+                        <a href="passwords.html">Password Generator</a>
+                    <a href="business-tools.html">Business & Sec Tools</a>
+                        <a href="todo.html">Personal To-Do</a>
+                        <a href="product-html.html">Product HTML Converter</a>
+                        <a href="scanner.html">Vulnerability Scanner</a>
+                        <a href="work.html">Work Tracker</a>
+                    </div>
+                </div>
+                <div class="nav-item">Resources ▼
+                    <div class="dropdown-content">
+                        <a href="info-archive.html">Archive</a>
+                        <a href="reports.html">Data/Reports</a>
+                        <a href="docs.html">Document Library</a>
+                        <a href="info-hub.html">Info Hub</a>
+                    </div>
+                </div>
+                <a href="about.html" class="nav-item">About</a>
+                <a href="settings.html" class="nav-item">Settings</a>
+            </nav>
+        </div>
+        <div id="userIdentityBadge" class="user-badge">Authenticating...</div>
+    </header>
+
+    <main class="main-container">
+        
+        <section class="hero-banner">
+            <img src="images/NebulaBanner.jpg" alt="Macro Library Banner" onerror="this.onerror=null; this.src='https://picsum.photos/1200/300?grayscale&blur=2';">
+            <div class="hero-overlay">
+                <div>
+                    <h2 class="hero-title">Enterprise Macro Library</h2>
+                    <div style="font-size: 0.9rem; font-weight: 600; opacity: 0.9; margin-top: 4px;">Centralized repository for automation code, templates, and payloads.</div>
+                </div>
+                <button class="btn btn-primary" onclick="openEditor()">+ Create New Macro</button>
+            </div>
+        </section>
+
+        <div class="layout-grid">
+            <aside class="sidebar">
+                <input type="text" id="searchMacro" class="input search-bar" aria-label="Search macros" placeholder="Search macros..." oninput="renderNav()">
+                <h3 style="margin: 0 0 12px 0; font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 800;">Library Index</h3>
+                <ul class="macro-nav-list" id="macroNavList"></ul>
+            </aside>
+
+            <div class="content-area">
+                
+                <div id="viewPanel" class="macro-card" style="display:block;">
+                    <div class="macro-header">
+                        <div>
+                            <h3 class="macro-title" id="viewTitle">Select a Macro</h3>
+                            <p class="macro-desc" id="viewDesc">Choose a script from the sidebar to view its contents.</p>
+                        </div>
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <button class="btn" id="editMacroBtn" onclick="editCurrentMacro()" style="display:none;">Edit Script</button>
+                            <button class="btn" id="deleteMacroBtn" onclick="deleteCurrentMacro()" style="display:none; color: var(--danger); border-color: #fca5a5;">Delete</button>
+                        </div>
+                    </div>
+                    <div id="viewCodesContainer">
+                        <div style="padding: 60px 20px; text-align: center; color: var(--text-secondary);">
+                            <div style="font-size: 3rem; margin-bottom: 16px; opacity: 0.5;">💻</div>
+                            <h3 style="margin: 0;">No Macro Selected</h3>
+                            <p style="margin-top: 8px;">Select a script from the index to view its code.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="editorPanel" class="editor-card">
+                    <h2 style="margin: 0 0 32px 0; font-size: 1.6rem; font-weight: 800;" id="editorTitle">Create Macro</h2>
+                    <input type="hidden" id="editId">
+                    
+                    
+
+                    <div class="form-group">
+                        <label class="form-label" for="editTitle">Macro Title</label>
+                        <input type="text" id="editTitle" class="input" placeholder="e.g. LOD Data Cleanser">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="editCategory">Language / Category</label>
+                        <input type="text" id="editCategory" class="input" placeholder="e.g. Excel VBA, Python, HTML">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="editDesc">Description</label>
+                        <input type="text" id="editDesc" class="input" placeholder="Briefly explain what this macro automates...">
+                    </div>
+
+                    <div class="code-editor-repeater" id="codeRepeater"></div>
+                    
+                    <button class="btn" type="button" onclick="addCodeBlockForm()" style="margin-top: 16px; margin-bottom: 32px; width: 100%; border-style: dashed; border-width: 2px;">+ Add Code Block</button>
+
+                    <div class="admin-box" id="adminBox" style="display: none; margin-bottom: 24px;">
+                        <input type="checkbox" id="editGlobal" style="width: 20px; height: 20px; accent-color: var(--global-badge);">
+                        <label for="editGlobal">Admin Override: Push to Global Workspace</label>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 16px; border-top: 1px solid var(--border-subtle); padding-top: 24px;">
+                        <button class="btn" onclick="closeEditor()">Cancel</button>
+                        <button class="btn btn-primary" onclick="saveMacro()">Save to Cloud Vault</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <div id="floatingNotepad">
+        <div id="fnHeader">
+            <span>⚡ Command Palette (Autosaved)</span>
+            <button id="fnClose">&times;</button>
+        </div>
+        <textarea id="fnContent" aria-label="Command Palette Notepad" placeholder="Jot notes, paste regex, or type '- [ ] Task name' to push to tracker..."></textarea>
+        <div class="fn-toolbar">
+            <span id="fnStatus" style="font-size: 0.8rem; color: var(--text-secondary);">Ready</span>
+            <button id="fnPushBtn" class="fn-push-btn">Push To-Do to Tracker ➔</button>
+        </div>
+    </div>
+
+    
+
+    <footer class="global-footer">
+        <div style="margin-bottom: 8px;">💡 Press <strong>Alt + N</strong> anywhere to open the Global Command Palette.</div>
+        &copy; 2026 Kore | Enterprise Cloud Vault Connected.
+    </footer>
+
+    <script>
+        let cloudIdentity = { userId: "local-dev", userName: "Local Developer" };
+        let macrosData = [];
+        let currentMacroId = null;
+        let profileName = "User";
+
+        // Advanced string escaping to prevent HTML termination/breaking within inputs
+        function escapeHtml(str) { 
+            return String(str||'')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;'); 
+        }
+
+        async function fetchSecureIdentity() {
+            try {
+                const response = await fetch('/.auth/me');
+                const data = await response.json();
+                if (data.clientPrincipal) {
+                    cloudIdentity.userId = data.clientPrincipal.userId;
+                    cloudIdentity.userName = data.clientPrincipal.userDetails;
+                    document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+                    window.isAdminUser = data.clientPrincipal.userRoles && data.clientPrincipal.userRoles.includes('admin');
+                }
+            } catch (error) {}
+
+            try {
+                const adminData = await loadCloudData('admin_settings') || { admins: [] };
+                if (!adminData.admins) adminData.admins = [];
+                const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                if (!window.isAdminUser) {
+                    window.isAdminUser = isLocal || adminData.admins.length === 0 || adminData.admins.includes(cloudIdentity.userName);
+                }
+            } catch (e) {}
+
+            const profile = await loadCloudData('profile') || {};
+            profileName = profile.name || cloudIdentity.userName.split('@')[0] || "User";
+            
+            const botWelcomeMsg = document.getElementById('botWelcomeMsg');
+            if (botWelcomeMsg) {
+                botWelcomeMsg.innerText = `Welcome to the Enterprise Macro Library, ${profileName}. How can I assist with your scripts?`;
+            }
+        }
+
+        async function loadCloudData(dataType) {
+            try {
+                const res = await fetch(`/api/get_user_data?userId=${cloudIdentity.userId}&dataType=${dataType}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && (Object.keys(data).length > 0 || data.length > 0)) return data;
+                }
+            } catch(e) {}
+            return null;
+        }
+
+        const defaultStarters = [
+            {
+                id: 'm_1', title: 'LOD Cleanse & Text Format', category: 'Excel VBA', isGlobal: true,
+                description: 'Removes hyphens from ZIP codes and formats Column B and L as text to prevent leading zeros from dropping during CSV save.',
+                codes: [{ title: 'VBA Script', code: 'Sub CleanLODFile()\n    Dim ws As Worksheet\n    Set ws = ActiveSheet\n    \n    ws.Columns("L").NumberFormat = "@"\n    ws.Columns("L").Replace What:="-", Replacement:="", LookAt:=xlPart\n    ws.Columns("B").NumberFormat = "@"\n    \n    MsgBox "LOD Cleansing Complete", vbInformation\nEnd Sub' }]
+            },
+            {
+                id: 'm_2', title: 'Merge Multiple CSVs', category: 'Python', isGlobal: true,
+                description: 'Uses pandas to scan a folder and combine all CSV files into a single master sheet.',
+                codes: [{ title: 'Python Script', code: 'import pandas as pd\nimport glob\nimport os\n\npath = r"C:\\Data\\CSVs"\nall_files = glob.glob(os.path.join(path, "*.csv"))\n\ndf_from_each_file = (pd.read_csv(f) for f in all_files)\nconcatenated_df = pd.concat(df_from_each_file, ignore_index=True)\n\nconcatenated_df.to_csv("master_export.csv", index=False)\nprint("Merge complete.")' }]
+            },
+            {
+                id: 'm_3', title: 'Automated Keystroke Loop', category: 'iSeries VBS', isGlobal: true,
+                description: 'Standard send-keys loop for repetitive terminal entry. Ensure window focus before execution.',
+                codes: [{ title: 'VBScript', code: 'Set WshShell = WScript.CreateObject("WScript.Shell")\nWScript.Sleep 2000 \' Wait for focus\n\nFor i = 1 To 10\n    WshShell.SendKeys "1NAPR"\n    WshShell.SendKeys "{TAB}"\n    WshShell.SendKeys "O"\n    WshShell.SendKeys "{ENTER}"\n    WScript.Sleep 500\nNext\n\nMsgBox "Sequence execution finished."' }]
+            }
+        ];
+
+        async function loadMacros() {
+            let cloudMacros = [];
+            try {
+                const res = await fetch(`/api/get_macros?userId=${cloudIdentity.userId}`);
+                if (res.ok) { cloudMacros = await res.json(); } 
+                else { cloudMacros = await loadCloudData('macros') || []; }
+            } catch(e) {
+                cloudMacros = await loadCloudData('macros') || [];
+            }
+
+            if (!cloudMacros || cloudMacros.length === 0) {
+                macrosData = [...defaultStarters];
+                try {
+                    await fetch('/api/save_user_data', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId: cloudIdentity.userId, dataType: 'macros', data: macrosData })
+                    });
+                } catch(e) {}
+            } else {
+                macrosData = cloudMacros.filter(m => !m.deleted);
+            }
+            
+            renderNav();
+        }
+
+        function renderNav() {
+            const list = document.getElementById('macroNavList');
+            const searchQ = document.getElementById('searchMacro').value.toLowerCase();
+            list.innerHTML = '';
+            
+            let filtered = macrosData.filter(m => m.title.toLowerCase().includes(searchQ) || (m.category || '').toLowerCase().includes(searchQ));
+            
+            filtered.sort((a,b) => a.title.localeCompare(b.title)).forEach(m => {
+                const isGlobal = m.isGlobal ? '<span class="tag-global">GLOBAL</span>' : '';
+                const li = document.createElement('li');
+                li.className = 'macro-nav-item' + (currentMacroId === m.id ? ' active' : '');
+                
+                li.innerHTML = `
+                    <div class="macro-nav-title">${escapeHtml(m.title)}</div>
+                    <div class="macro-nav-meta">
+                        <span style="font-weight: 600;">${escapeHtml(m.category || 'Code')}</span>
+                    </div>
+                    ${isGlobal}
+                `;
+                li.onclick = () => viewMacro(m.id);
+                list.appendChild(li);
+            });
+        }
+
+        function viewMacro(id) {
+            currentMacroId = id;
+            renderNav();
+            document.getElementById('editorPanel').style.display = 'none';
+            const panel = document.getElementById('viewPanel');
+            panel.style.display = 'block';
+
+            const m = macrosData.find(x => x.id === id);
+            if (!m) return;
+
+            document.getElementById('viewTitle').innerHTML = `${escapeHtml(m.title)} <span class="macro-tag">${escapeHtml(m.category || 'Code')}</span>`;
+            document.getElementById('viewDesc').innerText = m.description || '';
+            document.getElementById('editMacroBtn').style.display = 'inline-flex';
+            document.getElementById('deleteMacroBtn').style.display = 'inline-flex';
+
+            const codesContainer = document.getElementById('viewCodesContainer');
+            codesContainer.innerHTML = '';
+            
+            if (m.codes && m.codes.length > 0) {
+                m.codes.forEach((c, idx) => {
+                    codesContainer.innerHTML += `
+                        <div class="code-block-container">
+                            <h4 class="code-title">${escapeHtml(c.title || 'Code Snippet')}</h4>
+                            <div class="macro-code-wrapper">
+                                <div class="macro-code-header">
+                                    <div class="mac-dots">
+                                        <div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div>
+                                    </div>
+                                    <button class="copy-btn" onclick="copyCodeText(this, 'code_${idx}')">Copy Code</button>
+                                </div>
+                                <pre class="macro-code" id="code_${idx}">${escapeHtml(c.code)}</pre>
+                            </div>
+                        </div>`;
+                });
+            }
+        }
+
+        function openEditor(id = null) {
+            document.getElementById('viewPanel').style.display = 'none';
+            document.getElementById('editorPanel').style.display = 'block';
+            document.getElementById('codeRepeater').innerHTML = '';
+            
+            const adminBox = document.getElementById('adminBox');
+            const globalCheck = document.getElementById('editGlobal');
+            if (window.isAdminUser) { adminBox.style.display = 'flex'; } else { adminBox.style.display = 'none'; }
+            
+            if (id) {
+                const m = macrosData.find(x => x.id === id);
+                document.getElementById('editorTitle').innerText = 'Edit Script';
+                document.getElementById('editId').value = m.id;
+                document.getElementById('editTitle').value = m.title;
+                document.getElementById('editCategory').value = m.category || '';
+                document.getElementById('editDesc').value = m.description || '';
+                if (window.isAdminUser) globalCheck.checked = m.isGlobal || false;
+                
+
+                if (m.codes) m.codes.forEach(c => addCodeBlockForm(c.title, c.code));
+            } else {
+                document.getElementById('editorTitle').innerText = 'Create New Macro';
+                document.getElementById('editId').value = 'macro_' + Date.now();
+                document.getElementById('editTitle').value = '';
+                document.getElementById('editCategory').value = '';
+                document.getElementById('editDesc').value = '';
+                if (window.isAdminUser) globalCheck.checked = false;
+                
+                addCodeBlockForm();
+            }
+        }
+
+        function addCodeBlockForm(title = '', code = '') {
+            const id = Date.now() + Math.random().toString().replace('.', '');
+            const html = `
+                <div class="code-editor-block" id="block_${id}">
+                    <button type="button" class="remove-block-btn" onclick="document.getElementById('block_${id}').remove()" title="Remove Block">X</button>
+                    <label class="form-label" style="margin-bottom: 8px; display: block;" for="title_${id}">Snippet Label</label>
+                    <input type="text" id="title_${id}" class="input code-part-title" placeholder="e.g. HTML Template, Variables, etc." value="${escapeHtml(title)}" style="margin-bottom:16px;">
+                    <label class="form-label" style="margin-bottom: 8px; display: block;" for="body_${id}">Code Payload</label>
+                    <textarea id="body_${id}" class="textarea code-part-body" placeholder="Paste your code here...">${escapeHtml(code)}</textarea>
+                </div>`;
+            document.getElementById('codeRepeater').insertAdjacentHTML('beforeend', html);
+        }
+
+        function closeEditor() {
+            document.getElementById('editorPanel').style.display = 'none';
+            if (currentMacroId) {
+                document.getElementById('viewPanel').style.display = 'block';
+                viewMacro(currentMacroId);
+            } else {
+                document.getElementById('viewPanel').style.display = 'block';
+                document.getElementById('viewCodesContainer').innerHTML = `
+                    <div style="padding: 60px 20px; text-align: center; color: var(--text-secondary);">
+                        <div style="font-size: 3rem; margin-bottom: 16px; opacity: 0.5;">💻</div>
+                        <h3 style="margin: 0;">No Macro Selected</h3>
+                        <p style="margin-top: 8px;">Select a script from the index to view its code.</p>
+                    </div>`;
+            }
+        }
+
+        function editCurrentMacro() { if(currentMacroId) openEditor(currentMacroId); }
+
+        async function saveMacro() {
+            const title = document.getElementById('editTitle').value.trim();
+            if (!title) return alert("Title is required.");
+
+            const blocks = Array.from(document.querySelectorAll('.code-editor-block')).map(el => {
+                return {
+                    title: el.querySelector('.code-part-title').value.trim(),
+                    code: el.querySelector('.code-part-body').value
+                };
+            });
+
+            const payload = {
+                id: document.getElementById('editId').value,
+                title: title,
+                category: document.getElementById('editCategory').value.trim(),
+                description: document.getElementById('editDesc').value.trim(),
+                isGlobal: (window.isAdminUser && document.getElementById('editGlobal').checked) ? true : false,
+                authorId: cloudIdentity.userId,
+                codes: blocks,
+                deleted: false
+            };
+
+            const idx = macrosData.findIndex(x => x.id === payload.id);
+            if (idx > -1) macrosData[idx] = payload; else macrosData.push(payload);
+            
+            localStorage.setItem('kore_macros', JSON.stringify(macrosData));
+            
+            try {
+                await fetch('/api/save_macro', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                await fetch('/api/save_user_data', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: cloudIdentity.userId, dataType: 'macros', data: macrosData })
+                });
+            } catch(e) {}
+
+            closeEditor();
+            currentMacroId = payload.id;
+            renderNav();
+            viewMacro(currentMacroId);
+        }
+
+        // --- ADMIN DELETION PROTOCOL ---
+        async function deleteCurrentMacro() {
+            const targetMacro = macrosData.find(x => x.id === currentMacroId);
+            if (!targetMacro) return;
+
+            if (targetMacro.isGlobal) {
+                if (!window.isAdminUser) { alert("Authorization Denied. Admin access required."); return; }
+                if (!(await uiConfirm("Delete this Global macro permanently?"))) return;
+            } else if (!(await uiConfirm("Delete this macro permanently?"))) {
+                return;
+            }
+            
+            targetMacro.deleted = true;
+            
+            try {
+                await fetch('/api/save_macro', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(targetMacro)
+                });
+                
+                macrosData = macrosData.filter(x => x.id !== currentMacroId);
+                await fetch('/api/save_user_data', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: cloudIdentity.userId, dataType: 'macros', data: macrosData })
+                });
+            } catch(e) {}
+            
+            currentMacroId = null;
+            document.getElementById('viewPanel').style.display = 'block';
+            document.getElementById('viewTitle').innerHTML = `Select a Macro`;
+            document.getElementById('viewDesc').innerText = `Choose a script from the sidebar to view its contents.`;
+            document.getElementById('editMacroBtn').style.display = 'none';
+            document.getElementById('deleteMacroBtn').style.display = 'none';
+            document.getElementById('viewCodesContainer').innerHTML = `
+                <div style="padding: 60px 20px; text-align: center; color: var(--text-secondary);">
+                    <div style="font-size: 3rem; margin-bottom: 16px; opacity: 0.5;">💻</div>
+                    <h3 style="margin: 0;">No Macro Selected</h3>
+                    <p style="margin-top: 8px;">Select a script from the index to view its code.</p>
+                </div>`;
+            renderNav();
+        }
+
+        function copyCodeText(btn, id) {
+            navigator.clipboard.writeText(document.getElementById(id).innerText).then(() => {
+                btn.innerText = "Copied!"; btn.classList.add('copied');
+                setTimeout(() => { btn.innerText = "Copy Code"; btn.classList.remove('copied'); }, 2000);
+            });
+        }
+
+        // --- COMMAND PALETTE LOGIC ---
+        const fnModal = document.getElementById('floatingNotepad');
+        const fnContent = document.getElementById('fnContent');
+        const fnPushBtn = document.getElementById('fnPushBtn');
+        let isDragging = false, currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
+
+        document.addEventListener('keydown', (e) => {
+            if (e.altKey && e.key.toLowerCase() === 'n') {
+                e.preventDefault();
+                fnModal.style.display = fnModal.style.display === 'flex' ? 'none' : 'flex';
+                if (fnModal.style.display === 'flex') {
+                    fnContent.value = localStorage.getItem('kore_global_notepad') || '';
+                    fnContent.focus();
+                    checkNotepadFormatting();
+                }
+            }
+        });
+
+        document.getElementById('fnClose').addEventListener('click', () => { fnModal.style.display = 'none'; });
+
+        document.getElementById('fnHeader').addEventListener('mousedown', dragStart);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', dragEnd);
+
+        function dragStart(e) { initialX = e.clientX - xOffset; initialY = e.clientY - yOffset; isDragging = true; }
+        function drag(e) {
+            if (isDragging) {
+                e.preventDefault();
+                currentX = e.clientX - initialX; currentY = e.clientY - initialY;
+                xOffset = currentX; yOffset = currentY;
+                fnModal.style.transform = `translate(${currentX}px, ${currentY}px)`;
+            }
+        }
+        function dragEnd(e) { initialX = currentX; initialY = currentY; isDragging = false; }
+
+        let fnTimeout;
+        fnContent.addEventListener('input', () => {
+            localStorage.setItem('kore_global_notepad', fnContent.value);
+            document.getElementById('fnStatus').innerText = 'Saving...';
+            clearTimeout(fnTimeout);
+            fnTimeout = setTimeout(() => { document.getElementById('fnStatus').innerText = 'Saved locally.'; checkNotepadFormatting(); }, 800);
+        });
+
+        function checkNotepadFormatting() {
+            const val = fnContent.value;
+            if (val.startsWith('```')) { fnContent.classList.add('code-mode'); } else { fnContent.classList.remove('code-mode'); }
+            const hasTodo = /-\s?\[\s?\]\s?.+/i.test(val);
+            fnPushBtn.style.display = hasTodo ? 'block' : 'none';
+        }
+
+        fnPushBtn.addEventListener('click', async () => {
+            const lines = fnContent.value.split('\n');
+            let newTasks = []; let remainingLines = [];
+            lines.forEach((line, index) => {
+                const match = line.match(/-\s?\[\s?\]\s?(.+)/i);
+                if (match) { 
+                    newTasks.push({ id: 'todo_' + Date.now() + '_' + index, title: match[1].trim(), priority: "Medium", completed: false, dueDate: new Date().toISOString().split('T')[0] }); 
+                } else { remainingLines.push(line); }
+            });
+            if (newTasks.length > 0) {
+                let existingTodos = await loadCloudData('todos') || [];
+                existingTodos = existingTodos.concat(newTasks);
+                try {
+                    await fetch('/api/save_user_data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: cloudIdentity.userId, dataType: 'todos', data: existingTodos }) });
+                } catch(e) {}
+                fnContent.value = remainingLines.join('\n');
+                localStorage.setItem('kore_global_notepad', fnContent.value);
+                document.getElementById('fnStatus').innerText = `Pushed ${newTasks.length} tasks!`;
+                fnPushBtn.style.display = 'none';
+            }
+        });
+
+        
+
+        
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchSecureIdentity();
+            
+            loadMacros();
+        });
+    </script>
+
+    <button id="backToTop" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</button>
+    <script>
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('backToTop');
+            if(window.scrollY > 300) btn.style.display = 'flex';
+            else btn.style.display = 'none';
+        });
+        
+        function toggleMobileNav() {
+            const nav = document.querySelector('.nav-menu');
+            if(nav) nav.classList.toggle('open');
+        }
+        
+        if('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(console.error);
+        }
+    </script>
+
+<script>
+        // --- Navigation Preferences Logic ---
+        function applyNavPreferences() {
+            try {
+                const hiddenNavs = JSON.parse(localStorage.getItem('kore_hidden_navs') || '[]');
+                if (hiddenNavs.length > 0) {
+                    const links = document.querySelectorAll('.dropdown-content a');
+                    links.forEach(link => {
+                        const href = link.getAttribute('href');
+                        if (hiddenNavs.includes(href)) {
+                            link.style.display = 'none';
+                        } else {
+                            link.style.display = 'block';
+                        }
+                    });
+                    
+                    // Hide empty dropdowns
+                    document.querySelectorAll('.nav-item').forEach(item => {
+                        const dropdown = item.querySelector('.dropdown-content');
+                        if (dropdown) {
+                            const visibleLinks = Array.from(dropdown.querySelectorAll('a')).filter(a => a.style.display !== 'none');
+                            if (visibleLinks.length === 0) {
+                                item.style.display = 'none';
+                            } else {
+                                item.style.display = 'flex';
+                            }
+                        }
+                    });
+                } else {
+                    document.querySelectorAll('.dropdown-content a').forEach(a => a.style.display = 'block');
+                }
+            } catch(e) {}
+        }
+        document.addEventListener('DOMContentLoaded', applyNavPreferences);
+</script>
+
+
+<!-- Mobile Nav Script (Injected) -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        if (item.querySelector('.dropdown-content')) {
+            item.addEventListener('click', (e) => {
+                if (window.innerWidth <= 1023) {
+                    if (e.target.tagName.toLowerCase() === 'a' && e.target.closest('.dropdown-content')) {
+                        return;
+                    }
+                    e.preventDefault();
+                    item.classList.toggle('open-mobile');
+                }
+            });
+        }
+    });
+});
+</script>
+</body>
+</html>

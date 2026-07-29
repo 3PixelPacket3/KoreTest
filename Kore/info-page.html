@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kore | Info Hub Viewer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Premium Light Theme Variables */
+        :root {
+            --accent-primary: #0ea5e9;
+            --accent-hover: #0284c7;
+            --bg-app: #f8fafc;
+            --bg-surface: #ffffff;
+            --text-main: #0f172a;
+            --text-secondary: #475569;
+            --border-subtle: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.05);
+            --radius-md: 12px;
+            --radius-sm: 8px;
+        }
+        /* THEME: Midnight Dark */
+        body[data-theme="midnight"] {
+            --bg-app: #0f172a; --bg-surface: #1e293b; --text-main: #f8fafc; --text-secondary: #94a3b8;
+            --border-subtle: #334155; --accent-primary: #38bdf8; --accent-hover: #7dd3fc;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5); --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+        /* THEME: Cyberpunk */
+        body[data-theme="cyberpunk"] {
+            --bg-app: #000000; --bg-surface: #121212; --text-main: #00ff41; --text-secondary: #ff00ff;
+            --border-subtle: #00ff41; --accent-primary: #ff00ff; --accent-hover: #ff00aa;
+            --radius-md: 0px; --radius-sm: 0px; --shadow-sm: 0 0 5px rgba(0, 255, 65, 0.2);
+            --shadow-md: 0 0 10px rgba(255, 0, 255, 0.2);
+        }
+        /* THEME: Corporate Classic */
+        body[data-theme="corporate"] {
+            --bg-app: #e2e8f0; --bg-surface: #ffffff; --text-main: #1e293b; --text-secondary: #475569;
+            --border-subtle: #cbd5e1; --accent-primary: #1d4ed8; --accent-hover: #1e40af;
+            --radius-md: 4px; --radius-sm: 2px;
+        }
+        /* THEME: Earthy Minimal */
+        body[data-theme="earthy"] {
+            --bg-app: #fdf8f5; --bg-surface: #ffffff; --text-main: #3f3e3a; --text-secondary: #6b7280;
+            --border-subtle: #e5e5e5; --accent-primary: #5c7f67; --accent-hover: #4a6652;
+            --radius-md: 24px; --radius-sm: 16px;
+        }
+        /* THEME: Oceanic */
+        body[data-theme="oceanic"] {
+            --bg-app: #e0f2fe; --bg-surface: #f0f9ff; --text-main: #0c4a6e; --text-secondary: #0369a1;
+            --border-subtle: #bae6fd; --accent-primary: #0284c7; --accent-hover: #0369a1;
+            --radius-md: 16px; --radius-sm: 12px;
+        }
+
+        body {
+            margin: 0; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg-app); color: var(--text-main);
+            display: flex; flex-direction: column; min-height: 100vh; 
+        }
+
+        /* --- Global Header --- */
+        .global-header { background-color: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 64px; box-shadow: var(--shadow-sm); flex-shrink: 0; position: sticky; top: 0; z-index: 100;}
+        .header-left { display: flex; align-items: center; gap: 40px; height: 100%; }
+        .kore-logo { font-size: 1.5rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px; margin: 0; display: flex; align-items: center; gap: 8px; }
+        .kore-logo span { color: var(--accent-primary); }
+        .nav-menu { display: flex; gap: 8px; height: 100%; }
+        .nav-item { text-decoration: none; color: var(--text-secondary); padding: 0 16px; display: flex; align-items: center; height: 100%; font-weight: 500; font-size: 0.95rem; border-bottom: 3px solid transparent; cursor: pointer; position: relative; transition: all 0.2s ease; }
+        .nav-item:hover, .nav-item.active { color: var(--accent-primary); border-bottom-color: var(--accent-primary); background-color: rgba(14, 165, 233, 0.08); }
+        .dropdown-content { display: none; position: absolute; top: 64px; left: 0; background-color: var(--bg-surface); min-width: 200px; box-shadow: var(--shadow-md); border: 1px solid var(--border-subtle); border-radius: 0 0 var(--radius-sm) var(--radius-sm); overflow: hidden; z-index: 101; }
+        .nav-item:hover .dropdown-content { display: block; }
+        .dropdown-content a { white-space: nowrap; color: var(--text-secondary); padding: 14px 20px; text-decoration: none; display: block; border-bottom: 1px solid var(--bg-app); font-weight: 500; }
+        .dropdown-content a:hover { background-color: rgba(14, 165, 233, 0.08); color: var(--accent-primary); padding-left: 24px; transition: all 0.2s ease; }
+        .user-badge { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); background: var(--bg-app); padding: 6px 12px; border-radius: 99px; border: 1px solid var(--border-subtle); margin-left: auto; margin-right: 24px;}
+
+        /* --- Main Layout --- */
+        .main-container { padding: 40px 32px; max-width: 1400px; margin: 0 auto; width: 100%; box-sizing: border-box; flex-grow: 1; }
+        
+        .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 24px; }
+        .page-title { margin: 0 0 12px 0; font-size: 2.2rem; font-weight: 800; color: var(--text-main); }
+        .page-summary { margin: 0; font-size: 1.1rem; color: var(--text-secondary); line-height: 1.5; max-width: 800px; }
+        
+        .action-btns { display: flex; gap: 12px; }
+        .btn { background-color: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-subtle); padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.9rem; text-decoration: none; }
+        .btn:hover { background-color: var(--bg-app); border-color: var(--text-secondary); }
+        .btn-primary { background-color: var(--accent-primary); color: white; border: none; }
+        .btn-primary:hover { background-color: var(--accent-hover); box-shadow: var(--shadow-sm); border: none; }
+        .btn-danger { color: #ef4444; border-color: #fca5a5; background: #fef2f2; }
+        .btn-danger:hover { background: #fee2e2; border-color: #ef4444; }
+
+        /* --- Content Grid --- */
+        .content-grid { display: grid; grid-template-columns: 1fr 340px; gap: 32px; align-items: start; }
+        
+        .content-card { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 40px; box-shadow: var(--shadow-sm); font-size: 1rem; line-height: 1.6; color: var(--text-main); overflow-x: auto; }
+        .content-card h1, .content-card h2, .content-card h3 { color: var(--text-main); margin-top: 1.5em; margin-bottom: 0.5em; }
+        .content-card h1:first-child, .content-card h2:first-child, .content-card h3:first-child { margin-top: 0; }
+        .content-card a { color: var(--accent-primary); text-decoration: none; font-weight: 500; }
+        .content-card a:hover { text-decoration: underline; }
+        .content-card img { max-width: 100%; height: auto; border-radius: var(--radius-sm); margin: 1em 0; }
+        .content-card blockquote { border-left: 4px solid var(--accent-primary); background: rgba(14, 165, 233, 0.08); padding: 12px 20px; margin: 1em 0; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+        .content-card code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.9em; }
+
+        /* --- Sidebar --- */
+        .sidebar { display: flex; flex-direction: column; gap: 24px; }
+        .side-card { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 24px; box-shadow: var(--shadow-sm); }
+        .side-title { margin: 0 0 16px 0; font-size: 1.05rem; color: var(--text-main); font-weight: 700; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px; }
+        
+        .meta-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 16px; }
+        .meta-list li { display: flex; flex-direction: column; gap: 6px; }
+        .meta-label { font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .meta-value { font-weight: 500; color: var(--text-main); font-size: 0.95rem; }
+        
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 99px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; width: fit-content; }
+        .status-published { background: #ecfdf5; color: #10b981; border: 1px solid #a7f3d0; }
+        .status-draft { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+
+        .tags-container { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tag { background: rgba(14, 165, 233, 0.08); color: var(--accent-primary); border: 1px solid #bae6fd; padding: 4px 12px; border-radius: 99px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; }
+        .tag-global { background: #fef2f2; color: #ef4444; border-color: #fca5a5; }
+
+        .attachment-item { background: var(--bg-app); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 12px; }
+        .attachment-item img { width: 100%; border-radius: var(--radius-sm); display: block; border: 1px solid var(--border-subtle); }
+        .attachment-caption { font-size: 0.85rem; color: var(--text-secondary); text-align: center; margin-top: 10px; font-weight: 500; }
+        
+        .link-item { display: block; background: rgba(14, 165, 233, 0.08); color: var(--accent-primary); padding: 12px 16px; border-radius: var(--radius-sm); text-decoration: none; font-weight: 600; border: 1px solid #bae6fd; margin-bottom: 8px; transition: background 0.2s; }
+        .link-item:hover { background: #e0f2fe; }
+
+        #errorContainer { display: none; text-align: center; padding: 80px 20px; background: var(--bg-surface); border: 1px dashed var(--border-subtle); border-radius: var(--radius-md); }
+
+        /* --- Global Footer --- */
+        .global-footer { background-color: var(--bg-surface); border-top: 1px solid var(--border-subtle); padding: 24px; text-align: center; color: var(--text-secondary); font-size: 0.9rem; flex-shrink: 0; font-weight: 500; margin-top: auto; }
+    
+        
+    
+    
+            pre, code { white-space: pre-wrap; word-break: break-word; overflow-x: auto; max-width: 100%; }
+    
+    </style>
+
+    <!-- SEO & Mobile Optimization -->
+    <meta name="description" content="Kore Enterprise Workspace - Advanced Cloud Management System">
+    <meta name="keywords" content="Kore, Workspace, Enterprise, Management, LOD">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' font-family='Arial' fill='%230ea5e9' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' font-family='Arial' fill='%230ea5e9' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+
+    <style>
+        /* Mobile Layout & Back-to-Top */
+        
+        
+        .mobile-toggle { display: none; }
+        
+        #backToTop {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s, background 0.3s;
+        }
+        #backToTop:hover { background: var(--accent-hover); }
+    </style>
+
+    <script>
+        window.uiConfirm = function(msg) {
+            return new Promise(resolve => {
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:99999;display:flex;align-items:center;justify-content:center;';
+                const box = document.createElement('div');
+                box.style.cssText = 'background:var(--bg-surface,#fff);padding:24px;border-radius:8px;max-width:400px;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,0.2);border:1px solid var(--border-subtle,#ccc);color:var(--text-main,#000);font-family:sans-serif;';
+                box.innerHTML = '<p style="margin-top:0;margin-bottom:24px;font-size:1.1rem;">' + msg + '</p>' +
+                                '<div style="display:flex;gap:12px;justify-content:center;">' +
+                                '<button id="uiConfirmCancel" style="padding:8px 16px;border:1px solid #ccc;background:transparent;cursor:pointer;border-radius:4px;color:var(--text-main,#000);">Cancel</button>' +
+                                '<button id="uiConfirmOk" style="padding:8px 16px;border:none;background:#ef4444;color:#fff;cursor:pointer;border-radius:4px;">Confirm</button>' +
+                                '</div>';
+                overlay.appendChild(box);
+                document.body.appendChild(overlay);
+                document.getElementById('uiConfirmCancel').onclick = () => { document.body.removeChild(overlay); resolve(false); };
+                document.getElementById('uiConfirmOk').onclick = () => { document.body.removeChild(overlay); resolve(true); };
+            });
+        };
+</script>
+
+<style>
+/* --- RESPONSIVE MOBILE & TABLET (Injected) --- */
+* { box-sizing: border-box; }
+img, video, iframe, canvas { max-width: 100%; height: auto; }
+body { overflow-x: hidden; width: 100%; }
+
+@media (max-width: 1023px) {
+    .modal-content, .system-modal, .storage-tracker { max-width: 95vw !important; }
+
+    .global-header {
+        flex-direction: column;
+        height: auto;
+        padding: 10px 16px;
+        gap: 10px;
+    }
+    .header-left {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .search-container {
+        width: 100%;
+    }
+    .search-bar {
+        width: 100%;
+    }
+    .mobile-toggle {
+        display: flex !important;
+        align-items: center;
+        background: none;
+        border: none;
+        color: var(--text-main);
+        cursor: pointer;
+    }
+    .nav-menu {
+        display: none !important;
+        flex-direction: column;
+        width: 100%;
+        background: var(--bg-surface);
+        position: absolute;
+        top: 100%;
+        left: 0;
+        box-shadow: var(--shadow-md);
+        z-index: 200;
+        max-height: 70vh;
+        overflow-y: auto;
+        border-top: 1px solid var(--border-subtle);
+    }
+    .nav-menu.open {
+        display: flex !important;
+    }
+    .nav-item {
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--border-subtle);
+        width: 100%;
+        flex-wrap: wrap;
+        height: auto;
+    }
+    .nav-item:last-child {
+        border-bottom: none;
+    }
+    .dropdown-content {
+        position: static;
+        display: none;
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        width: 100%;
+        padding-left: 20px;
+        margin-top: 10px;
+    }
+    .nav-item.open-mobile .dropdown-content {
+        display: block !important;
+    }
+    /* Hide hover effects on mobile */
+    .nav-item:hover .dropdown-content, 
+    .nav-item:focus-within .dropdown-content,
+    .nav-item:active .dropdown-content {
+        display: none;
+    }
+    .nav-item.open-mobile:hover .dropdown-content,
+    .nav-item.open-mobile:focus-within .dropdown-content,
+    .nav-item.open-mobile:active .dropdown-content {
+        display: block !important;
+    }
+    
+    .dashboard-grid, .dashboard-layout, .apps-grid, .grid-container,
+    .layout-grid, .chart-grid, .library-controls, .add-task-panel,
+    .controls-grid, .content-grid, .layout-split, .form-grid,
+    .metrics-bar, .view-boxes, .grid-2, .workspace-grid,
+    .kpi-grid, .nav-pref-grid, .color-target-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .metrics-bar, .form-grid {
+        gap: 16px !important;
+    }
+    .main-container {
+        padding: 15px !important;
+    }
+    .hero-banner {
+        padding: 30px 15px !important;
+        height: auto !important;
+        min-height: 160px;
+    }
+    .hero-title {
+        font-size: 1.8rem !important;
+    }
+    
+    /* Make tables scrollable */
+    table, .table-container, .data-table-container {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    /* Ensure containers don't overflow */
+    .panel, .card, .widget, .card-body, .intel-panel, .info-panel {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    /* Layout fixes for sidebars */
+    .workspace-layout {
+        flex-direction: column !important;
+    }
+    .sidebar {
+        width: 100% !important;
+        max-height: none !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border-subtle);
+        position: static !important;
+    }
+}
+</style>
+
+</head>
+
+<body>
+<script>
+    // Theme Initializer to prevent flash on load
+    const savedTheme = localStorage.getItem('kore_theme') || 'default';
+    if(savedTheme !== 'default') {
+        document.body.setAttribute('data-theme', savedTheme);
+    }
+</script>
+
+    <header class="global-header">
+        <div class="header-left">
+            <h1 class="kore-logo">Kore<span>.</span></h1>
+        <button class="mobile-toggle" aria-label="Toggle Menu" onclick="toggleMobileNav()"><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 12h18M3 6h18M3 18h18"></path></svg></button>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">Dashboard</a>
+                
+                <div class="nav-item">Operations ▼
+                    <div class="dropdown-content">
+                        <a href="apps.html">Apps</a>
+                        <a href="file-converter.html">File to LOAD Converter</a>
+                        <a href="lod.html">LOD Validation Tool</a>
+                        <a href="macros.html">Macro Library</a>
+                        <a href="nebula.html">Nebula HTML Forge</a>
+                        <a href="passwords.html">Password Generator</a>
+                    <a href="business-tools.html">Business & Sec Tools</a>
+                        <a href="todo.html">Personal To-Do</a>
+                        <a href="product-html.html">Product HTML Converter</a>
+                        <a href="scanner.html">Vulnerability Scanner</a>
+                        <a href="work.html">Work Tracker</a>
+                    </div>
+                </div>
+                
+                <div class="nav-item active">Resources ▼
+                    <div class="dropdown-content">
+                        <a href="info-archive.html">Archive</a>
+                        <a href="reports.html">Data/Reports</a>
+                        <a href="docs.html">Document Library</a>
+                        <a href="info-hub.html">Info Hub</a>
+                    </div>
+                </div>
+                
+                <a href="about.html" class="nav-item">About</a>
+                <a href="settings.html" class="nav-item">Settings</a>
+            </nav>
+        </div>
+        <div id="userIdentityBadge" class="user-badge">Authenticating...</div>
+    </header>
+
+    <main class="main-container">
+        
+        <div id="errorContainer">
+            <h2 style="margin-top: 0; font-size: 1.8rem; color: var(--text-main);">Page Not Found</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 24px;">This page may have been archived, deleted, or you may lack access permissions.</p>
+            <a href="info-hub.html" class="btn btn-primary">Return to Hub</a>
+        </div>
+
+        <div id="contentGrid" style="display: none;">
+            
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title" id="viewTitle">Loading...</h1>
+                    <p class="page-summary" id="viewSummary"></p>
+                </div>
+                <div class="action-btns">
+                    <button id="editPageBtn" class="btn btn-primary">Edit Page</button>
+                    <button id="archivePageBtn" class="btn btn-danger">Archive (Delete)</button>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="content-card" id="viewContent"></div>
+
+                <div class="sidebar">
+                    <div class="side-card">
+                        <h3 class="side-title">Document Information</h3>
+                        <ul class="meta-list" id="viewMeta"></ul>
+                    </div>
+
+                    <div class="side-card" id="linksSection" style="display: none;">
+                        <h3 class="side-title">External Links</h3>
+                        <div id="viewLinks"></div>
+                    </div>
+
+                    <div class="side-card" id="imagesSection" style="display: none;">
+                        <h3 class="side-title">Supporting Images</h3>
+                        <div id="viewImages"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <footer class="global-footer">&copy; 2026 Kore | Enterprise Cloud Vault Connected.</footer>
+
+    <script>
+        let cloudIdentity = { userId: "local-dev", userName: "Local Developer" };
+        let currentPageId = null;
+
+        async function fetchSecureIdentity() {
+            try {
+                const response = await fetch('/.auth/me');
+                const data = await response.json();
+                if (data.clientPrincipal) {
+                    cloudIdentity.userId = data.clientPrincipal.userId;
+                    cloudIdentity.userName = data.clientPrincipal.userDetails;
+                    document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+                } else {
+                    document.getElementById('userIdentityBadge').innerText = "Running Locally (Unauthenticated)";
+                }
+            } catch (error) {}
+        }
+
+        // --- Cloud Sync Logic ---
+        async function loadCloudData(dataType) {
+            try {
+                const res = await fetch(`/api/get_user_data?userId=${cloudIdentity.userId}&dataType=${dataType}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && (Object.keys(data).length > 0 || data.length > 0)) return data;
+                }
+            } catch(e) {}
+            return null;
+        }
+
+        async function saveCloudData(dataType, data) {
+            try {
+                await fetch('/api/save_user_data', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: cloudIdentity.userId, dataType: dataType, data: data })
+                });
+            } catch(e) {}
+        }
+
+        async function fetchPagesFromCloud() {
+            try {
+                const res = await fetch(`/api/get_info_pages?userId=${cloudIdentity.userId}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data)) return data;
+                }
+            } catch(e) {}
+            const fallback = await loadCloudData('infoPages');
+            return Array.isArray(fallback) ? fallback : [];
+        }
+
+        function escapeHtml(str) {
+            return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        function formatDate(iso) {
+            if (!iso) return 'Unknown';
+            try { return new Date(iso).toLocaleString(); } catch (e) { return iso; }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchSecureIdentity();
+            
+            const params = new URLSearchParams(window.location.search);
+            currentPageId = params.get('id');
+
+            const errorContainer = document.getElementById('errorContainer');
+            const contentGrid = document.getElementById('contentGrid');
+
+            if (!currentPageId) {
+                if (errorContainer) errorContainer.style.display = 'block';
+                return;
+            }
+
+            const pages = await fetchPagesFromCloud();
+            const page = pages.find(p => p.id === currentPageId && !p.archived);
+
+            if (!page) {
+                if (errorContainer) errorContainer.style.display = 'block';
+                return;
+            }
+
+            // Render Core Content
+            if (contentGrid) contentGrid.style.display = 'block';
+            
+            const viewTitle = document.getElementById('viewTitle');
+            if (viewTitle) viewTitle.innerHTML = page.titleHtml || escapeHtml(page.title) || 'Untitled Page';
+            
+            const viewSummary = document.getElementById('viewSummary');
+            if (viewSummary) viewSummary.innerHTML = page.summaryHtml || escapeHtml(page.summary || page.shortDesc || '');
+            
+            const viewContent = document.getElementById('viewContent');
+            if (viewContent) viewContent.innerHTML = page.contentHtml || '';
+
+            // Render Meta
+            const statusClass = (page.status || 'draft').toLowerCase() === 'published' ? 'status-published' : 'status-draft';
+            let metaHtml = `
+                <li><span class="meta-label">Status</span><span class="status-badge ${statusClass}">${escapeHtml(page.status || 'Draft')}</span></li>
+                <li><span class="meta-label">Author</span><span class="meta-value">${escapeHtml(page.author || 'Local User')}</span></li>
+                <li><span class="meta-label">Last Updated</span><span class="meta-value">${formatDate(page.updatedAt || page.createdAt)}</span></li>
+            `;
+
+            if (page.isGlobal) {
+                metaHtml += `<li><span class="meta-label">Scope</span><span class="tag tag-global" style="width: fit-content;">🌐 GLOBAL</span></li>`;
+            }
+
+            if (page.tags && page.tags.length > 0) {
+                const tagsHtml = page.tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('');
+                metaHtml += `<li><span class="meta-label">Tags</span><div class="tags-container">${tagsHtml}</div></li>`;
+            }
+            
+            const viewMeta = document.getElementById('viewMeta');
+            if (viewMeta) viewMeta.innerHTML = metaHtml;
+
+            // Render Images
+            if (page.images && page.images.length > 0) {
+                const imagesSection = document.getElementById('imagesSection');
+                if (imagesSection) imagesSection.style.display = 'block';
+                
+                const imgContainer = document.getElementById('viewImages');
+                if (imgContainer) {
+                    page.images.forEach(img => {
+                        if (img.dataUrl) {
+                            const div = document.createElement('div');
+                            div.className = 'attachment-item';
+                            div.innerHTML = `<img src="${img.dataUrl}" alt="Attached Image"><div class="attachment-caption">${escapeHtml(img.caption || '')}</div>`;
+                            imgContainer.appendChild(div);
+                        }
+                    });
+                }
+            }
+
+            // Render Links
+            if (page.links && page.links.length > 0) {
+                const linksSection = document.getElementById('linksSection');
+                if (linksSection) linksSection.style.display = 'block';
+                
+                const linkContainer = document.getElementById('viewLinks');
+                if (linkContainer) {
+                    page.links.forEach(lnk => {
+                        if (lnk.url) {
+                            const a = document.createElement('a');
+                            a.href = lnk.url;
+                            a.target = '_blank';
+                            a.className = 'link-item';
+                            a.textContent = lnk.label || lnk.url;
+                            linkContainer.appendChild(a);
+                        }
+                    });
+                }
+            }
+
+            // Actions
+            const editBtn = document.getElementById('editPageBtn');
+            if (editBtn) {
+                editBtn.addEventListener('click', () => {
+                    window.location.href = `create-page.html?id=${encodeURIComponent(page.id)}`;
+                });
+            }
+
+            // --- MASTER ADMIN DELETION PROTOCOL ---
+            const archiveBtn = document.getElementById('archivePageBtn');
+            if (archiveBtn) {
+                archiveBtn.addEventListener('click', async () => {
+                    
+                    if (page.isGlobal) {
+                        const adminData = await loadCloudData('admin_settings') || { admins: [] };
+                        if (!adminData.admins) adminData.admins = [];
+                        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                        window.isAdminUser = isLocal || adminData.admins.length === 0 || adminData.admins.includes(cloudIdentity.userName);
+                        
+                        if (!window.isAdminUser) {
+                            alert("Authorization Denied. Admin access required.");
+                            return;
+                        }
+                        if (!(await uiConfirm("Delete this Global Info Hub page?"))) {
+                            return;
+                        }
+                    } else if (!(await uiConfirm('Archive this personal page? It will be removed from the main Info Hub.'))) {
+                        return;
+                    }
+
+                    archiveBtn.innerText = "Archiving...";
+                    page.archived = true;
+                    
+                    // FIX: Save page as archived instead of deleting the file physically
+                    try {
+                        await fetch('/api/save_info_page', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(page)
+                        });
+                    } catch(e) {}
+                    
+                    // Fallback to update local/vault cache state
+                    let allPages = await fetchPagesFromCloud();
+                    const idx = allPages.findIndex(p => p.id === page.id);
+                    if (idx !== -1) allPages[idx].archived = true;
+                    else allPages.push(page); // Ensure it's in the list
+                    
+                    await saveCloudData('infoPages', allPages);
+                    
+                    window.location.href = 'info-hub.html';
+                });
+            }
+        });
+    </script>
+
+    <button id="backToTop" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</button>
+    <script>
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('backToTop');
+            if(window.scrollY > 300) btn.style.display = 'flex';
+            else btn.style.display = 'none';
+        });
+        
+        function toggleMobileNav() {
+            const nav = document.querySelector('.nav-menu');
+            if(nav) nav.classList.toggle('open');
+        }
+        
+        if('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(console.error);
+        }
+    </script>
+
+<script>
+        // --- Navigation Preferences Logic ---
+        function applyNavPreferences() {
+            try {
+                const hiddenNavs = JSON.parse(localStorage.getItem('kore_hidden_navs') || '[]');
+                if (hiddenNavs.length > 0) {
+                    const links = document.querySelectorAll('.dropdown-content a');
+                    links.forEach(link => {
+                        const href = link.getAttribute('href');
+                        if (hiddenNavs.includes(href)) {
+                            link.style.display = 'none';
+                        } else {
+                            link.style.display = 'block';
+                        }
+                    });
+                    
+                    // Hide empty dropdowns
+                    document.querySelectorAll('.nav-item').forEach(item => {
+                        const dropdown = item.querySelector('.dropdown-content');
+                        if (dropdown) {
+                            const visibleLinks = Array.from(dropdown.querySelectorAll('a')).filter(a => a.style.display !== 'none');
+                            if (visibleLinks.length === 0) {
+                                item.style.display = 'none';
+                            } else {
+                                item.style.display = 'flex';
+                            }
+                        }
+                    });
+                } else {
+                    document.querySelectorAll('.dropdown-content a').forEach(a => a.style.display = 'block');
+                }
+            } catch(e) {}
+        }
+        document.addEventListener('DOMContentLoaded', applyNavPreferences);
+</script>
+
+
+<!-- Mobile Nav Script (Injected) -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        if (item.querySelector('.dropdown-content')) {
+            item.addEventListener('click', (e) => {
+                if (window.innerWidth <= 1023) {
+                    if (e.target.tagName.toLowerCase() === 'a' && e.target.closest('.dropdown-content')) {
+                        return;
+                    }
+                    e.preventDefault();
+                    item.classList.toggle('open-mobile');
+                }
+            });
+        }
+    });
+});
+</script>
+</body>
+</html>
