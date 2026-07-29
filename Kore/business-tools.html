@@ -441,26 +441,192 @@ body { overflow-x: hidden; width: 100%; }
                     const data = await res.json();
                     if (data && (Object.keys(data).length > 0 || data.length > 0)) return data;
                 }
-            } catch(e) {}
+            } catch (e) {}
             return null;
         }
 
         async function fetchSecureIdentity() {
-            try {
-                const response = await fetch('/.auth/me');
-                const data = await response.json();
-                
-            
+        try {
+            const response = await fetch('/.auth/me');
+            const data = await response.json();
             if (data.clientPrincipal) {
                 cloudIdentity.userId = data.clientPrincipal.userId;
                 cloudIdentity.userName = data.clientPrincipal.userDetails;
-                if (document.getElementById('userIdentityBadge')) document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+                if (document.getElementById('userIdentityBadge')) {
+                    document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+                }
             } else {
-                if (document.getElementById('userIdentityBadge')) document.getElementById('userIdentityBadge').innerHTML = `<a href="/.auth/login/aad" style="color: inherit; text-decoration: none;">Log In (Entra ID)</a>`;
+                if (document.getElementById('userIdentityBadge')) {
+                    document.getElementById('userIdentityBadge').innerHTML = `<a href="/.auth/login/aad" style="color: inherit; text-decoration: none;">Log In (Entra ID)</a>`;
+                }
             }
-        } catch (e) {
-            if (document.getElementById('userIdentityBadge')) document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+        } catch (error) {
+            if (document.getElementById('userIdentityBadge')) {
+                document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+            }
         }
+        
+        const profile = await loadCloudData('profile') || {};
+            profileName = profile.name || cloudIdentity.userName.split('@')[0] || "User";
+            
+            const welcomeMessages = [
+                `Hello ${profileName}.`,
+                `Welcome back, ${profileName}. I'm synced to your cloud data.`,
+                `Good to see you, ${profileName}. I can navigate the site or look up tickets for you.`
+            ];
+            const botWelcomeMsg = document.getElementById('botWelcomeMsg');
+            if (botWelcomeMsg) {
+                botWelcomeMsg.innerText = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+            }
+
+            localTasks = await loadCloudData('todos') || [];
+            try {
+                const res = await fetch('/api/get_work_items'); 
+                if (res.ok) { localTickets = await res.json(); } 
+                else { localTickets = await loadCloudData('work_items') || []; }
+            } catch(e) { localTickets = await loadCloudData('work_items') || []; }
+        }
+
+        
+
+        function isDateToday(dateStr) {
+            if (!dateStr) return false;
+            const d = new Date(dateStr + 'T00:00:00');
+            return d.toDateString() === new Date().toDateString();
+        }
+        function isDatePast(dateStr) {
+            if (!dateStr) return false;
+            const d = new Date(dateStr + 'T00:00:00');
+            const today = new Date(); today.setHours(0,0,0,0);
+            return d < today;
+        }
+
+        
+
+                // No password logic here.
+        document.addEventListener("DOMContentLoaded", async () => {
+            await fetchSecureIdentity();
+        });
+    </script>
+
+    <button id="backToTop" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</button>
+    <script>
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('backToTop');
+            if(window.scrollY > 300) btn.style.display = 'flex';
+            else btn.style.display = 'none';
+        });
+        
+        function toggleMobileNav() {
+            const nav = document.querySelector('.nav-menu');
+            if(nav) nav.classList.toggle('open');
+        }
+        
+        if('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(console.error);
+        }
+    </script>
+
+<script>
+
+        async function generateHash(alg) {
+            const text = document.getElementById('hashInput').value;
+            if(!text) return;
+            const msgUint8 = new TextEncoder().encode(text);
+            const hashBuffer = await crypto.subtle.digest(alg, msgUint8);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            document.getElementById('hashResult').innerText = hashHex;
+        }
+
+        function encodeB64() {
+            try {
+                const text = document.getElementById('b64Input').value;
+                document.getElementById('b64Result').innerText = btoa(text);
+            } catch(e) { document.getElementById('b64Result').innerText = "Error: Invalid character."; }
+        }
+        function decodeB64() {
+            try {
+                const text = document.getElementById('b64Input').value;
+                document.getElementById('b64Result').innerText = atob(text);
+            } catch(e) { document.getElementById('b64Result').innerText = "Error: Invalid Base64."; }
+        }
+
+        function formatJson() {
+            try {
+                const raw = document.getElementById('jsonInput').value;
+                const parsed = JSON.parse(raw);
+                document.getElementById('jsonResult').style.color = 'var(--success)';
+                document.getElementById('jsonResult').innerText = JSON.stringify(parsed, null, 4);
+            } catch(e) {
+                document.getElementById('jsonResult').style.color = 'var(--danger)';
+                document.getElementById('jsonResult').innerText = "Invalid JSON:\n" + e.message;
+            }
+        }
+        function minifyJson() {
+            try {
+                const raw = document.getElementById('jsonInput').value;
+                const parsed = JSON.parse(raw);
+                document.getElementById('jsonResult').style.color = 'var(--success)';
+                document.getElementById('jsonResult').innerText = JSON.stringify(parsed);
+            } catch(e) {
+                document.getElementById('jsonResult').style.color = 'var(--danger)';
+                document.getElementById('jsonResult').innerText = "Invalid JSON:\n" + e.message;
+            }
+        }
+
+        function convertEpoch() {
+            let val = document.getElementById('epochInput').value.trim();
+            if(!val) return;
+            // Handle both seconds and milliseconds
+            if(val.length <= 10) val = val * 1000;
+            else val = parseInt(val);
+            const d = new Date(val);
+            if(isNaN(d.getTime())) {
+                document.getElementById('epochResult').innerText = "Invalid timestamp";
+            } else {
+                document.getElementById('epochResult').innerText = "UTC: " + d.toUTCString() + "\nLocal: " + d.toString();
+            }
+        }
+        function currentEpoch() {
+            const now = Date.now();
+            document.getElementById('epochInput').value = now;
+            convertEpoch();
+        }
+    
+</script>
+<script>
+        // --- Navigation Preferences Logic ---
+        function applyNavPreferences() {
+            try {
+                const hiddenNavs = JSON.parse(localStorage.getItem('kore_hidden_navs') || '[]');
+                if (hiddenNavs.length > 0) {
+                    const links = document.querySelectorAll('.dropdown-content a');
+                    links.forEach(link => {
+                        const href = link.getAttribute('href');
+                        if (hiddenNavs.includes(href)) {
+                            link.style.display = 'none';
+                        } else {
+                            link.style.display = 'block';
+                        }
+                    });
+                    
+                    // Hide empty dropdowns
+                    document.querySelectorAll('.nav-item').forEach(item => {
+                        const dropdown = item.querySelector('.dropdown-content');
+                        if (dropdown) {
+                            const visibleLinks = Array.from(dropdown.querySelectorAll('a')).filter(a => a.style.display !== 'none');
+                            if (visibleLinks.length === 0) {
+                                item.style.display = 'none';
+                            } else {
+                                item.style.display = 'flex';
+                            }
+                        }
+                    });
+                } else {
+                    document.querySelectorAll('.dropdown-content a').forEach(a => a.style.display = 'block');
+                }
+            } catch(e) {}
         }
         document.addEventListener('DOMContentLoaded', applyNavPreferences);
 </script>

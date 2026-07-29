@@ -606,21 +606,36 @@ body { overflow-x: hidden; width: 100%; }
         let currentTrackerView = 'lines'; 
 
         async function fetchSecureIdentity() {
-            try {
-                const response = await fetch('/.auth/me');
-                const data = await response.json();
-                
-            
+        try {
+            const response = await fetch('/.auth/me');
+            const data = await response.json();
             if (data.clientPrincipal) {
                 cloudIdentity.userId = data.clientPrincipal.userId;
                 cloudIdentity.userName = data.clientPrincipal.userDetails;
-                if (document.getElementById('userIdentityBadge')) document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+                if (document.getElementById('userIdentityBadge')) {
+                    document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+                }
             } else {
-                if (document.getElementById('userIdentityBadge')) document.getElementById('userIdentityBadge').innerHTML = `<a href="/.auth/login/aad" style="color: inherit; text-decoration: none;">Log In (Entra ID)</a>`;
+                if (document.getElementById('userIdentityBadge')) {
+                    document.getElementById('userIdentityBadge').innerHTML = `<a href="/.auth/login/aad" style="color: inherit; text-decoration: none;">Log In (Entra ID)</a>`;
+                }
             }
-        } catch (e) {
-            if (document.getElementById('userIdentityBadge')) document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+        } catch (error) {
+            if (document.getElementById('userIdentityBadge')) {
+                document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+            }
         }
+        if (document.getElementById('userIdentityBadge')) document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+        }
+
+        async function loadCloudData(dataType) {
+            try {
+                const res = await fetch(`/api/get_user_data?userId=${cloudIdentity.userId}&dataType=${dataType}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && (Object.keys(data).length > 0 || data.length > 0)) return data;
+                }
+            } catch (e) {}
             return null;
         }
 

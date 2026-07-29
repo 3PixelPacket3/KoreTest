@@ -654,21 +654,86 @@ body { overflow-x: hidden; width: 100%; }
         let savedPresets = [];
 
         async function fetchSecureIdentity() {
-            try {
-                const response = await fetch('/.auth/me');
-                const data = await response.json();
-                
-            
+        try {
+            const response = await fetch('/.auth/me');
+            const data = await response.json();
             if (data.clientPrincipal) {
                 cloudIdentity.userId = data.clientPrincipal.userId;
                 cloudIdentity.userName = data.clientPrincipal.userDetails;
-                if (document.getElementById('userIdentityBadge')) document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+                if (document.getElementById('userIdentityBadge')) {
+                    document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+                }
             } else {
-                if (document.getElementById('userIdentityBadge')) document.getElementById('userIdentityBadge').innerHTML = `<a href="/.auth/login/aad" style="color: inherit; text-decoration: none;">Log In (Entra ID)</a>`;
+                if (document.getElementById('userIdentityBadge')) {
+                    document.getElementById('userIdentityBadge').innerHTML = `<a href="/.auth/login/aad" style="color: inherit; text-decoration: none;">Log In (Entra ID)</a>`;
+                }
             }
-        } catch (e) {
-            if (document.getElementById('userIdentityBadge')) document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+        } catch (error) {
+            if (document.getElementById('userIdentityBadge')) {
+                document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+            }
         }
+        if (document.getElementById('userIdentityBadge')) document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+        }
+
+        // --- COMMAND PALETTE LOGIC ---
+        const fnModal = document.getElementById('floatingNotepad');
+        const fnContent = document.getElementById('fnContent');
+        const fnPushBtn = document.getElementById('fnPushBtn');
+        let isDragging = false, currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
+
+        document.addEventListener('keydown', (e) => {
+            if (e.altKey && e.key.toLowerCase() === 'n') {
+                e.preventDefault();
+                fnModal.style.display = fnModal.style.display === 'flex' ? 'none' : 'flex';
+                if (fnModal.style.display === 'flex') {
+                    fnContent.value = localStorage.getItem('kore_global_notepad') || '';
+                    fnContent.focus();
+                    checkNotepadFormatting();
+                }
+            }
+        });
+
+        document.getElementById('fnClose').addEventListener('click', () => { fnModal.style.display = 'none'; });
+
+        document.getElementById('fnHeader').addEventListener('mousedown', dragStart);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', dragEnd);
+
+        function dragStart(e) { initialX = e.clientX - xOffset; initialY = e.clientY - yOffset; isDragging = true; }
+        function drag(e) {
+            if (isDragging) {
+                e.preventDefault();
+                currentX = e.clientX - initialX; currentY = e.clientY - initialY;
+                xOffset = currentX; yOffset = currentY;
+                fnModal.style.transform = `translate(${currentX}px, ${currentY}px)`;
+            }
+        }
+        function dragEnd(e) { initialX = currentX; initialY = currentY; isDragging = false; }
+
+        let fnTimeout;
+        fnContent.addEventListener('input', () => {
+            localStorage.setItem('kore_global_notepad', fnContent.value);
+            document.getElementById('fnStatus').innerText = 'Saving...';
+            clearTimeout(fnTimeout);
+            fnTimeout = setTimeout(() => { document.getElementById('fnStatus').innerText = 'Saved locally.'; checkNotepadFormatting(); }, 800);
+        });
+
+        function checkNotepadFormatting() {
+            const val = fnContent.value;
+            if (val.startsWith('```')) { fnContent.classList.add('code-mode'); } else { fnContent.classList.remove('code-mode'); }
+            const hasTodo = /-\s?\[\s?\]\s?.+/i.test(val);
+            fnPushBtn.style.display = hasTodo ? 'block' : 'none';
+        }
+
+        async function loadCloudData(dataType) {
+            try {
+                const res = await fetch(`/api/get_user_data?userId=${cloudIdentity.userId}&dataType=${dataType}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && (Object.keys(data).length > 0 || data.length > 0)) return data;
+                }
+            } catch (e) {}
             return null;
         }
 

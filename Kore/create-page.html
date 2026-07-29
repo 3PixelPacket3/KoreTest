@@ -526,21 +526,35 @@ body { overflow-x: hidden; width: 100%; }
 
         // --- Auth & Cloud Comm ---
         async function fetchSecureIdentity() {
-            try {
-                const response = await fetch('/.auth/me');
-                const data = await response.json();
-                
-            
+        try {
+            const response = await fetch('/.auth/me');
+            const data = await response.json();
             if (data.clientPrincipal) {
                 cloudIdentity.userId = data.clientPrincipal.userId;
                 cloudIdentity.userName = data.clientPrincipal.userDetails;
-                if (document.getElementById('userIdentityBadge')) document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+                if (document.getElementById('userIdentityBadge')) {
+                    document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+                }
             } else {
-                if (document.getElementById('userIdentityBadge')) document.getElementById('userIdentityBadge').innerHTML = `<a href="/.auth/login/aad" style="color: inherit; text-decoration: none;">Log In (Entra ID)</a>`;
+                if (document.getElementById('userIdentityBadge')) {
+                    document.getElementById('userIdentityBadge').innerHTML = `<a href="/.auth/login/aad" style="color: inherit; text-decoration: none;">Log In (Entra ID)</a>`;
+                }
             }
-        } catch (e) {
-            if (document.getElementById('userIdentityBadge')) document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+        } catch (error) {
+            if (document.getElementById('userIdentityBadge')) {
+                document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+            }
         }
+        if (document.getElementById('userIdentityBadge')) document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+
+            try {
+                const adminData = await loadCloudData('admin_settings') || { admins: [] };
+                if (!adminData.admins) adminData.admins = [];
+                const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                if (!window.isAdminUser) {
+                    window.isAdminUser = isLocal || adminData.admins.length === 0 || adminData.admins.includes(cloudIdentity.userName);
+                }
+            } catch (e) {}
         }
 
         async function loadCloudData(dataType) {
@@ -550,7 +564,9 @@ body { overflow-x: hidden; width: 100%; }
                     const data = await res.json();
                     if (data && (Object.keys(data).length > 0 || data.length > 0)) return data;
                 }
-            } catch(e) {}
+            } catch (e) {
+            if (document.getElementById('userIdentityBadge')) document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+        }
             return null;
         }
 
