@@ -557,22 +557,18 @@ body { overflow-x: hidden; width: 100%; }
             try {
                 const response = await fetch('/.auth/me');
                 const data = await response.json();
-                if (data.clientPrincipal) {
-                    cloudIdentity.userId = data.clientPrincipal.userId;
-                    cloudIdentity.userName = data.clientPrincipal.userDetails;
-                    document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
-                    window.isAdminUser = data.clientPrincipal.userRoles && data.clientPrincipal.userRoles.includes('admin');
-                }
-            } catch (error) {}
+                
             
-            try {
-                const adminData = await loadCloudDataAs(cloudIdentity.userId, 'admin_settings') || { admins: [] };
-                if (!adminData.admins) adminData.admins = [];
-                const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-                if (!window.isAdminUser) {
-                    window.isAdminUser = isLocal || adminData.admins.length === 0 || adminData.admins.includes(cloudIdentity.userName);
-                }
-            } catch (e) {}
+            if (data.clientPrincipal) {
+                cloudIdentity.userId = data.clientPrincipal.userId;
+                cloudIdentity.userName = data.clientPrincipal.userDetails;
+                if (document.getElementById('userIdentityBadge')) document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+            } else {
+                if (document.getElementById('userIdentityBadge')) document.getElementById('userIdentityBadge').innerHTML = `<a href="/.auth/login/aad" style="color: inherit; text-decoration: none;">Log In (Entra ID)</a>`;
+            }
+        } catch (e) {
+            if (document.getElementById('userIdentityBadge')) document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+        }
 
             if (window.isAdminUser) {
                 document.getElementById('globalPushContainer').style.display = 'flex';

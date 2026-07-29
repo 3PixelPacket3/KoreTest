@@ -520,167 +520,17 @@ body { overflow-x: hidden; width: 100%; }
             try {
                 const response = await fetch('/.auth/me');
                 const data = await response.json();
-                if (data.clientPrincipal) {
-                    cloudIdentity.userId = data.clientPrincipal.userId;
-                    cloudIdentity.userName = data.clientPrincipal.userDetails;
-                    document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
-                } else { document.getElementById('userIdentityBadge').innerText = "Running Locally"; }
-            } catch (error) { document.getElementById('userIdentityBadge').innerText = "Offline Mode"; }
-        }
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            await fetchSecureIdentity();
-        });
-
-        // --- UI State Management ---
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
-        const fileMeta = document.getElementById('fileMeta');
-        const fileNameDisplay = document.getElementById('fileNameDisplay');
-        let currentFile = null;
-
-        // Reset Logic
-        document.getElementById('resetSystemBtn').addEventListener('click', () => {
-            document.getElementById('urlInput').value = '';
-            document.getElementById('payloadInput').value = '';
-            currentFile = null;
-            fileInput.value = '';
-            fileMeta.style.display = 'none';
-            fileNameDisplay.textContent = '';
-            dropZone.classList.remove('is-scanning');
-            
-            document.getElementById('scanTypeLabel').textContent = "Standby";
-            document.getElementById('vulnCount').textContent = "0";
-            document.getElementById('riskLevel').textContent = "SECURE";
-            document.getElementById('riskLevel').style.color = "var(--success-text)";
-            document.getElementById('scanTime').textContent = "0.0s";
-            
-            document.getElementById('emptyState').style.display = 'block';
-            document.getElementById('resultsTableContainer').style.display = 'none';
-            document.getElementById('resultsTableBody').innerHTML = '';
-        });
-
-        // --- File Drop Zone Logic ---
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
-        dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault(); dropZone.classList.remove('dragover');
-            if (e.dataTransfer.files.length) handleFileSelection(e.dataTransfer.files[0]);
-        });
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length) handleFileSelection(e.target.files[0]);
-        });
-
-        function handleFileSelection(file) {
-            currentFile = file;
-            fileMeta.style.display = 'block';
-            fileNameDisplay.textContent = file.name;
-        }
-
-        // --- Simulation Timer ---
-        function simulateScanTime() {
-            const time = (Math.random() * (1.2 - 0.3) + 0.3).toFixed(2);
-            document.getElementById('scanTime').textContent = `${time}s`;
-        }
-
-        // --- Static File Analysis Engine ---
-        document.getElementById('scanFileBtn').addEventListener('click', () => {
-            if (!currentFile) { alert("Please deploy a file to the sandbox first."); return; }
-            document.getElementById('scanTypeLabel').textContent = `(Static Analysis: ${currentFile.name})`;
-            dropZone.classList.add('is-scanning');
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                setTimeout(() => { dropZone.classList.remove('is-scanning'); }, 800);
-                const content = e.target.result;
-                const findings = [];
-
-                // Expanded Regex Ruleset
-                const rules = [
-                    { regex: /(password|secret|api_key|token|credentials)\s*[:=]\s*["'][^"']+["']/gi, type: "Hardcoded Credential", severity: "HIGH" },
-                    { regex: /<script\b[^>]*>[\s\S]*?<\/script>/gi, type: "Potential XSS Vector", severity: "MED" },
-                    { regex: /eval\s*\(/g, type: "Dangerous Execution (eval)", severity: "HIGH" },
-                    { regex: /document\.cookie\s*=/g, type: "Insecure Cookie Modification", severity: "MED" },
-                    { regex: /innerHTML\s*=/g, type: "DOM-based XSS Risk", severity: "LOW" },
-                    { regex: /http:\/\//g, type: "Insecure Protocol (HTTP)", severity: "LOW" },
-                    { regex: /SELECT\s+.*\s+FROM\s+.*\s+WHERE\s+.*=/gi, type: "Potential SQLi Vector", severity: "MED" }
-                ];
-
-                rules.forEach(rule => {
-                    let match;
-                    while ((match = rule.regex.exec(content)) !== null) {
-                        const start = Math.max(0, match.index - 20);
-                        const end = Math.min(content.length, match.index + match[0].length + 20);
-                        let snippet = content.substring(start, end).replace(/\n/g, " ");
-                        findings.push({ severity: rule.severity, type: rule.type, context: `...${snippet}...` });
-                    }
-                });
-
-                // Check for Office Doc metadata masking (Office files are zipped XMLs, basic text read might catch plaintext paths)
-                if (currentFile.name.endsWith('.docx') || currentFile.name.endsWith('.xlsx') || currentFile.name.endsWith('.pptx')) {
-                    if (content.includes('docProps/core.xml') || content.includes('[Content_Types].xml')) {
-                        findings.push({ severity: "LOW", type: "Office Metadata Exposed", context: "File contains extractable authorship and routing metadata." });
-                    }
-                }
-
-                simulateScanTime();
-                renderResults(findings);
-            };
-            
-            // Read as text to attempt raw pattern matching (even on binaries, strings can be pulled)
-            reader.readAsText(currentFile);
-        });
-
-        // --- URL Network Reconnaissance Engine ---
-        document.getElementById('scanUrlBtn').addEventListener('click', async () => {
-            const urlVal = document.getElementById('urlInput').value.trim();
-            if (!urlVal) { alert("Please enter a target URL."); return; }
-            
-            document.getElementById('scanTypeLabel').textContent = `(Recon: ${urlVal})`;
-            const findings = [];
-            
-            try {
-                const targetUrl = urlVal.startsWith('http') ? urlVal : `https://${urlVal}`;
                 
-                // Fallback Simulation Logic for demonstration
-                if (targetUrl.includes('example.com') || targetUrl.includes('http://')) {
-                    if (targetUrl.startsWith('http://')) {
-                        findings.push({ severity: "HIGH", type: "Unencrypted Protocol", context: "Site is served over HTTP. Traffic is vulnerable to interception." });
-                    }
-                    findings.push({ severity: "MED", type: "Missing Security Header", context: "Strict-Transport-Security (HSTS) header is missing." });
-                    findings.push({ severity: "LOW", type: "Missing Security Header", context: "X-Content-Type-Options header is missing." });
-                } else {
-                    findings.push({ severity: "LOW", type: "Missing Security Header", context: "Content-Security-Policy (CSP) is not strictly defined." });
-                    findings.push({ severity: "LOW", type: "Server Info Leak", context: "Server header exposes version information." });
-                }
-                
-                simulateScanTime();
-                renderResults(findings);
-
-            } catch (error) {
-                alert("Network boundary restricted. Ensure your cloud proxy is active to scan external endpoints.");
+            if (data.clientPrincipal) {
+                cloudIdentity.userId = data.clientPrincipal.userId;
+                cloudIdentity.userName = data.clientPrincipal.userDetails;
+                if (document.getElementById('userIdentityBadge')) document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+            } else {
+                if (document.getElementById('userIdentityBadge')) document.getElementById('userIdentityBadge').innerHTML = `<a href="/.auth/login/aad" style="color: inherit; text-decoration: none;">Log In (Entra ID)</a>`;
             }
-        });
-
-        // --- Cryptographic Payload Inspector ---
-        document.getElementById('scanPayloadBtn').addEventListener('click', () => {
-            const payload = document.getElementById('payloadInput').value.trim();
-            if (!payload) { alert("Please enter a payload vector."); return; }
-            
-            document.getElementById('scanTypeLabel').textContent = "(Payload Analysis)";
-            const findings = [];
-
-            // JWT Check
-            if (payload.startsWith("eyJ") && payload.split('.').length === 3) {
-                findings.push({ severity: "LOW", type: "JWT Detected", context: "Payload structure indicates a JSON Web Token." });
-                try {
-                    const header = JSON.parse(atob(payload.split('.')[0]));
-                    if (header.alg === "none") {
-                        findings.push({ severity: "HIGH", type: "JWT Vulnerability", context: "Algorithm set to 'none'. Signature verification bypassed." });
-                    } else if (header.alg === "HS256") {
-                        findings.push({ severity: "MED", type: "Weak Cryptography", context: "HS256 detected. Susceptible to brute-force if secret is weak." });
-                    }
-                } catch(e) {}
+        } catch (e) {
+            if (document.getElementById('userIdentityBadge')) document.getElementById('userIdentityBadge').innerText = `👤 ${cloudIdentity.userName}`;
+        }
             } 
             // Base64 Check
             else if (/^[A-Za-z0-9+/=]+$/.test(payload) && payload.length % 4 === 0) {
